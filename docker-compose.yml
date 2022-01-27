@@ -3,7 +3,7 @@ services:
 
   mysql:
     container_name: mysql
-    image: amd64/mysql:5.7.29
+    image: amd64/mysql:5.7.37
     ports:
       - 3306:3306
     environment:
@@ -14,13 +14,14 @@ services:
 
   elasticsearch:
     container_name: elasticsearch
+    hostname: elasticsearch
     build: ./elasticsearch/.
     environment:
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - "discovery.type=single-node"
-      - xpack.security.enabled=true  # override what is in elasticsearch.yml
+      - xpack.security.enabled=false  # override what is in elasticsearch.yml
       - bootstrap.memory_lock=true
-      - ELASTIC_PASSWORD=ElasticRocks  # default username is elastic
+      #- ELASTIC_PASSWORD=ElasticRocks  # default username is elastic
     ulimits:
       memlock:
         soft: -1
@@ -40,7 +41,7 @@ services:
 
   redis:
     container_name: quepid_redis
-    image: redis:6.0.5-alpine
+    image: redis:6.2.6-alpine
     ports:
       - 6379:6379
 
@@ -79,7 +80,7 @@ services:
       - redis
 
   prometheus:
-    image: prom/prometheus:v2.22.0
+    image: prom/prometheus:v2.32.1
     container_name: prometheus
     restart: always
     hostname: prometheus
@@ -91,7 +92,7 @@ services:
       - ./prometheus/:/etc/prometheus/
 
   grafana:
-    image: grafana/grafana:7.2.1
+    image: grafana/grafana:7.5.13
     container_name: grafana
     restart: always
     hostname: grafana
@@ -105,8 +106,18 @@ services:
     depends_on:
       - prometheus
 
-  keycloak_es:
-    image: quay.io/keycloak/keycloak:13.0.0
+  elasticsearch-exporter:
+    image: quay.io/prometheuscommunity/elasticsearch-exporter:latest
+    hostname: elasticsearch-exporter
+    container_name: elasticsearch-exporter
+    command:
+      - '--es.uri=http://elasticsearch:9200'
+    restart: always
+    ports:
+      - "9114:9114"
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:16.1.0
     container_name: keycloak
     hostname: keycloak
     command: ["-b", "0.0.0.0", "-Dkeycloak.migration.action=import", "-Dkeycloak.migration.provider=dir", "-Dkeycloak.migration.dir=/opt/jboss/keycloak/realm-config", "-Dkeycloak.migration.strategy=OVERWRITE_EXISTING", "-Djboss.socket.binding.port-offset=1000", "-Dkeycloak.profile.feature.upload_scripts=enabled"]

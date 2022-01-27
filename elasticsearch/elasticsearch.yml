@@ -1,4 +1,4 @@
-xpack.security.enabled: true
+#xpack.security.enabled: true
 network.host: 0.0.0.0
 http.cors:
   enabled: true
@@ -7,7 +7,7 @@ http.cors:
   allow-headers: "X-Requested-With, Content-Type, Content-Length, if-modified-since, Authorization"
 
 # Anonymous user can read all
-xpack.security.authc:
-  anonymous:
-    roles: anonymous_user
-    authz_exception: true
+#xpack.security.authc:
+#  anonymous:
+#    roles: anonymous_user
+#    authz_exception: true
