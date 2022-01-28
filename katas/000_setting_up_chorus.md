@@ -25,19 +25,9 @@ Next, we need to format the data before we can index it into Elasticsearch. For 
 
 This can take a while. The script takes the freshly extracted JSON data and transforms it in a way to be used by [Elasticsearch's Bulk API](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html).
 
-```
-curl -X PUT "localhost:9200/ecommerce?pretty" -H 'Content-Type: application/json' -d'
-{
-  "settings": {
-    "index": {
-      "number_of_shards": 1,  
-      "number_of_replicas": 0,
-      "mapping.total_fields.limit": 10000 
-    }
-  }
-}
-'
-```
+Let's create an index with some predefined settings and a basic mapping: 
+
+> curl -s -X PUT "localhost:9200/ecommerce/" -H 'Content-Type: application/json' --data-binary @./elasticsearch/schema.json
 
 With the crated index and the data in a suitable format we can go ahead and index the data:
 
