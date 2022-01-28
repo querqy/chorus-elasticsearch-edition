@@ -1,4 +1,3 @@
-=======
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 
@@ -112,4 +111,3 @@ The version of the Icecat product data that Chorus [provides](https://querqy.org
 * Data converted to JSON format.
 * Products that don't have a 500x500 pixel image listed are removed.
 * Prices extracted for ~19,000 products from the https://www.upcitemdb.com/ service using EAN codes to match.
->>>>>>> initial-setup
