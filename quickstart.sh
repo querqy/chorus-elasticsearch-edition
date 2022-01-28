@@ -78,18 +78,8 @@ echo -e "${MAJOR}Waiting for Elasticsearch to start up and be online.${RESET}"
 #echo -e "${MINOR}waiting for Keycloak to be available${RESET}"
 #./keycloak/wait-for-keycloak.sh
 
-echo -e "${MAJOR}Creating ecommerce index.${RESET}"
-curl -X PUT "localhost:9200/ecommerce?pretty" -H 'Content-Type: application/json' -d'
-{
-  "settings": {
-    "index": {
-      "number_of_shards": 1,
-      "number_of_replicas": 0,
-      "mapping.total_fields.limit": 10000
-    }
-  }
-}
-'
+echo -e "${MAJOR}Creating ecommerce index and defining its mapping.${RESET}"
+curl -s -X PUT "localhost:9200/ecommerce/" -H 'Content-Type: application/json' --data-binary @./elasticsearch/schema.json
 
 if [ ! -f ./icecat-products-w_price-19k-20201127.tar.gz ]; then
     echo -e "${MAJOR}Downloading the sample product data.${RESET}"
