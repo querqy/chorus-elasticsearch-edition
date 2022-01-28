@@ -36,7 +36,7 @@ Want to stay up-to-date with the community? Visit https://querqy.org/ to learn m
 * Prometheus runs at http://localhost:9090
 * Grafana runs at http://localhost:9091
 
-Working with macOS?   Pop open all the tuning related web pages with one terminal command:
+Working with macOS? Pop open all the tuning related web pages with one terminal command:
 > open http://localhost:9200 http://localhost:5601 http://localhost:3000 http://localhost:7979
 
 # 5 Minutes to Run Chorus!
