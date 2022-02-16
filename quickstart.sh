@@ -29,6 +29,7 @@ fi
 observability=false
 shutdown=false
 offline_lab=false
+stop=false
 
 while [ ! $# -eq 0 ]
 do
@@ -37,6 +38,7 @@ do
       echo -e "Use the option --with-offline-lab | -lab to include Quepid service in Chorus."
 			echo -e "Use the option --with-observability | -obs to include Grafana, Prometheus, and Elasticsearch Exporter services in Chorus."
       echo -e "Use the option --shutdown | -s to shutdown and remove the Docker containers and data."
+      echo -e "Use the option --stop to stop the Docker containers."
 			exit
 			;;
 		--with-observability | -obs)
@@ -51,11 +53,15 @@ do
 			shutdown=true
       echo -e "${MAJOR}Shutting down Chorus${RESET}"
 			;;
+	  --stop)
+    	stop=true
+      echo -e "${MAJOR}Stopping Chorus${RESET}"
+    	;;
 	esac
 	shift
 done
 
-services="elasticsearch kibana chorus-ui"
+services="elasticsearch kibana chorus_es_ui"
 if $observability; then
   services="${services} grafana elasticsearch-exporter"
 fi
@@ -64,8 +70,13 @@ if $offline_lab; then
   services="${services} quepid keycloak"
 fi
 
-docker-compose down -v
+if $stop; then
+  services="${services} grafana elasticsearch-exporter quepid keycloak"
+  docker container stop ${services}
+fi
+
 if $shutdown; then
+  docker-compose down -v
   exit
 fi
 

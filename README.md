@@ -30,6 +30,7 @@ Want to stay up-to-date with the community? Visit https://querqy.org/ to learn m
 
 # What Runs Where
 
+* The UI (Reactivesearch) runs at http://localhost:4001 
 * Elasticsearch runs at http://localhost:9200
 * Kibana runs at http://localhost:5601
 * Quepid runs at http://localhost:3000
@@ -80,6 +81,12 @@ If you want to narrow down to just one component of the Chorus stack do:
 ```
 docker-compose ps                       # list out the names of the components
 docker-compose logs -tf elasticsearch   # tail elasticsearch only
+```
+
+To stop the containers you can run
+
+```
+./quickstart.sh --stop
 ```
 
 To destroy your environment (including any volumes created like the mysql db), just run:
