@@ -55,7 +55,7 @@ do
 	shift
 done
 
-services="elasticsearch kibana"
+services="elasticsearch kibana chorus-ui"
 if $observability; then
   services="${services} grafana elasticsearch-exporter"
 fi

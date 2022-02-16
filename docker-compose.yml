@@ -39,6 +39,15 @@ services:
     ports:
       - 5601:5601
 
+  chorus-ui:
+    container_name: chorus_es_ui
+    build: ./reactivesearch/.
+    volumes:
+      - './reactivesearch:/usr/src/app'
+      - '/usr/src/app/node_modules'
+    ports:
+      - 3000:3000
+
   redis:
     container_name: quepid_redis
     image: redis:6.2.6-alpine
