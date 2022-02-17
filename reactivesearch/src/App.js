@@ -9,7 +9,6 @@ import {
   SingleList
 } from "@appbaseio/reactivesearch";
 import AlgoPicker from './custom/AlgoPicker';
-import './styles/index.css'
 
 class App extends Component {
 
