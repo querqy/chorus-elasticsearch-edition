@@ -72,7 +72,8 @@ fi
 
 if $stop; then
   services="${services} grafana elasticsearch-exporter quepid keycloak"
-  docker container stop ${services}
+  docker-compose stop ${services}
+  exit
 fi
 
 if $shutdown; then
@@ -89,14 +90,14 @@ echo -e "${MAJOR}Waiting for Elasticsearch to start up and be online.${RESET}"
 #echo -e "${MINOR}waiting for Keycloak to be available${RESET}"
 #./keycloak/wait-for-keycloak.sh
 
-echo -e "${MAJOR}Creating ecommerce index and defining its mapping.${RESET}"
+echo -e "${MAJOR}Creating ecommerce index and defining its mapping.\n${RESET}"
 curl -s -X PUT "localhost:9200/ecommerce/" -H 'Content-Type: application/json' --data-binary @./elasticsearch/schema.json
 
 if [ ! -f ./icecat-products-w_price-19k-20201127.tar.gz ]; then
-    echo -e "${MAJOR}Downloading the sample product data.${RESET}"
+    echo -e "${MAJOR}Downloading the sample product data.\n${RESET}"
     wget https://querqy.org/datasets/icecat/icecat-products-w_price-19k-20201127.tar.gz
 fi
-echo -e "${MAJOR}Populating products, please give it a few minutes!${RESET}"
+echo -e "${MAJOR}Populating products, please give it a few minutes!\n${RESET}"
 tar xzf icecat-products-w_price-19k-20201127.tar.gz
 output=transformed_data.json
 
@@ -110,6 +111,46 @@ done
 
 echo -e "${MAJOR}Indexing data, please wait...${RESET}"
 curl -s -X POST "localhost:9200/ecommerce/_bulk?pretty" -H 'Content-Type: application/json' --data-binary @transformed_data.json
+
+echo -e "${MAJOR}Adding query rewriters.\n${RESET}"
+# Query rewriters are configured empty, without any rules. This ensures that no errors occur when the different
+# relevance algorithms are used in the frontend before any rules are set.
+# For configuring the rules SMUI will be set up and used.
+curl -s --request PUT 'http://localhost:9200/_querqy/rewriter/common_rules' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "class": "querqy.elasticsearch.rewriter.SimpleCommonRulesRewriterFactory",
+    "config": {
+        "rules": ""
+    }
+}'
+
+curl -s --request PUT 'http://localhost:9200/_querqy/rewriter/common_rules_prelive' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "class": "querqy.elasticsearch.rewriter.SimpleCommonRulesRewriterFactory",
+    "config": {
+        "rules": ""
+    }
+}'
+
+curl -s --request PUT 'http://localhost:9200/_querqy/rewriter/replace' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "class": "querqy.elasticsearch.rewriter.ReplaceRewriterFactory",
+    "config": {
+        "rules": ""
+    }
+}'
+
+curl -s --request PUT 'http://localhost:9200/_querqy/rewriter/replace_prelive' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "class": "querqy.elasticsearch.rewriter.ReplaceRewriterFactory",
+    "config": {
+        "rules": ""
+    }
+}'
 
 echo -e "${MAJOR}Setting up SMUI${RESET}"
 #TODO: Integrate SMUI

@@ -19,7 +19,6 @@ class App extends Component {
       app="ecommerce"
       enableAppbase={false}
     >
-      {/* other components will go here. */}
       <div style={{ height: "200px", width: "100%"}}>
         <img style={{ height: "100%", class: "center"  }} src={require('./assets/chorus-logo.png').default} />
       </div>
@@ -74,9 +73,8 @@ class App extends Component {
                 var algo = "";
                 if (elem) {
                   algo = elem.value
-                } else {console.log("Something went wrong!");}
+                } else {console.log("Unable to determine selected algorithm!");}
                 if (algo === "default") {
-                  console.log("Using default algorithm");
                   return {
                     query: {
                       multi_match: {
@@ -86,22 +84,26 @@ class App extends Component {
                     }
                   }
                 } else if (algo === "querqy_preview") {
-                  console.log("Using querqy preview algorithm");
                   return {
                     query: {
-                      multi_match: {
-                        query: value,
-                        fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"]
+                      querqy: {
+                        matching_query: {
+                          query: value
+                        },
+                        query_fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"],
+                        rewriters: ["common_rules_prelive", "replace_prelive"]
                       }
                     }
                   }
                 } else if (algo === "querqy_live") {
-                  console.log("Using querqy live algorithm");
                   return {
                     query: {
-                      multi_match: {
-                        query: value,
-                        fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"]
+                      querqy: {
+                        matching_query: {
+                          query: value
+                        },
+                        query_fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"],
+                        rewriters: ["common_rules", "replace"]
                       }
                     }
                   }
