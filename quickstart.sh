@@ -12,17 +12,16 @@ RESET='\033[0m' # No Color
 
 export DOCKER_SCAN_SUGGEST=false
 
-
 if ! [ -x "$(command -v curl)" ]; then
-  echo '${ERROR}Error: curl is not installed.${RESET}' >&2
+  echo "${ERROR}Error: curl is not installed.${RESET}" >&2
   exit 1
 fi
 if ! [ -x "$(command -v docker-compose)" ]; then
-  echo '${ERROR}Error: docker-compose is not installed.${RESET}' >&2
+  echo "${ERROR}Error: docker-compose is not installed.${RESET}" >&2
   exit 1
 fi
 if ! [ -x "$(command -v jq)" ]; then
-  echo '${ERROR}Error: jq is not installed.${RESET}' >&2
+  echo "${ERROR}Error: jq is not installed.${RESET}" >&2
   exit 1
 fi
 
