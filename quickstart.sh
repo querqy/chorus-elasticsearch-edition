@@ -60,7 +60,7 @@ do
 	shift
 done
 
-services="elasticsearch kibana chorus-ui"
+services="elasticsearch kibana chorus-ui smui"
 if $observability; then
   services="${services} grafana elasticsearch-exporter"
 fi
@@ -85,9 +85,8 @@ docker-compose up -d --build ${services}
 echo -e "${MAJOR}Waiting for Elasticsearch to start up and be online.${RESET}"
 ./elasticsearch/wait-for-es.sh # Wait for Elasticsearch to be online
 
-#ToDo: This failed, no idea why.
-#echo -e "${MINOR}waiting for Keycloak to be available${RESET}"
-#./keycloak/wait-for-keycloak.sh
+echo -e "${MINOR}waiting for Keycloak to be available${RESET}"
+./keycloak/wait-for-keycloak.sh
 
 echo -e "${MAJOR}Creating ecommerce index and defining its mapping.\n${RESET}"
 curl -s -X PUT "localhost:9200/ecommerce/" -H 'Content-Type: application/json' --data-binary @./elasticsearch/schema.json
@@ -153,6 +152,11 @@ curl -s --request PUT 'http://localhost:9200/_querqy/rewriter/replace_prelive' \
 
 echo -e "${MAJOR}Setting up SMUI${RESET}"
 #TODO: Integrate SMUI
+while [ $(curl -s http://localhost:9000/api/v1/solr-index | wc -c) -lt 2 ]; do
+    echo "Waiting 5s for SMUI to be ready..."
+    sleep 5
+done
+curl -X PUT -H "Content-Type: application/json" -d '{"name":"ecommerce", "description":"Ecommerce Demo"}' http://localhost:9000/api/v1/solr-index
 
 if $offline_lab; then
   echo -e "${MAJOR}Setting up Quepid${RESET}"

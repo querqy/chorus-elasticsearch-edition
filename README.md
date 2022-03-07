@@ -16,7 +16,7 @@ Chorus makes deploying powerful ecommerce search easier by shifting the **buy vs
 
 3. ***Sharing Knowledge is a Must!*** It isn't enough to just have conference talks, we need sample code and sample data in order to share knowledge about improving ecommerce search. Chorus is that public environment that you can use to share your next great idea!
 
-This is the project covering Elasticsearch as the search engine. As of now (January 2022), this project is under development. For those interested in the whole stack: You can visit the [Solr version of Chorus](https://github.com/querqy/chorus)
+This is the project covering Elasticsearch as the search engine. As of now (March 2022), this project is under development. For those interested in the whole stack: You can visit the [Solr version of Chorus](https://github.com/querqy/chorus)
 
 Want to stay up-to-date with the community? Visit https://querqy.org/ to learn more, and join the [E-Commerce Search Slack](https://ecom-search.slack.com/) group for tips, tricks and news on what's new in the Chorus ecosystem.
 
@@ -33,12 +33,13 @@ Want to stay up-to-date with the community? Visit https://querqy.org/ to learn m
 * The UI (Reactivesearch) runs at http://localhost:4001 
 * Elasticsearch runs at http://localhost:9200
 * Kibana runs at http://localhost:5601
+* SMUI runs at http://localhost:9000
 * Quepid runs at http://localhost:3000
 * Prometheus runs at http://localhost:9090
 * Grafana runs at http://localhost:9091
 
 Working with macOS? Pop open all the tuning related web pages with one terminal command:
-> open http://localhost:9200 http://localhost:5601 http://localhost:3000 http://localhost:7979
+> open http://localhost:4001 http://localhost:9200 http://localhost:5601 http://localhost:9000 http://localhost:3000 http://localhost:7979
 
 # 5 Minutes to Run Chorus!
 

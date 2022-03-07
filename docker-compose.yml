@@ -1,4 +1,4 @@
-version: '3'
+version: '3.7'
 services:
 
   mysql:
@@ -8,6 +8,7 @@ services:
       - 3306:3306
     environment:
       - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=smui
     volumes:
       - ./mysql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
       - mysql_data:/var/lib/mysql
@@ -54,7 +55,7 @@ services:
 
   quepid:
     container_name: quepid
-    image: o19s/quepid:6.10.0
+    image: o19s/quepid:6.10.1
     ports:
       - 3000:3000
     environment:
@@ -81,6 +82,32 @@ services:
     links:
       - mysql
       - redis
+
+  smui:
+    container_name: smui
+    build: ./smui
+    ports:
+      - 9000:9000
+    init: true
+    environment:
+      - SMUI_HEADLINE=Chorus SMUI
+      - SMUI_DB_URL=jdbc:mysql://mysql:3306/smui?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
+      - SMUI_DB_USER=root
+      - SMUI_DB_PASSWORD=password
+      - SMUI_DEPLOY_PRELIVE_SOLR_HOST=elasticsearch:9200
+      - SMUI_2SOLR_SOLR_HOST=elasticsearch:9200
+      - SMUI_TOGGLE_DEPL_PRELIVE=true
+      - SMUI_TOGGLE_SPELLING=true
+      - SMUI_TOGGLE_DEPL_CUSTOM_SCRIPT=true
+      - SMUI_TOGGLE_DEPL_CUSTOM_SCRIPT_PATH=/smui/conf/smui2es.sh
+      - SMUI_DEPLOY_PRELIVE_FN_RULES_TXT=/configs/ecommerce/rules.txt
+      - SMUI_DEPLOY_PRELIVE_FN_REPLACE_TXT=/configs/ecommerce/replace-rules.txt
+      - SMUI_TOGGLE_RULE_ID_LOGGING=true
+      - SMUI_TOGGLE_EVENTHISTORY=true
+      - SMUI_RULE_TAGGING_ACTIVE=true
+      - SMUI_PREDEFINED_TAGS_FILE=/smui/conf/predefined_tags.json
+    depends_on:
+      - mysql
 
   prometheus:
     image: prom/prometheus:v2.32.1
@@ -117,7 +144,7 @@ services:
       - "9114:9114"
 
   keycloak:
-    image: quay.io/keycloak/keycloak:16.1.0
+    image: jboss/keycloak:16.1.1
     container_name: keycloak
     command: ["-b", "0.0.0.0", "-Dkeycloak.migration.action=import", "-Dkeycloak.migration.provider=dir", "-Dkeycloak.migration.dir=/opt/jboss/keycloak/realm-config", "-Dkeycloak.migration.strategy=OVERWRITE_EXISTING", "-Djboss.socket.binding.port-offset=1000", "-Dkeycloak.profile.feature.upload_scripts=enabled"]
     ports:
