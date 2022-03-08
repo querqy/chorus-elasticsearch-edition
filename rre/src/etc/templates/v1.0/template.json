@@ -1,0 +1,9 @@
+{
+  "query": {
+    "multi_match": {
+        "query": "$query",
+        "fields": [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes" ]
+    }
+  },
+  "template_version": "v1.0"
+}

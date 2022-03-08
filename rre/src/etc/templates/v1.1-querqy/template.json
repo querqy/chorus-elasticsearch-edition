@@ -1,0 +1,11 @@
+{
+  "query": {
+    "querqy": {
+      "matching_query": {
+        "query": "$query"
+      },
+      "query_fields": [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes" ],
+      "rewriters": [ "common_rules", "replace" ]
+    }
+  }
+}

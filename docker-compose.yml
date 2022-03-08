@@ -107,6 +107,19 @@ services:
     depends_on:
       - prometheus
 
+  rre:
+    container_name: rre
+    build:
+      context: ./rre
+      dockerfile: Dockerfile
+    volumes:
+      - ./rre:/rre
+    ports:
+      - "7979:8080"
+    command: "java -jar rre-server-1.1.jar"
+    depends_on:
+      - elasticsearch
+
   elasticsearch-exporter:
     image: quay.io/prometheuscommunity/elasticsearch-exporter:latest
     container_name: elasticsearch-exporter
