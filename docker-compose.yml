@@ -1,0 +1,148 @@
+version: '3'
+services:
+
+  mysql:
+    container_name: mysql
+    image: amd64/mysql:5.7.37
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+    volumes:
+      - ./mysql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+      - mysql_data:/var/lib/mysql
+
+  elasticsearch:
+    container_name: elasticsearch
+    build: ./elasticsearch/.
+    environment:
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "discovery.type=single-node"
+      - xpack.security.enabled=false  # override what is in elasticsearch.yml
+      - bootstrap.memory_lock=true
+      #- ELASTIC_PASSWORD=ElasticRocks  # default username is elastic
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - ./elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - es_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+
+  kibana:
+    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:7.16.2
+    ports:
+      - 5601:5601
+
+  chorus-ui:
+    container_name: chorus_ui
+    build: ./reactivesearch/.
+    volumes:
+      - './reactivesearch:/usr/src/app'
+      - '/usr/src/app/node_modules'
+    ports:
+      - 4001:3000
+
+  redis:
+    container_name: redis
+    image: redis:6.2.6-alpine
+    ports:
+      - 6379:6379
+
+  quepid:
+    container_name: quepid
+    image: o19s/quepid:6.10.0
+    ports:
+      - 3000:3000
+    environment:
+      - PORT=3000
+      - RACK_ENV=production
+      - RAILS_ENV=production
+      - DATABASE_URL=mysql2://root:password@mysql:3306/quepid
+      - REDIS_URL=redis://redis:6379/1
+      - FORCE_SSL=false
+      - MAX_THREADS=2
+      - WEB_CONCURRENCY=2
+      - RAILS_LOG_TO_STDOUT=true
+      - RAILS_SERVE_STATIC_FILES=true
+      - SECRET_KEY_BASE=chorus_key
+      - TC_URL=
+      - PRIVACY_URL=
+      - COOKIES_URL=
+      - EMAIL_MARKETING_MODE=false
+      - EMAIL_PROVIDER=
+      - QUEPID_DEFAULT_SCORER=DCG@10
+      - KEYCLOAK_REALM=chorus
+      - KEYCLOAK_SITE=http://keycloak:9080
+      - SIGNUP_ENABLED=true
+    links:
+      - mysql
+      - redis
+
+  prometheus:
+    image: prom/prometheus:v2.32.1
+    container_name: prometheus
+    restart: always
+    ports:
+      - 9090:9090
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+
+  grafana:
+    image: grafana/grafana:7.5.13
+    container_name: grafana
+    restart: always
+    ports:
+      - 9091:3000
+    volumes:
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=password
+      - GF_USERS_ALLOW_SIGN_UP=true
+    depends_on:
+      - prometheus
+
+  rre:
+    container_name: rre
+    build:
+      context: ./rre
+      dockerfile: Dockerfile
+    volumes:
+      - ./rre:/rre
+    ports:
+      - "7979:8080"
+    command: "java -jar rre-server-1.1.jar"
+    depends_on:
+      - elasticsearch
+
+  elasticsearch-exporter:
+    image: quay.io/prometheuscommunity/elasticsearch-exporter:latest
+    container_name: elasticsearch-exporter
+    command:
+      - '--es.uri=http://elasticsearch:9200'
+    restart: always
+    ports:
+      - "9114:9114"
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:16.1.0
+    container_name: keycloak
+    command: ["-b", "0.0.0.0", "-Dkeycloak.migration.action=import", "-Dkeycloak.migration.provider=dir", "-Dkeycloak.migration.dir=/opt/jboss/keycloak/realm-config", "-Dkeycloak.migration.strategy=OVERWRITE_EXISTING", "-Djboss.socket.binding.port-offset=1000", "-Dkeycloak.profile.feature.upload_scripts=enabled"]
+    ports:
+      - 9080:9080
+      - 9443:9443
+    environment:
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: password
+      DB_VENDOR: h2
+    volumes:
+      - ./keycloak/realm-config:/opt/jboss/keycloak/realm-config
+
+volumes:
+  mysql_data: {}
+  es_data: {}
