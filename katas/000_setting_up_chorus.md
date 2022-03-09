@@ -39,7 +39,7 @@ You can confirm that the data is loaded by visiting http://localhost:9200/ecomme
 
 ToDo: Integrate SMUI part when SMUI is ready.
 
-Now we want to pivot to setting up our Offline Testing Environment.  Today we have two open source projects integrated into Chorus: Quepid and Rated Ranking Evaluator (RRE).
+Now we want to pivot to setting up our Offline Testing Environment. Today we have two open source projects integrated into Chorus: Quepid and Rated Ranking Evaluator (RRE).
 
 We'll start with Quepid and then move on to RRE.
 
@@ -53,10 +53,29 @@ We also need to create you an account with Administrator permissions:
 
 Visit Quepid at http://localhost:3000 and log in with the email and password you just set up.
 
-Go through the initial case setup process.  Quepid will walk you through setting up a _Movie Cases_ case via a Wizard interface, and then show you some of the key features of Quepid's UI.  I know you want to skip the tour of Quepid interface, however there is a lot of interactivity in the UI, so it's worth going through the tutorial to get acquainted! As this is the Chorus for Elasticsearch project, you can choose Elasticsearch as your search engine instead of Solr.
+Go through the initial case setup process. Quepid will walk you through setting up a _Movie Cases_ case via a Wizard interface, and then show you some of the key features of Quepid's UI.  I know you want to skip the tour of Quepid interface, however there is a lot of interactivity in the UI, so it's worth going through the tutorial to get acquainted! As this is the Chorus for Elasticsearch project, you can choose Elasticsearch as your search engine instead of Solr.
 
-ToDo: Do we want to integrate RRE?
+Now we are ready to confirm our second Offline Testing tool, Rated Ranking Evaluator, commonly called RRE, is ready to go. Unlike Quepid, which is a webapp, RRE is a set of command line tools that run tests, and then publishes the results in both an Excel spreadsheet format and a web dashboard.
 
+Now, lets confirm that you can run the RRE command line tool. Go ahead and run a regression:
+
+```sh
+docker-compose run rre mvn rre:evaluate
+```
+
+You should see some output, and you should see the output saved to `./rre/target/rre/evaluation.json` in your local directory.  We've wrapped RRE inside of the Docker container, so you can edit the RRE configurations locally, but run RRE in the container.
+
+Now, let's go ahead and make sure we publish the results of our evaluation:
+
+```sh
+docker-compose run rre mvn rre-report:report
+```
+
+You can now see an Excel spreadsheet saved to `./rre/target/site/rre-report.xlsx`.
+
+Bring up http://localhost:7979 and you will see a relatively unexciting empty dashboard. Don't worry, in our first kata, we'll do a relevancy test and fill this dashboard in.
+
+----
 Last but not least we want to set up what we need to monitor our end user facing applications. We use Prometheus and Grafana for this task. Prometheus is already collecting and storing data. For Grafana we need to set up a user and grant this user administrative rights in Grafana:
 
 ```

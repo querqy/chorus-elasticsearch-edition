@@ -19,9 +19,9 @@ services:
     environment:
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - "discovery.type=single-node"
-      - xpack.security.enabled=false  # override what is in elasticsearch.yml
+      - xpack.security.enabled=true  # override what is in elasticsearch.yml
       - bootstrap.memory_lock=true
-      #- ELASTIC_PASSWORD=ElasticRocks  # default username is elastic
+      - ELASTIC_PASSWORD=ElasticRocks  # default username is elastic
     ulimits:
       memlock:
         soft: -1
@@ -35,6 +35,9 @@ services:
   kibana:
     container_name: kibana
     image: docker.elastic.co/kibana/kibana:7.16.2
+    environment:
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=ElasticRocks
     ports:
       - 5601:5601
 
@@ -134,11 +137,27 @@ services:
     depends_on:
       - prometheus
 
+  rre:
+    container_name: rre
+    build:
+      context: ./rre
+      dockerfile: Dockerfile
+    volumes:
+      - ./rre:/rre
+    ports:
+      - "7979:8080"
+    command: "java -jar rre-server-1.1.jar"
+    depends_on:
+      - elasticsearch
+
   elasticsearch-exporter:
     image: quay.io/prometheuscommunity/elasticsearch-exporter:latest
     container_name: elasticsearch-exporter
     command:
       - '--es.uri=http://elasticsearch:9200'
+    environment:
+      - ES_USERNAME=elastic
+      - ES_PASSWORD=ElasticRocks
     restart: always
     ports:
       - "9114:9114"
