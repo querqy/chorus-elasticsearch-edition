@@ -21,6 +21,6 @@ if __name__ == "__main__":
         }
     }
 
-    resp = requests.put(rewriter_url, json=req)
+    resp = requests.put(rewriter_url, auth = ('elastic', 'ElasticRocks'), json=req)
     if resp.status_code != 200:
         sys.exit(2)

@@ -157,7 +157,6 @@ curl -u 'elastic:ElasticRocks' -s --request PUT 'http://localhost:9200/_querqy/r
 }'
 
 echo -e "${MAJOR}Setting up SMUI${RESET}"
-#TODO: Integrate SMUI
 while [ $(curl -s http://localhost:9000/api/v1/solr-index | wc -c) -lt 2 ]; do
     echo "Waiting 5s for SMUI to be ready..."
     sleep 5

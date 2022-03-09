@@ -28,16 +28,16 @@ echo "^-- Perform rules.txt deployment (decompound-rules.txt eventually)"
 
 function common_rules_rewriter_url() {
   if [ $TARGET_SYSTEM == "LIVE" ]; then
-    URL="http://$ES_HOST/_querqy/rewriter/common_rules"
+    URL="http://elastic:ElasticRocks@$ES_HOST/_querqy/rewriter/common_rules"
   else
-    URL="http://$ES_HOST/_querqy/rewriter/common_rules_prelive"
+    URL="http://elastic:ElasticRocks@$ES_HOST/_querqy/rewriter/common_rules_prelive"
   fi
 }
 function replace_rewriter_url() {
   if [ $TARGET_SYSTEM == "LIVE" ]; then
-    URL="http://$ES_HOST/_querqy/rewriter/replace"
+    URL="http://elastic:ElasticRocks@$ES_HOST/_querqy/rewriter/replace"
   else
-    URL="http://$ES_HOST/_querqy/rewriter/replace_prelive"
+    URL="http://elastic:ElasticRocks@$ES_HOST/_querqy/rewriter/replace_prelive"
   fi
 }
 
