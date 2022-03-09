@@ -34,7 +34,7 @@ while [ ! $# -eq 0 ]
 do
 	case "$1" in
 		--help | -h)
-      echo -e "Use the option --with-offline-lab | -lab to include Quepid service in Chorus."
+      echo -e "Use the option --with-offline-lab | -lab to include Quepid and RRE services in Chorus."
 			echo -e "Use the option --with-observability | -obs to include Grafana, Prometheus, and Elasticsearch Exporter services in Chorus."
       echo -e "Use the option --shutdown | -s to shutdown and remove the Docker containers and data."
       echo -e "Use the option --stop to stop the Docker containers."
@@ -66,11 +66,11 @@ if $observability; then
 fi
 
 if $offline_lab; then
-  services="${services} quepid keycloak"
+  services="${services} quepid rre keycloak"
 fi
 
 if $stop; then
-  services="${services} grafana elasticsearch-exporter quepid keycloak"
+  services="${services} grafana elasticsearch-exporter quepid rre keycloak"
   docker-compose stop ${services}
   exit
 fi
@@ -90,32 +90,38 @@ echo -e "${MAJOR}Waiting for Elasticsearch to start up and be online.${RESET}"
 #./keycloak/wait-for-keycloak.sh
 
 echo -e "${MAJOR}Creating ecommerce index and defining its mapping.\n${RESET}"
-curl -s -X PUT "localhost:9200/ecommerce/" -H 'Content-Type: application/json' --data-binary @./elasticsearch/schema.json
+curl -u 'elastic:ElasticRocks' -s -X PUT "localhost:9200/ecommerce/" -H 'Content-Type: application/json' --data-binary @./elasticsearch/schema.json
 
 if [ ! -f ./icecat-products-w_price-19k-20201127.tar.gz ]; then
     echo -e "${MAJOR}Downloading the sample product data.\n${RESET}"
     wget https://querqy.org/datasets/icecat/icecat-products-w_price-19k-20201127.tar.gz
 fi
-echo -e "${MAJOR}Populating products, please give it a few minutes!\n${RESET}"
-tar xzf icecat-products-w_price-19k-20201127.tar.gz
-output=transformed_data.json
 
-for row in $(cat icecat-products-w_price-19k-20201127.json | jq -r '.[] | @base64'); do
-    _jq() {
-     echo ${row} | base64 --decode | jq -r ${1}
-    }
-   echo { \"index\" : {}} >> ${output}
-   echo $(_jq '.') >> ${output}
-done
+if [ ! -f ./icecat-products-w_price-19k-20201127.json ]; then
+    echo -e "${MAJOR}Populating products, please give it a few minutes!\n${RESET}"
+    tar xzf icecat-products-w_price-19k-20201127.tar.gz
+fi
+
+if [ ! -f ./transformed_data.json ]; then
+  output=transformed_data.json
+
+  for row in $(cat icecat-products-w_price-19k-20201127.json | jq -r '.[] | @base64'); do
+      _jq() {
+       echo ${row} | base64 --decode | jq -r ${1}
+      }
+     echo { \"index\" : {}} >> ${output}
+     echo $(_jq '.') >> ${output}
+  done
+fi
 
 echo -e "${MAJOR}Indexing data, please wait...${RESET}"
-curl -s -X POST "localhost:9200/ecommerce/_bulk?pretty" -H 'Content-Type: application/json' --data-binary @transformed_data.json
+curl -u 'elastic:ElasticRocks' -s -X POST "localhost:9200/ecommerce/_bulk?pretty" -H 'Content-Type: application/json' --data-binary @transformed_data.json
 
 echo -e "${MAJOR}Adding query rewriters.\n${RESET}"
 # Query rewriters are configured empty, without any rules. This ensures that no errors occur when the different
 # relevance algorithms are used in the frontend before any rules are set.
 # For configuring the rules SMUI will be set up and used.
-curl -s --request PUT 'http://localhost:9200/_querqy/rewriter/common_rules' \
+curl -u 'elastic:ElasticRocks' -s --request PUT 'http://localhost:9200/_querqy/rewriter/common_rules' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "class": "querqy.elasticsearch.rewriter.SimpleCommonRulesRewriterFactory",
@@ -124,7 +130,7 @@ curl -s --request PUT 'http://localhost:9200/_querqy/rewriter/common_rules' \
     }
 }'
 
-curl -s --request PUT 'http://localhost:9200/_querqy/rewriter/common_rules_prelive' \
+curl -u 'elastic:ElasticRocks' -s --request PUT 'http://localhost:9200/_querqy/rewriter/common_rules_prelive' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "class": "querqy.elasticsearch.rewriter.SimpleCommonRulesRewriterFactory",
@@ -133,7 +139,7 @@ curl -s --request PUT 'http://localhost:9200/_querqy/rewriter/common_rules_preli
     }
 }'
 
-curl -s --request PUT 'http://localhost:9200/_querqy/rewriter/replace' \
+curl -u 'elastic:ElasticRocks' -s --request PUT 'http://localhost:9200/_querqy/rewriter/replace' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "class": "querqy.elasticsearch.rewriter.ReplaceRewriterFactory",
@@ -142,7 +148,7 @@ curl -s --request PUT 'http://localhost:9200/_querqy/rewriter/replace' \
     }
 }'
 
-curl -s --request PUT 'http://localhost:9200/_querqy/rewriter/replace_prelive' \
+curl -u 'elastic:ElasticRocks' -s --request PUT 'http://localhost:9200/_querqy/rewriter/replace_prelive' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "class": "querqy.elasticsearch.rewriter.ReplaceRewriterFactory",
@@ -158,6 +164,10 @@ if $offline_lab; then
   echo -e "${MAJOR}Setting up Quepid${RESET}"
   docker-compose run --rm quepid bin/rake db:setup
   docker-compose run quepid thor user:create -a admin@choruselectronics.com "Chorus Admin" password
+
+  echo -e "${MAJOR}Setting up RRE${RESET}"
+  docker-compose run rre mvn rre:evaluate
+  docker-compose run rre mvn rre-report:report
 fi
 
 if $observability; then

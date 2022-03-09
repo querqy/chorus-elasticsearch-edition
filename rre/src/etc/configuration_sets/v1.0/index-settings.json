@@ -1,4 +1,6 @@
 {
   "hostUrls": [ "http://elasticsearch:9200" ],
-  "index": "ecommerce"
+  "index": "ecommerce",
+  "user": "elastic",
+  "password" :"ElasticRocks"
 }
