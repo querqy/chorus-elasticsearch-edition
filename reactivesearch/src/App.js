@@ -17,6 +17,7 @@ class App extends Component {
     <ReactiveBase
       url="http://localhost:9200"
       app="ecommerce"
+      credentials="elastic:ElasticRocks"
       enableAppbase={false}
     >
       <div style={{ height: "200px", width: "100%"}}>

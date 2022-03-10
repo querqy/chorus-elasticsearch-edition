@@ -7,9 +7,19 @@ Open up a terminal window and run:
 
 Wait a while, because you'll be downloading and building quite a few images!  You may think it's frozen at various points, but go for a walk and come back and it'll be up and running.
 
-Now we need to load our product data into Chorus.  Open a second terminal window, so you can see how as you work with Chorus how the various system respond.
+We have security activated for Elasticsearch. The default user `elastic` is provided as a technical user for creating indexes, adding users, accessing Elasticsearch for monitoring, etc.
+We will create another user, `chorus_admin`, that we can use to access Elasticsearch and Kibana if we want to explore the data:
 
-ToDo: Security?
+```
+curl -u 'elastic:ElasticRocks' -X POST "localhost:9200/_security/user/chorus_admin?pretty" -H 'Content-Type: application/json' -d'
+{
+  "password" : "password",
+  "roles" : ["superuser"]
+}
+'
+```
+
+Now we need to load our product data into Chorus.  Open a second terminal window, so you can see how as you work with Chorus how the various system respond.
 
 Grab a sample dataset of 19k products by running from the root of your Chorus checkout:
 
@@ -25,13 +35,13 @@ Next, we need to format the data before we can index it into Elasticsearch. For 
 
 This can take a while. The script takes the freshly extracted JSON data and transforms it in a way to be used by [Elasticsearch's Bulk API](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html).
 
-Let's create an index with some predefined settings and a basic mapping: 
+Let's create an index with some predefined settings and a basic mapping:
 
-> curl -s -X PUT "localhost:9200/ecommerce/" -H 'Content-Type: application/json' --data-binary @./elasticsearch/schema.json
+> curl -u 'elastic:ElasticRocks' -s -X PUT "localhost:9200/ecommerce/" -H 'Content-Type: application/json' --data-binary @./elasticsearch/schema.json
 
-With the crated index and the data in a suitable format we can go ahead and index the data:
+With the created index and the data in a suitable format we can go ahead and index the data:
 
-> curl -X POST "localhost:9200/ecommerce/_bulk?pretty" -H 'Content-Type: application/json' --data-binary @transformed_data.json
+> curl -u 'elastic:ElasticRocks' -X POST "localhost:9200/ecommerce/_bulk?pretty" -H 'Content-Type: application/json' --data-binary @transformed_data.json
 
 The sample data will take only a couple of minutes to load.
 
@@ -56,6 +66,23 @@ Visit Quepid at http://localhost:3000 and log in with the email and password you
 Go through the initial case setup process. Quepid will walk you through setting up a _Movie Cases_ case via a Wizard interface, and then show you some of the key features of Quepid's UI.  I know you want to skip the tour of Quepid interface, however there is a lot of interactivity in the UI, so it's worth going through the tutorial to get acquainted! As this is the Chorus for Elasticsearch project, you can choose Elasticsearch as your search engine instead of Solr.
 
 Now we are ready to confirm our second Offline Testing tool, Rated Ranking Evaluator, commonly called RRE, is ready to go. Unlike Quepid, which is a webapp, RRE is a set of command line tools that run tests, and then publishes the results in both an Excel spreadsheet format and a web dashboard.
+
+Before we do that, we will add a role that RRE uses for anonymous access to Elasticsearch.
+
+```
+curl -u 'elastic:ElasticRocks' -X POST "localhost:9200/_security/role/anonymous_user" -H 'Content-Type: application/json' -d'
+{
+  "run_as": [ ],
+  "cluster": [ ],
+  "indices": [
+    {
+      "names": [ "ecommerce" ],
+      "privileges": [ "read" ]
+    }
+  ]
+}
+'
+```
 
 Now, lets confirm that you can run the RRE command line tool. Go ahead and run a regression:
 

@@ -18,9 +18,9 @@ services:
     environment:
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - "discovery.type=single-node"
-      - xpack.security.enabled=false  # override what is in elasticsearch.yml
+      - xpack.security.enabled=true  # override what is in elasticsearch.yml
       - bootstrap.memory_lock=true
-      #- ELASTIC_PASSWORD=ElasticRocks  # default username is elastic
+      - ELASTIC_PASSWORD=ElasticRocks  # default username is elastic
     ulimits:
       memlock:
         soft: -1
@@ -34,6 +34,9 @@ services:
   kibana:
     container_name: kibana
     image: docker.elastic.co/kibana/kibana:7.16.2
+    environment:
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=ElasticRocks
     ports:
       - 5601:5601
 
@@ -125,12 +128,15 @@ services:
     container_name: elasticsearch-exporter
     command:
       - '--es.uri=http://elasticsearch:9200'
+    environment:
+      - ES_USERNAME=elastic
+      - ES_PASSWORD=ElasticRocks
     restart: always
     ports:
       - "9114:9114"
 
   keycloak:
-    image: quay.io/keycloak/keycloak:16.1.0
+    image: quay.io/keycloak/keycloak:16.1.1
     container_name: keycloak
     command: ["-b", "0.0.0.0", "-Dkeycloak.migration.action=import", "-Dkeycloak.migration.provider=dir", "-Dkeycloak.migration.dir=/opt/jboss/keycloak/realm-config", "-Dkeycloak.migration.strategy=OVERWRITE_EXISTING", "-Djboss.socket.binding.port-offset=1000", "-Dkeycloak.profile.feature.upload_scripts=enabled"]
     ports:
