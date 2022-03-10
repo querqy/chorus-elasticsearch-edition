@@ -85,9 +85,29 @@ docker-compose up -d --build ${services}
 echo -e "${MAJOR}Waiting for Elasticsearch to start up and be online.${RESET}"
 ./elasticsearch/wait-for-es.sh # Wait for Elasticsearch to be online
 
-#ToDo: This failed, no idea why.
-#echo -e "${MINOR}waiting for Keycloak to be available${RESET}"
-#./keycloak/wait-for-keycloak.sh
+echo -e "${MAJOR}Setting up an admin user to explore Elasticsearch and a role for anonymous access to run RRE offline tests.\n${RESET}"
+curl -u 'elastic:ElasticRocks' -X POST "localhost:9200/_security/user/chorus_admin?pretty" -H 'Content-Type: application/json' -d'
+{
+  "password" : "password",
+  "roles" : ["superuser"]
+}
+'
+
+curl -u 'elastic:ElasticRocks' -X POST "localhost:9200/_security/role/anonymous_user" -H 'Content-Type: application/json' -d'
+{
+  "run_as": [ ],
+  "cluster": [ ],
+  "indices": [
+    {
+      "names": [ "ecommerce" ],
+      "privileges": [ "read" ]
+    }
+  ]
+}
+'
+
+echo -e "${MINOR}waiting for Keycloak to be available${RESET}"
+./keycloak/wait-for-keycloak.sh
 
 echo -e "${MAJOR}Creating ecommerce index and defining its mapping.\n${RESET}"
 curl -u 'elastic:ElasticRocks' -s -X PUT "localhost:9200/ecommerce/" -H 'Content-Type: application/json' --data-binary @./elasticsearch/schema.json
@@ -114,7 +134,7 @@ if [ ! -f ./transformed_data.json ]; then
   done
 fi
 
-echo -e "${MAJOR}Indexing data, please wait...${RESET}"
+echo -e "${MAJOR}Indexing data, please wait...\n${RESET}"
 curl -u 'elastic:ElasticRocks' -s -X POST "localhost:9200/ecommerce/_bulk?pretty" -H 'Content-Type: application/json' --data-binary @transformed_data.json
 
 echo -e "${MAJOR}Adding query rewriters.\n${RESET}"
