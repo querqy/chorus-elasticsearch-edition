@@ -13,8 +13,8 @@ We will create another user, `chorus_admin`, that we can use to access Elasticse
 ```
 curl -u 'elastic:ElasticRocks' -X POST "localhost:9200/_security/user/chorus_admin?pretty" -H 'Content-Type: application/json' -d'
 {
-"password" : "password",
-"roles" : ["superuser"]
+  "password" : "password",
+  "roles" : ["superuser"]
 }
 '
 ```
@@ -35,7 +35,7 @@ Next, we need to format the data before we can index it into Elasticsearch. For 
 
 This can take a while. The script takes the freshly extracted JSON data and transforms it in a way to be used by [Elasticsearch's Bulk API](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html).
 
-Let's create an index with some predefined settings and a basic mapping: 
+Let's create an index with some predefined settings and a basic mapping:
 
 > curl -u 'elastic:ElasticRocks' -s -X PUT "localhost:9200/ecommerce/" -H 'Content-Type: application/json' --data-binary @./elasticsearch/schema.json
 
@@ -72,14 +72,14 @@ Before we do that, we will add a role that RRE uses for anonymous access to Elas
 ```
 curl -u 'elastic:ElasticRocks' -X POST "localhost:9200/_security/role/anonymous_user" -H 'Content-Type: application/json' -d'
 {
-"run_as": [ ],
-"cluster": [ ],
-"indices": [
-{
-"names": [ "ecommerce" ],
-"privileges": [ "read" ]
-}
-]
+  "run_as": [ ],
+  "cluster": [ ],
+  "indices": [
+    {
+      "names": [ "ecommerce" ],
+      "privileges": [ "read" ]
+    }
+  ]
 }
 '
 ```
