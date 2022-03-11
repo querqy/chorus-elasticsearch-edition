@@ -124,7 +124,6 @@ The version of the Icecat product data that Chorus [provides](https://querqy.org
 
 1. Keycloak apparently does not run on Apple M1 chips with the pre-built images. If the Keycloak authentication for Quepid is not used this issue will not be experienced. For a workaround please follow these instructions: https://github.com/docker/for-mac/issues/5310#issuecomment-877653653They 
 They have been successfully tested with Keycloak 16.1.1.
-2. RRE is unable to communicate successfully with the secured Elasticsearch instance. Turn off basic auth in Elasticsearch when planning to use RRE.
-3. SMUI is a search management UI designed to work with Solr. We provided scripts for basic functionality with Elasticsearch but there are limitations. A future Kata will outline what's possible and what's not. 
+2. SMUI is a search management UI designed to work with Solr. We provided scripts for basic functionality with Elasticsearch but there are limitations. A future Kata will outline what's possible and what's not. 
 
 Of course, contributions are welcome to improve Chorus - The Elasticsearch Edition! 
