@@ -2,8 +2,6 @@
   "id_field": "_id",
   "index": "ecommerce",
   "template": "template.json",
-  "user": "elastic",
-  "password": "ElasticRocks",
   "queries": [
     {
       "placeholders": {
