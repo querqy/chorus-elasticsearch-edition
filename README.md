@@ -16,7 +16,7 @@ Chorus makes deploying powerful ecommerce search easier by shifting the **buy vs
 
 3. ***Sharing Knowledge is a Must!*** It isn't enough to just have conference talks, we need sample code and sample data in order to share knowledge about improving ecommerce search. Chorus is that public environment that you can use to share your next great idea!
 
-This is the project covering Elasticsearch as the search engine. As of now (January 2022), this project is under development. For those interested in the whole stack: You can visit the [Solr version of Chorus](https://github.com/querqy/chorus)
+This is the project covering Elasticsearch as the search engine. As of now (March 2022), this project is under development. For those interested in the whole stack: You can visit the [Solr version of Chorus](https://github.com/querqy/chorus)
 
 Want to stay up-to-date with the community? Visit https://querqy.org/ to learn more, and join the [E-Commerce Search Slack](https://ecom-search.slack.com/) group for tips, tricks and news on what's new in the Chorus ecosystem.
 
@@ -33,12 +33,13 @@ Want to stay up-to-date with the community? Visit https://querqy.org/ to learn m
 * The UI (Reactivesearch) runs at http://localhost:4001 
 * Elasticsearch runs at http://localhost:9200
 * Kibana runs at http://localhost:5601
+* SMUI runs at http://localhost:9000
 * Quepid runs at http://localhost:3000
 * Prometheus runs at http://localhost:9090
 * Grafana runs at http://localhost:9091
 
 Working with macOS? Pop open all the tuning related web pages with one terminal command:
-> open http://localhost:9200 http://localhost:5601 http://localhost:3000 http://localhost:7979
+> open http://localhost:4001 http://localhost:9200 http://localhost:5601 http://localhost:9000 http://localhost:3000 http://localhost:7979
 
 # 5 Minutes to Run Chorus!
 
@@ -118,3 +119,12 @@ The version of the Icecat product data that Chorus [provides](https://querqy.org
 * Data converted to JSON format.
 * Products that don't have a 500x500 pixel image listed are removed.
 * Prices extracted for ~19,000 products from the https://www.upcitemdb.com/ service using EAN codes to match.
+
+# Known Issues
+
+1. Keycloak apparently does not run on Apple M1 chips with the pre-built images. If the Keycloak authentication for Quepid is not used this issue will not be experienced. For a workaround please follow these instructions: https://github.com/docker/for-mac/issues/5310#issuecomment-877653653
+
+    They have been successfully tested with Keycloak 16.1.1.
+2. SMUI is a search management UI designed to work with Solr. We provided scripts for basic functionality with Elasticsearch but there are limitations. A future Kata will outline what's possible and what's not. 
+
+Of course, contributions are welcome to improve Chorus - The Elasticsearch Edition! 

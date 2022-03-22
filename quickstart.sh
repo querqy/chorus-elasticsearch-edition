@@ -60,7 +60,7 @@ do
 	shift
 done
 
-services="elasticsearch kibana chorus-ui"
+services="elasticsearch kibana chorus-ui smui"
 if $observability; then
   services="${services} grafana elasticsearch-exporter"
 fi
@@ -178,7 +178,11 @@ curl -u 'elastic:ElasticRocks' -s --request PUT 'http://localhost:9200/_querqy/r
 }'
 
 echo -e "${MAJOR}Setting up SMUI${RESET}"
-#TODO: Integrate SMUI
+while [ $(curl -s http://localhost:9000/api/v1/solr-index | wc -c) -lt 2 ]; do
+    echo "Waiting 5s for SMUI to be ready..."
+    sleep 5
+done
+curl -X PUT -H "Content-Type: application/json" -d '{"name":"ecommerce", "description":"Chorus Webshop"}' http://localhost:9000/api/v1/solr-index
 
 if $offline_lab; then
   echo -e "${MAJOR}Setting up Quepid${RESET}"

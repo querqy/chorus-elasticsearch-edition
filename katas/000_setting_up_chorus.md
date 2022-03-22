@@ -47,7 +47,73 @@ The sample data will take only a couple of minutes to load.
 
 You can confirm that the data is loaded by visiting http://localhost:9200/ecommerce/_search. You should see some of the indexed products with their attributes.
 
-ToDo: Integrate SMUI part when SMUI is ready.
+A more convenient approach to see the indexed products is visiting our mock e-commerce store, Chorus Electronics, available at http://localhost:4001/. Try out the facets, and search for something, like `coffee`.
+
+Before we set our search management UI (SMUI) up we need to define an empty set of rules that we can use by picking different relevance algorithms in our Online store.
+These are used by Querqy, the query rewriting library for Elasticsearch (and Solr).
+
+```
+curl -u 'elastic:ElasticRocks' -s --request PUT 'http://localhost:9200/_querqy/rewriter/common_rules' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+"class": "querqy.elasticsearch.rewriter.SimpleCommonRulesRewriterFactory",
+"config": {
+"rules": ""
+}
+}'
+```
+```
+curl -u 'elastic:ElasticRocks' -s --request PUT 'http://localhost:9200/_querqy/rewriter/common_rules_prelive' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+"class": "querqy.elasticsearch.rewriter.SimpleCommonRulesRewriterFactory",
+"config": {
+"rules": ""
+}
+}'
+```
+```
+curl -u 'elastic:ElasticRocks' -s --request PUT 'http://localhost:9200/_querqy/rewriter/replace' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+"class": "querqy.elasticsearch.rewriter.ReplaceRewriterFactory",
+"config": {
+"rules": ""
+}
+}'
+```
+```
+curl -u 'elastic:ElasticRocks' -s --request PUT 'http://localhost:9200/_querqy/rewriter/replace_prelive' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+"class": "querqy.elasticsearch.rewriter.ReplaceRewriterFactory",
+"config": {
+"rules": ""
+}
+}'
+```
+
+You can now choose between three algorithms in the frontend: `Default`, `Querqy Prelive`, `Querqy Live`. They will become relevant (pun intended) in later Katas.  
+
+We also need to set up the name of the index we're going to be doing active search management for in SMUI. We do this via
+
+```sh
+curl -X PUT -H "Content-Type: application/json" -d '{"name":"ecommerce", "description":"Ecommerce Demo"}' http://localhost:9000/api/v1/solr-index
+```
+
+Grab the `returnId` from the response, something like `3f47cc75-a99f-4653-acd4-a9dc73adfcd1`, you'll need it for the next steps!
+
+```sh
+export ES_INDEX_ID=5bc6e917-33b7-45ec-91ba-8e2c4a2e8085
+curl -X PUT -H "Content-Type: application/json" -d '{"name":"product_type"}' http://localhost:9000/api/v1/${ES_INDEX_ID}/suggested-solr-field
+curl -X PUT -H "Content-Type: application/json" -d '{"name":"title"}' http://localhost:9000/api/v1/${ES_INDEX_ID}/suggested-solr-field
+```
+
+Now go ahead and confirm that SMUI is working by visiting http://localhost:9000.
+
+Don't get confused by any references to Solr in the UI. SMUI is a search management UI for Solr and our usage for Elasticsearch is not fully supported yet. Contributions are very welcome!
+
+We'll learn more about using SMUI later, however test that it's working by clicking the `Publish to LIVE` button and confirming the publication by hitting `Yes, publish to LIVE`. You will get a confirmation message that the rules were deployed.  
 
 Now we want to pivot to setting up our Offline Testing Environment. Today we have two open source projects integrated into Chorus: Quepid and Rated Ranking Evaluator (RRE).
 
@@ -113,4 +179,4 @@ curl -u admin:password -S -X POST -H "Content-Type: application/json" http://loc
 
 Check if Grafana is up and running and the freshly created user has access by logging into Grafana at http://localhost:9091 using the username `admin@choruselectronics.com` with the password `password`. We'll dive into the details of observability in a later Kata.
 
-Congratulations! You now have Chorus successfully running with its components!
+Congratulations! You now have Chorus - The Elasticsearch Edition successfully running with its components!
