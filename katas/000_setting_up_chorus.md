@@ -47,7 +47,7 @@ The sample data will take only a couple of minutes to load.
 
 You can confirm that the data is loaded by visiting http://localhost:9200/ecommerce/_search. You should see some of the indexed products with their attributes.
 
-A more convenient approach to see the indexed products is visiting our mock e-commerce store, Chorus Electronics, available at ttp://localhost:4001/. Try out the facets, and search for something, like `coffee`.
+A more convenient approach to see the indexed products is visiting our mock e-commerce store, Chorus Electronics, available at http://localhost:4001/. Try out the facets, and search for something, like `coffee`.
 
 Before we set our search management UI (SMUI) up we need to define an empty set of rules that we can use by picking different relevance algorithms in our Online store.
 These are used by Querqy, the query rewriting library for Elasticsearch (and Solr).
