@@ -30,16 +30,16 @@ Want to stay up-to-date with the community? Visit https://querqy.org/ to learn m
 
 # What Runs Where
 
-* The UI (Reactivesearch) runs at http://localhost:4001 
-* Elasticsearch runs at http://localhost:9200
-* Kibana runs at http://localhost:5601
-* SMUI runs at http://localhost:9000
-* Quepid runs at http://localhost:3000
-* Prometheus runs at http://localhost:9090
-* Grafana runs at http://localhost:9091
+* The UI (Reactivesearch) runs at http://localhost:4000  |  http://chorus.dev.o19s.com:4000
+* Elasticsearch runs at http://localhost:9200  |  http://chorus.dev.o19s.com:9200
+* Kibana runs at http://localhost:5601  |  http://chorus.dev.o19s.com:5601
+* SMUI runs at http://localhost:9000  |  http://chorus.dev.o19s.com:9000
+* Quepid runs at http://localhost:3000  |  http://chorus.dev.o19s.com:3000
+* Prometheus runs at http://localhost:9090  |  http://chorus.dev.o19s.com:9090
+* Grafana runs at http://localhost:9091  |  http://chorus.dev.o19s.com:9091
 
 Working with macOS? Pop open all the tuning related web pages with one terminal command:
-> open http://localhost:4001 http://localhost:9200 http://localhost:5601 http://localhost:9000 http://localhost:3000 http://localhost:7979
+> open http://localhost:4000 http://localhost:9200 http://localhost:5601 http://localhost:9000 http://localhost:3000
 
 # 5 Minutes to Run Chorus!
 
@@ -124,7 +124,8 @@ The version of the Icecat product data that Chorus [provides](https://querqy.org
 
 1. Keycloak apparently does not run on Apple M1 chips with the pre-built images. If the Keycloak authentication for Quepid is not used this issue will not be experienced. For a workaround please follow these instructions: https://github.com/docker/for-mac/issues/5310#issuecomment-877653653
 
-    They have been successfully tested with Keycloak 16.1.1.
-2. SMUI is a search management UI designed to work with Solr. We provided scripts for basic functionality with Elasticsearch but there are limitations. A future Kata will outline what's possible and what's not. 
+   They have been successfully tested with Keycloak 16.1.1.
+2. SMUI is a search management UI designed to work with Solr. We provided scripts for basic functionality with Elasticsearch but there are limitations. You get a feeling what's currently possible by running through [Kata 1: Optimize a Query](katas/001_optimize_a_query.md).
+3. RRE: The technical integration is able to run queries and get the correct results from Elasticsearch, but apparently it computes the search metrics incorrectly. 
 
 Of course, contributions are welcome to improve Chorus - The Elasticsearch Edition! 
