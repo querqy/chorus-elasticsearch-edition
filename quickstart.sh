@@ -106,9 +106,6 @@ curl -u 'elastic:ElasticRocks' -X POST "localhost:9200/_security/role/anonymous_
 }
 '
 
-echo -e "${MINOR}waiting for Keycloak to be available${RESET}"
-./keycloak/wait-for-keycloak.sh
-
 echo -e "${MAJOR}Creating ecommerce index and defining its mapping.\n${RESET}"
 curl -u 'elastic:ElasticRocks' -s -X PUT "localhost:9200/ecommerce/" -H 'Content-Type: application/json' --data-binary @./elasticsearch/schema.json
 
@@ -185,6 +182,9 @@ done
 curl -X PUT -H "Content-Type: application/json" -d '{"name":"ecommerce", "description":"Chorus Webshop"}' http://localhost:9000/api/v1/solr-index
 
 if $offline_lab; then
+  echo -e "${MINOR}waiting for Keycloak to be available${RESET}"
+  ./keycloak/wait-for-keycloak.sh
+
   echo -e "${MAJOR}Setting up Quepid${RESET}"
   docker-compose run --rm quepid bin/rake db:setup
   docker-compose run quepid thor user:create -a admin@choruselectronics.com "Chorus Admin" password
