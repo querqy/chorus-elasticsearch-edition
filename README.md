@@ -22,6 +22,7 @@ Want to stay up-to-date with the community? Visit https://querqy.org/ to learn m
 
 ## News
 
+* 23 March 2022: [Chorus, now also for Elasticsearch!](https://opensourceconnections.com/blog/2022/03/23/chorus-now-also-for-elasticsearch/)
 * 17th June 2021: [Encores? - Going beyond matching and ranking of search results](https://www.slideshare.net/o19s/encores) - Chorus is used at BerlinBuzzwords.
 * 15th November 2020: [Chorus Workshop Series Announced](https://plainschwarz.com/ps-salon/) - Learn from the creators of the components of Chorus via six workshops.
 * 17th October 2020: [Chorus featured at ApacheCon @Home](https://www.youtube.com/watch?v=NGtmSbOoFjA) - René and Eric give a talk at ApacheCon on Chorus.
@@ -30,13 +31,14 @@ Want to stay up-to-date with the community? Visit https://querqy.org/ to learn m
 
 # What Runs Where
 
-* The UI (Reactivesearch) runs at http://localhost:4000  |  http://chorus.dev.o19s.com:4000
-* Elasticsearch runs at http://localhost:9200  |  http://chorus.dev.o19s.com:9200
-* Kibana runs at http://localhost:5601  |  http://chorus.dev.o19s.com:5601
-* SMUI runs at http://localhost:9000  |  http://chorus.dev.o19s.com:9000
-* Quepid runs at http://localhost:3000  |  http://chorus.dev.o19s.com:3000
-* Prometheus runs at http://localhost:9090  |  http://chorus.dev.o19s.com:9090
-* Grafana runs at http://localhost:9091  |  http://chorus.dev.o19s.com:9091
+* The UI (Reactivesearch) runs at http://localhost:4000  |  http://chorus-es-edition.dev.o19s.com:4000
+* Elasticsearch runs at http://localhost:9200  |  http://chorus-es-edition.dev.o19s.com:9200
+* Kibana runs at http://localhost:5601  |  http://chorus-es-edition.dev.o19s.com:5601
+* SMUI runs at http://localhost:9000  |  http://chorus-es-edition.dev.o19s.com:9000
+* Quepid runs at http://localhost:3000  |  http://chorus-es-edition.dev.o19s.com:3000
+* Keycloak runs at http://keycloak:9080 |  http://chorus-es-edition.dev.o19s.com:9080
+* Prometheus runs at http://localhost:9090  |  http://chorus-es-edition.dev.o19s.com:9090
+* Grafana runs at http://localhost:9091  |  http://chorus-es-edition.dev.o19s.com:9091
 
 Working with macOS? Pop open all the tuning related web pages with one terminal command:
 > open http://localhost:4000 http://localhost:9200 http://localhost:5601 http://localhost:9000 http://localhost:3000
@@ -126,6 +128,6 @@ The version of the Icecat product data that Chorus [provides](https://querqy.org
 
    They have been successfully tested with Keycloak 16.1.1.
 2. SMUI is a search management UI designed to work with Solr. We provided scripts for basic functionality with Elasticsearch but there are limitations. You get a feeling what's currently possible by running through [Kata 1: Optimize a Query](katas/001_optimize_a_query.md).
-3. RRE: The technical integration is able to run queries and get the correct results from Elasticsearch, but apparently it computes the search metrics incorrectly. 
+3. RRE: The technical integration is able to run queries and get the correct results from Elasticsearch, but apparently it computes the search metrics incorrectly.
 
-Of course, contributions are welcome to improve Chorus - The Elasticsearch Edition! 
+Of course, contributions are welcome to improve Chorus - The Elasticsearch Edition!
