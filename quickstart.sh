@@ -28,6 +28,7 @@ fi
 observability=false
 shutdown=false
 offline_lab=false
+local_deploy=true
 stop=false
 
 while [ ! $# -eq 0 ]
@@ -38,6 +39,7 @@ do
 			echo -e "Use the option --with-observability | -obs to include Grafana, Prometheus, and Elasticsearch Exporter services in Chorus."
       echo -e "Use the option --shutdown | -s to shutdown and remove the Docker containers and data."
       echo -e "Use the option --stop to stop the Docker containers."
+      echo -e "Use the option --online-deployment | -online to update configuration to run on chorus-es-edition.dev.o19s.com environment."
 			exit
 			;;
 		--with-observability | -obs)
@@ -48,6 +50,10 @@ do
 			offline_lab=true
       echo -e "${MAJOR}Running Chorus with offline lab environment enabled${RESET}"
 			;;
+    --online-deployment | -online)
+  		local_deploy=false
+      echo -e "${MAJOR}Configuring Chorus for chorus-es-edition.dev.o19s.com environment${RESET}"
+  		;;
     --shutdown | -s)
 			shutdown=true
       echo -e "${MAJOR}Shutting down Chorus${RESET}"
@@ -67,6 +73,13 @@ fi
 
 if $offline_lab; then
   services="${services} quepid rre keycloak"
+fi
+
+if ! $local_deploy; then
+  echo -e "${MAJOR}Updating configuration files for online deploy${RESET}"
+  sed -i.bu 's/localhost:3000/chorus-es-edition.dev.o19s.com:3000/g'  ./keycloak/realm-config/chorus-realm.json
+  sed -i.bu 's/keycloak:9080/chorus-es-edition.dev.o19s.com:9080/g'  ./keycloak/wait-for-keycloak.sh
+  sed -i.bu 's/keycloak:9080/chorus-es-edition.dev.o19s.com:9080/g'  ./docker-compose.yml
 fi
 
 if $stop; then
@@ -105,9 +118,6 @@ curl -u 'elastic:ElasticRocks' -X POST "localhost:9200/_security/role/anonymous_
   ]
 }
 '
-
-echo -e "${MINOR}waiting for Keycloak to be available${RESET}"
-./keycloak/wait-for-keycloak.sh
 
 echo -e "${MAJOR}Creating ecommerce index and defining its mapping.\n${RESET}"
 curl -u 'elastic:ElasticRocks' -s -X PUT "localhost:9200/ecommerce/" -H 'Content-Type: application/json' --data-binary @./elasticsearch/schema.json
@@ -185,6 +195,13 @@ done
 curl -X PUT -H "Content-Type: application/json" -d '{"name":"ecommerce", "description":"Chorus Webshop"}' http://localhost:9000/api/v1/solr-index
 
 if $offline_lab; then
+
+  if $local_deploy; then
+    ./keycloak/check-for-host-configuration.sh
+  fi
+  echo -e "${MINOR}waiting for Keycloak to be available${RESET}"
+  ./keycloak/wait-for-keycloak.sh
+
   echo -e "${MAJOR}Setting up Quepid${RESET}"
   docker-compose run --rm quepid bin/rake db:setup
   docker-compose run quepid thor user:create -a admin@choruselectronics.com "Chorus Admin" password
@@ -201,4 +218,4 @@ if $observability; then
   curl -u admin:password -S -X POST -H "Content-Type: application/json" http://localhost:9091/api/users/2/using/1
 fi
 
-echo -e "${MAJOR}Welcome to Chorus!${RESET}"
+echo -e "${MAJOR}Welcome to Chorus ES Edition!${RESET}"
