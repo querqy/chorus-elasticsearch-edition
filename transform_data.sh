@@ -6,9 +6,13 @@
 # needed by Elasticsearch.
 
 for row in $(cat icecat-products-w_price-19k-20201127.json | jq -r '.[] | @base64'); do
-    _jq() {
-     echo ${row} | base64 --decode | jq -r ${1}
+    my_line=$(echo ${row} | base64 --decode)
+    _id() {
+     echo ${my_line} | jq -r .id
     }
-   echo { \"index\" : {}}
+    _jq() {
+     echo ${my_line} | jq -r ${1}
+    }
+   echo { \"index\" : {\"_id\" : \"$(_id)\"}}
    echo $(_jq '.')
 done

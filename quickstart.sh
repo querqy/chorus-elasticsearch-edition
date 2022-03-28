@@ -44,11 +44,11 @@ do
 			;;
 		--with-observability | -obs)
 			observability=true
-      echo -e "${MAJOR}Running Chorus with observability services enabled${RESET}"
+      echo -e "${MAJOR}Running Chorus with observability services enabled\n${RESET}"
 			;;
     --with-offline-lab | -lab)
 			offline_lab=true
-      echo -e "${MAJOR}Running Chorus with offline lab environment enabled${RESET}"
+      echo -e "${MAJOR}Running Chorus with offline lab environment enabled\n${RESET}"
 			;;
     --online-deployment | -online)
   		local_deploy=false
@@ -56,11 +56,11 @@ do
   		;;
     --shutdown | -s)
 			shutdown=true
-      echo -e "${MAJOR}Shutting down Chorus${RESET}"
+      echo -e "${MAJOR}Shutting down Chorus\n${RESET}"
 			;;
 	  --stop)
     	stop=true
-      echo -e "${MAJOR}Stopping Chorus${RESET}"
+      echo -e "${MAJOR}Stopping Chorus\n${RESET}"
     	;;
 	esac
 	shift
@@ -136,11 +136,15 @@ if [ ! -f ./transformed_data.json ]; then
   output=transformed_data.json
 
   for row in $(cat icecat-products-w_price-19k-20201127.json | jq -r '.[] | @base64'); do
-      _jq() {
-       echo ${row} | base64 --decode | jq -r ${1}
+      my_line=$(echo ${row} | base64 --decode)
+      _id() {
+       echo ${my_line} | jq -r .id
       }
-     echo { \"index\" : {}} >> ${output}
-     echo $(_jq '.') >> ${output}
+      _jq() {
+       echo ${my_line} | jq -r ${1}
+      }
+     echo { \"index\" : {\"_id\" : \"$(_id)\"}}
+     echo $(_jq '.')
   done
 fi
 
@@ -187,7 +191,7 @@ curl -u 'elastic:ElasticRocks' -s --request PUT 'http://localhost:9200/_querqy/r
     }
 }'
 
-echo -e "${MAJOR}Setting up SMUI${RESET}"
+echo -e "${MAJOR}Setting up SMUI\n${RESET}"
 while [ $(curl -s http://localhost:9000/api/v1/solr-index | wc -c) -lt 2 ]; do
     echo "Waiting 5s for SMUI to be ready..."
     sleep 5
@@ -195,7 +199,6 @@ done
 curl -X PUT -H "Content-Type: application/json" -d '{"name":"ecommerce", "description":"Chorus Webshop"}' http://localhost:9000/api/v1/solr-index
 
 if $offline_lab; then
-
   if $local_deploy; then
     ./keycloak/check-for-host-configuration.sh
   fi
@@ -203,16 +206,17 @@ if $offline_lab; then
   ./keycloak/wait-for-keycloak.sh
 
   echo -e "${MAJOR}Setting up Quepid${RESET}"
+
   docker-compose run --rm quepid bin/rake db:setup
   docker-compose run quepid thor user:create -a admin@choruselectronics.com "Chorus Admin" password
 
-  echo -e "${MAJOR}Setting up RRE${RESET}"
+  echo -e "${MAJOR}Setting up RRE\n${RESET}"
   docker-compose run rre mvn rre:evaluate
   docker-compose run rre mvn rre-report:report
 fi
 
 if $observability; then
-  echo -e "${MAJOR}Setting up Grafana${RESET}"
+  echo -e "${MAJOR}Setting up Grafana\n${RESET}"
   curl -u admin:password -S -X POST -H "Content-Type: application/json" -d '{"email":"admin@choruselectronics.com", "name":"Chorus Admin", "role":"admin", "login":"admin@choruselectronics.com", "password":"password", "theme":"light"}' http://localhost:9091/api/admin/users
   curl -u admin:password -S -X PUT -H "Content-Type: application/json" -d '{"isGrafanaAdmin": true}' http://localhost:9091/api/admin/users/2/permissions
   curl -u admin:password -S -X POST -H "Content-Type: application/json" http://localhost:9091/api/users/2/using/1
