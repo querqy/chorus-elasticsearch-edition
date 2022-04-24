@@ -43,7 +43,7 @@ class App extends Component {
             size={20}
             showSearch={false}
             react={{
-              and: ["searchbox", "brandfilter", "typefilter"]
+              and: ["searchbox", "typefilter"]
             }}
             style={{ "paddingBottom": "10px", "paddingTop": "10px" }}
           />
@@ -54,7 +54,7 @@ class App extends Component {
             size={20}
             showSearch={false}
             react={{
-              and: ["searchbox", "brandfilter", "typefilter"]
+              and: ["searchbox", "brandfilter"]
             }}
             style={{ "paddingBottom": "10px", "paddingTop": "10px" }}
           />
@@ -137,8 +137,8 @@ class App extends Component {
                       }}
                     />
                     <ResultCard.Description>
-                      {item.price +
-                        ".00 $ | " +
+                      {item.price/100 +
+                        " $ | " +
                         item.supplier}
                     </ResultCard.Description>
                   </ResultCard>
