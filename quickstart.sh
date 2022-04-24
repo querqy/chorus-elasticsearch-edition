@@ -24,6 +24,10 @@ if ! [ -x "$(command -v jq)" ]; then
   echo "${ERROR}Error: jq is not installed.${RESET}" >&2
   exit 1
 fi
+if ! [ -x "$(command -v wget)" ]; then
+  echo "${ERROR}Error: wget is not installed.${RESET}" >&2
+  exit 1
+fi
 
 observability=false
 shutdown=false
@@ -143,8 +147,8 @@ if [ ! -f ./transformed_data.json ]; then
       _jq() {
        echo ${my_line} | jq -r ${1}
       }
-     echo { \"index\" : {\"_id\" : \"$(_id)\"}}
-     echo $(_jq '.')
+     echo { \"index\" : {\"_id\" : \"$(_id)\"}} >> ${output}
+     echo $(_jq '.') >> ${output}
   done
 fi
 
