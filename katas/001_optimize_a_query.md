@@ -93,25 +93,19 @@ Arrange your screens so the `Chorus Electonics` store and SMUI are both visible.
 
 ![Layout out your webstore and tuning tools side by side](images/001_screens_side_by_side.png)
 
-Because we are working with the Querqy library, in the `Chorus Electronics` store, make sure to change from `Default` in the dropdown next to the search bar to `Querqy Live`. Do a search for notebook, and while the initial product images may look good to you, remember, they aren't images of notebooks, they are notebook *accessories* that we are getting back! While we are at it, let's also check `laptop` as well.
+Because we are working with the Querqy library, in the `Chorus Electronics` store, make sure to change from `Default` in the dropdown next to the search bar to `Querqy Live`. Do a search for `notebook`, and while the initial product images may look good to you, remember, they aren't images of notebooks, they are notebook *accessories* that we are getting back! While we are at it, let's also check `laptop` as well.
 
 Let's switch to SMUI our search management UI at http://localhost:9000 and start working on the query `notebook` by typing it in the empty text box on the left and click `+ New`. Confirm that by selecting `Rule Management`. As a result, you get an empty rules set.
 
-Let's start with boosting notebooks to the top when searching for `notebook`. Add a new search rule and pick `UP/DOWN rule`. We'll pick a boost of `UP(++++)`, a pretty heavy boost. Now we are encountering one of SMUI's current limitations. It is designed and implemented to work with Solr, and we have Elasticsearch running under the hood. To add a boost rule we need to use a specific syntax to let the magic work. If you want to dive into the details of query rewriting and its syntax, please visit the Querqy docs: https://docs.querqy.org/
+Let's start with boosting notebooks to the top when searching for `notebook`. Add a new search rule and pick `UP/DOWN Rule`. We'll pick a boost of `UP(++++)`, a pretty heavy boost. Now we are encountering one of SMUI's current limitations. It is designed and implemented to work with Solr, and we have Elasticsearch running under the hood, so not everything possible with Solr is also possible with Elasticsearch. To add a boost rule we need to use a specific syntax to let the magic work. We can use a `field:value` notation to use the domain specific knowledge we as proper searchandizers have. 
 
-Enter the following code snippet in the second empty text box:
+Enter the following rule text in the empty box next to `UP(++++)`:
 ```
-* {"term": {"product_type":"notebook"}}"
+product_type:notebook
 ```
 This means that we want to boost all documents containing the *term* `notebook` in the field `product_type`. As a result, this will boost products tagged with the notebook category up in the search results.
 
-Go ahead and click `Save search rules for input`. You will notice the rule *breaking up* into two pieces being spread across the two input boxes:
-
-![Our first rule after saving it](images/001_first_SMUI_rule.png)
-
-Don't worry too much about it. This limitation, again, is connected to SMUI being a Solr tool originally. We just need to keep an extra careful eye on how we manage rules when working with Elasticsearch. But at least we can manage rules this way.
-
-Let us now push our change to Elasticsearch by clicking the `Push Config to Solr` and then, after seeing a success message, click on `Publish to LIVE`.
+Go ahead and click `Save search rules for input`. Let us now push our change to Elasticsearch by clicking the `Push Config to Solr` and then, after seeing a success message, click on `Publish to LIVE`.
 
 Go ahead and do a new query in the store, notice the improvements in the quality for `notebook`? In short, the results look very good! Not a single non-notebook computer on the first page.
 
@@ -158,4 +152,4 @@ Quepid tells us that the results for laptop are at 0.09 - definitely looking for
 
 Save this, and publish it to live to see the results in our web shop. Go to http://localhost:4000, make sure the algorithm in the dropdown menu is set to `Querqy Live` and search for `laptop`: It worked! Now go ahead and judge the results for `laptop` in Quepid and see how the metric improves. You can go ahead and rate the results in Quepid that don't have a rating yet.
 
-That all folks! You've successfully taken two bad queries from the store, assessed them to put a numerical value on the quality of the search, and then improved them using some rules to rewrite the query. You then remeasured them, saw the quantitative improvement, and have meaningfully improved search quality, which drives more revenue!
+That's all folks! You've successfully taken two bad queries from the store, assessed them to put a numerical value on the quality of the search, and then improved them using some rules to rewrite the query. You then remeasured them, saw the quantitative improvement, and have meaningfully improved search quality, which drives more revenue!
