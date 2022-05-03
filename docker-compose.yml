@@ -90,6 +90,7 @@ services:
       - SMUI_DB_USER=root
       - SMUI_DB_PASSWORD=password
       - SMUI_DEPLOY_PRELIVE_SOLR_HOST=elasticsearch:9200
+      - SMUI_TOGGLE_UI_WITH_SOLR_FIELDS=false
       - SMUI_2SOLR_SOLR_HOST=elasticsearch:9200
       - SMUI_TOGGLE_DEPL_PRELIVE=true
       - SMUI_TOGGLE_SPELLING=true

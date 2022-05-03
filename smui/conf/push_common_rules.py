@@ -14,6 +14,7 @@ if __name__ == "__main__":
     req = {
         "class": "querqy.elasticsearch.rewriter.SimpleCommonRulesRewriterFactory",
         "config": {
+            "querqyParser": "querqy.rewrite.commonrules.FieldAwareWhiteSpaceQuerqyParserFactory",
             "rules" : f.read()
         }
     }
