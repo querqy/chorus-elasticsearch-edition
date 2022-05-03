@@ -1,24 +1,24 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 
-<img src="assets/chorus-logo.png" alt="Chorus Logo" title="Chorus: Towards a open stack for ecommerce search" width="200" align="right"/>
+<img src="assets/chorus-logo.png" alt="Chorus Logo" title="Chorus: Towards an open stack for ecommerce search" width="200" align="right"/>
 
 Chorus
 ==========================
 
 *Towards an open source tool stack for e-commerce search*
 
-Chorus makes deploying powerful ecommerce search easier by shifting the **buy vs build** decision in favour of **build**, so you can own your search! It deals with three issues:
+Chorus makes deploying powerful ecommerce search easier by shifting the **buy vs build** decision in favour of **build**, so you can own your search! Chorus deals with three issues:
 
-1. **Starting from Scratch is Time Consuming** Downloading an open source search engine isn't enough, it's like getting the parts of a Lego model, only without the directions ;-) .  We need a better baseline to quickly get started.
+1. **Starting from Scratch is Time Consuming** Downloading an open source search engine isn't enough. It's like beeing provided with all the parts of a Lego model, but without building instructions ;-) .  We need a better baseline to quickly get started.
 
-2. **Integration of Tooling is Hard** Search isn't just the index, it's also the analytics tooling, the relevance tooling, the operational monitoring that goes into it.  Every team starts incurs the penalty of starting from scratch integrating the ecosystem of options.
+2. **Integration of Tooling is Hard** Search isn't just a query running on an index of data. It's also the operational monitoring, the analytics and relevance tooling, that goes into it.  Every team that starts, faces the penalties of starting from scratch, integrating an ecosystem of options.
 
-3. ***Sharing Knowledge is a Must!*** It isn't enough to just have conference talks, we need sample code and sample data in order to share knowledge about improving ecommerce search. Chorus is that public environment that you can use to share your next great idea!
+3. ***Sharing Knowledge is a Must!*** It isn't enough to just have conference talks. We need code and data samples in order to share knowledge about improving ecommerce search. Chorus is a public environment that you can use to profit from the community and also to share your next great idea!
 
-This is the project covering Elasticsearch as the search engine. As of now (March 2022), this project is under development. For those interested in the whole stack: You can visit the [Solr version of Chorus](https://github.com/querqy/chorus)
+This is the project that enables Chorus to use Elasticsearch as the search engine. As of now (March 2022), this project is under development. For those interested in the whole stack: You can visit the [Solr version of Chorus](https://github.com/querqy/chorus)
 
-Want to stay up-to-date with the community? Visit https://querqy.org/ to learn more, and join the [E-Commerce Search Slack](https://ecom-search.slack.com/) group for tips, tricks and news on what's new in the Chorus ecosystem.
+Want to stay up-to-date with the community? Visit https://querqy.org/ to learn more, and join the [E-Commerce Search Slack](https://ecom-search.slack.com/) group for tips, tricks, help and news on what's new in the Chorus ecosystem.
 
 ## News
 
@@ -45,19 +45,19 @@ Working with macOS? Pop open all the tuning related web pages with one terminal 
 
 # 5 Minutes to Run Chorus!
 
-We are trying to strike a balance between making the setup process as easy and fool proof as possible with the need to not _hide_ too much of the interactions between the projects that make up Chorus.
+We are trying to strike a balance between making the setup process as easy and fool proof as possible, with the need to not _hide_ too much of the interactions between the projects that make up Chorus.
 
-If you are impatient, we have a quick start script, `./quickstart.sh` that sets you up, however I recommend you go through [Kata 0: Setting up Chorus](katas/000_setting_up_chorus.md).
+If you are impatient, we provide a quick start script, `./quickstart.sh` that sets Chorus up for you. However, I recommend you go through [Kata 0: Setting up Chorus](katas/000_setting_up_chorus.md), to get a picture of what's running in the stack.
 
 # Useful Commands for Chorus
 
-To start your environment, but still run each command to setup the integrations manually, run:
+To start your environment, but still run each command to set up the integrations manually, run:
 
 ```
 docker-compose up --build -d
 ```
 
-The quickstart command will launch Elasticsearch, and index the product data for the _ecommerce_ index:
+The quickstart script will launch Elasticsearch, download and index the sample product data for the _ecommerce_ index:
 
 ```
 ./quickstart.sh
@@ -69,65 +69,69 @@ If you want to add in the offline lab environment based on Quepid, then tack on 
 ./quickstart.sh --with-offline-lab
 ```
 
-To include the observability features, run:
+To include the observability features (Grafana, Prometheus, and Elasticsearch Exporter), run:
 
 ```
 ./quickstart.sh --with-observability
 ```
 
 To see what is happening in the Chorus stack you can tail the logs for all the components via:
+
 ```
 docker-compose logs -tf
 ```
 
-If you want to narrow down to just one component of the Chorus stack do:
+If you want to see the logs of just one component of the Chorus stack, use:
+
 ```
 docker-compose ps                       # list out the names of the components
 docker-compose logs -tf elasticsearch   # tail elasticsearch only
 ```
 
-To stop the containers you can run
+To stop all containers, you can run:
 
 ```
 ./quickstart.sh --stop
 ```
 
-To destroy your environment (including any volumes created like the mysql db), just run:
+To destroy your environment (including any volumes created, like the mysql DBs), just run:
+
 ```
 docker-compose down -v
 ```
 
-or
+or:
 
 ```
 ./quickstart.sh --shutdown
 ```
 
-If Docker is giving you a hard time then some options are:
+If Docker is giving you a hard time, then some options are:
+
 ```
 docker system prune                     # removes orphaned images, networks, etc.
 docker system prune -a --volumes        # removes all images, clears out your Docker diskspace if you full.
 ```
 
-You may also have to [increase the resources](./assets/increase_docker_resources.gif) given to Docker, up to 4 GB RAM and 2 GB Swap space.
+You may also have to [increase the resources](./assets/increase_docker_resources.gif) given to Docker - up to 4 GB RAM and 2 GB Swap space.
 
 # Chorus Data Details
 
-The Chorus project includes some public datasets. These datasets let the community learn, experiment, and collaborate in a safe manner and are a key part of demonstrating how to build measurable and tunable ecommerce search with open source components.
+The Chorus project includes some public, sample datasets. These datasets enables the community to learn, experiment and collaborate in a safe manner and are a key part of demonstrating, how to build measurable and tunable ecommerce search, with open source components.
 
-The product data is gratefully sourced from [Icecat](https://icecat.biz/) and is licensed under their [Open Content License](https://iceclog.com/open-content-license-opl/).
+The sample product data is generously sourced from [Icecat](https://icecat.biz/) and is licensed under their [Open Content License](https://iceclog.com/open-content-license-opl/).
 
 The version of the Icecat product data that Chorus [provides](https://querqy.org/datasets/icecat/icecat-products-w_price-19k-20201127.tar.gz) has the following changes:
 * Data converted to JSON format.
 * Products that don't have a 500x500 pixel image listed are removed.
-* Prices extracted for ~19,000 products from the https://www.upcitemdb.com/ service using EAN codes to match.
+* The Prices of ~19,000 products got extracted from the https://www.upcitemdb.com/ service, using EAN codes.
 
 # Known Issues
 
-1. Keycloak apparently does not run on Apple M1 chips with the pre-built images. If the Keycloak authentication for Quepid is not used this issue will not be experienced. For a workaround please follow these instructions: https://github.com/docker/for-mac/issues/5310#issuecomment-877653653
+1. Keycloak apparently does not run on Apple M1 chips with the pre-built images. To avoid this issue, don't use Keycloak authentication for Quepid. For a workaround please follow these instructions: https://github.com/docker/for-mac/issues/5310#issuecomment-877653653
 
-   They have been successfully tested with Keycloak 16.1.1.
-2. SMUI is a search management UI designed to work with Solr. We provided scripts for basic functionality with Elasticsearch but there are limitations. You get a feeling what's currently possible by running through [Kata 1: Optimize a Query](katas/001_optimize_a_query.md).
+   The workaround has been successfully tested with Keycloak version 16.1.1.
+2. SMUI stands for \'search management UI\'. It is designed to work with Solr. We provided some scripts for basic functionality with Elasticsearch but there are still limitations. You get a feeling what's currently possible by going through [Kata 1: Optimize a Query](katas/001_optimize_a_query.md).
 3. RRE: The technical integration is able to run queries and get the correct results from Elasticsearch, but apparently it computes the search metrics incorrectly.
 
-Of course, contributions are welcome to improve Chorus - The Elasticsearch Edition!
+Of course, contributions are very welcome to improve Chorus - The Elasticsearch Edition!
