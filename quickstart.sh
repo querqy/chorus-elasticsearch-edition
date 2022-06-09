@@ -84,6 +84,7 @@ if ! $local_deploy; then
   sed -i.bu 's/localhost:3000/chorus-es-edition.dev.o19s.com:3000/g'  ./keycloak/realm-config/chorus-realm.json
   sed -i.bu 's/keycloak:9080/chorus-es-edition.dev.o19s.com:9080/g'  ./keycloak/wait-for-keycloak.sh
   sed -i.bu 's/keycloak:9080/chorus-es-edition.dev.o19s.com:9080/g'  ./docker-compose.yml
+  sed -i.bu 's/localhost:9200/chorus-es-edition.dev.o19s.com:9200/g'  ./reactivesearch/src/App.js
 fi
 
 if $stop; then
