@@ -92,7 +92,7 @@ class App extends Component {
                           query: value
                         },
                         query_fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"],
-                        rewriters: ["common_rules_prelive", "replace_prelive"]
+                        rewriters: ["replace_prelive", "common_rules_prelive"]
                       }
                     }
                   }
@@ -104,7 +104,7 @@ class App extends Component {
                           query: value
                         },
                         query_fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"],
-                        rewriters: ["common_rules", "replace"]
+                        rewriters: ["replace", "common_rules"]
                       }
                     }
                   }
