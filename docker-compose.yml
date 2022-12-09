@@ -53,7 +53,7 @@ services:
     ports:
       - "9200:9200"
     healthcheck:
-      test: curl -s http://localhost:9200 >/dev/null || exit 1
+      test: [ "CMD", "wget", "http://localhost:9200" ]
       interval: 30s
       timeout: 10s
       retries: 50
@@ -76,7 +76,7 @@ services:
       - './reactivesearch:/usr/src/app'
       - '/usr/src/app/node_modules'
     ports:
-      - 4001:3000
+      - 4000:3000
 
   quepid:
     container_name: quepid
