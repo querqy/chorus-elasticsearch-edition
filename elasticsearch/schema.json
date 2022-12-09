@@ -72,7 +72,6 @@
       "search_attributes": {
         "type": "text",
         "analyzer": "english_stemmed",
-        "doc_values": true,
         "fielddata": true
       },
       "attr_t_product_type": {
@@ -83,12 +82,10 @@
       "product_type": {
         "type": "text",
         "analyzer": "english_stemmed",
-        "doc_values": true,
         "fielddata": true
       },
       "brand": {
         "type": "text",
-        "doc_values": true,
         "fielddata": true
       },
       "filter_brand": {
