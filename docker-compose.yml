@@ -26,7 +26,7 @@ services:
     ports:
       - 3306:3306
     environment:
-      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_DATABASE=smui
     volumes:
       - ./mysql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
@@ -87,7 +87,7 @@ services:
       - PORT=3000
       - RACK_ENV=production
       - RAILS_ENV=production
-      - DATABASE_URL=mysql2://root:password@mysql:3306/quepid
+      - DATABASE_URL=mysql2://root:${MYSQL_ROOT_PASSWORD}@mysql:3306/quepid
       - REDIS_URL=redis://redis:6379/1
       - FORCE_SSL=false
       - MAX_THREADS=2
@@ -124,7 +124,7 @@ services:
       - SMUI_HEADLINE=Chorus SMUI
       - SMUI_DB_URL=jdbc:mysql://mysql:3306/smui?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
       - SMUI_DB_USER=root
-      - SMUI_DB_PASSWORD=password
+      - SMUI_DB_PASSWORD=${SMUI_DB_PASSWORD}
       - SMUI_DEPLOY_PRELIVE_SOLR_HOST=elasticsearch:9200
       - SMUI_TOGGLE_UI_WITH_SOLR_FIELDS=false
       - SMUI_2SOLR_SOLR_HOST=elasticsearch:9200
@@ -165,7 +165,7 @@ services:
     volumes:
       - ./grafana/provisioning/:/etc/grafana/provisioning/
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=password
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
       - GF_USERS_ALLOW_SIGN_UP=true
     healthcheck:
       test: [ "CMD", "wget", "--tries=1", "--spider", "http://localhost:3000" ]
@@ -194,7 +194,7 @@ services:
       - '--es.uri=http://elasticsearch:9200'
     environment:
       - ES_USERNAME=elastic
-      - ES_PASSWORD=ElasticRocks
+      - ES_PASSWORD=${ELASTIC_PASSWORD}
     restart: always
     ports:
       - "9114:9114"
@@ -212,7 +212,7 @@ services:
     environment:
       KC_HTTP_PORT: 9080
       KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: password
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
       DB_VENDOR: h2
     volumes:
       - ./keycloak/realm-config/chorus-realm.json:/opt/keycloak/data/import/chorus-realm.json:ro
