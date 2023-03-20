@@ -88,6 +88,14 @@
         "type": "text",
         "fielddata": true
       },
+      "product_vector": {
+        "type": "dense_vector",
+        "dims": 384
+      },
+      "product_image_vector": {
+        "type": "dense_vector",
+        "dims": 768
+      },
       "filter_brand": {
         "type": "keyword"
       },
@@ -96,6 +104,24 @@
       }
     },
     "dynamic_templates": [
+      {
+        "vector_attributes_768": {
+          "match": "*_768",
+          "mapping": {
+            "type": "dense_vector",
+            "dims": 768
+          }
+        }
+      },
+      {
+      "vector_attributes_384": {
+        "match": "*_384",
+        "mapping": {
+          "type": "dense_vector",
+          "dims": 384
+        }
+      }
+      },
       {
         "numerical_attributes": {
           "match": "attr_n_*",

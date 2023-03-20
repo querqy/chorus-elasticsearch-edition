@@ -33,6 +33,7 @@ observability=false
 shutdown=false
 offline_lab=false
 local_deploy=true
+vector_search=false
 stop=false
 
 while [ ! $# -eq 0 ]
@@ -58,6 +59,10 @@ do
   		local_deploy=false
       echo -e "${MAJOR}Configuring Chorus for chorus-es-edition.dev.o19s.com environment${RESET}"
   		;;
+    --with-vector-search | -vector)
+        vector_search=true
+        log_major "Configuring Chorus with vector search services enabled"
+        ;;
     --shutdown | -s)
 			shutdown=true
       echo -e "${MAJOR}Shutting down Chorus\n${RESET}"
@@ -86,6 +91,17 @@ if ! $local_deploy; then
   sed -i.bu 's/keycloak:9080/chorus-es-edition.dev.o19s.com:9080/g'  ./docker-compose.yml
   sed -i.bu 's/localhost:9200/chorus-es-edition.dev.o19s.com:9200/g'  ./reactivesearch/src/App.js
 fi
+
+if $vector_search; then
+  docker_memory_allocated=`docker info --format '{{json .MemTotal}}'`
+  echo "Memory total is ${docker_memory_allocated}"
+
+  if (( $docker_memory_allocated < 10737418240 )); then
+    docker_memory_allocated_in_gb=$((docker_memory_allocated/1024/1024/1024))
+    log_red "You have only ${docker_memory_allocated_in_gb} GB memory allocated to Docker, and you need at least 10GB for vectors demo."
+  fi
+fi
+
 
 if $stop; then
   services="${services} grafana elasticsearch-exporter quepid rre keycloak"
@@ -127,36 +143,44 @@ curl -u 'elastic:ElasticRocks' -X POST "localhost:9200/_security/role/anonymous_
 echo -e "${MAJOR}Creating ecommerce index, defining its mapping & settings\n${RESET}"
 curl -u 'elastic:ElasticRocks' -s -X PUT "localhost:9200/ecommerce/" -H 'Content-Type: application/json' --data-binary @./elasticsearch/schema.json
 
-if [ ! -f ./icecat-products-w_price-19k-20201127.tar.gz ]; then
+if $vector_search; then
+  # Populating product data for vector search
+  log_major "Populating products for vector search, please give it a few minutes!"
+  ./index-vectors.sh
+
+else
+  # Populating product data for non-vector search
+  if [ ! -f ./icecat-products-w_price-19k-20201127.tar.gz ]; then
     echo -e "${MAJOR}Downloading the sample product data\n${RESET}"
     wget https://querqy.org/datasets/icecat/icecat-products-w_price-19k-20201127.tar.gz
-fi
+  fi
 
-if [ ! -f ./icecat-products-w_price-19k-20201127.json ]; then
+  if [ ! -f ./icecat-products-w_price-19k-20201127.json ]; then
     echo -e "${MAJOR}Unpacking the sample product data, please give it a few minutes!\n${RESET}"
     tar xzf icecat-products-w_price-19k-20201127.tar.gz
+  fi
+
+  if [ ! -f ./transformed_data.json ]; then
+    output=transformed_data.json
+
+    for row in $(cat icecat-products-w_price-19k-20201127.json | jq -r '.[] | @base64'); do
+        my_line=$(echo ${row} | base64 --decode)
+        _id() {
+         echo ${my_line} | jq -r .id
+        }
+        _jq() {
+         echo ${my_line} | jq -r ${1}
+        }
+       echo { \"index\" : {\"_id\" : \"$(_id)\"}} >> ${output}
+       echo $(_jq '.') >> ${output}
+    done
+  fi
+  echo -e "${MAJOR}Indexing the sample product data, please wait...\n${RESET}"
+  curl -u 'elastic:ElasticRocks' -s -X POST "localhost:9200/ecommerce/_bulk?pretty" -H 'Content-Type: application/json' --data-binary @transformed_data.json
+
 fi
 
-if [ ! -f ./transformed_data.json ]; then
-  output=transformed_data.json
-
-  for row in $(cat icecat-products-w_price-19k-20201127.json | jq -r '.[] | @base64'); do
-      my_line=$(echo ${row} | base64 --decode)
-      _id() {
-       echo ${my_line} | jq -r .id
-      }
-      _jq() {
-       echo ${my_line} | jq -r ${1}
-      }
-     echo { \"index\" : {\"_id\" : \"$(_id)\"}} >> ${output}
-     echo $(_jq '.') >> ${output}
-  done
-fi
-
-echo -e "${MAJOR}Indexing the sample product data, please wait...\n${RESET}"
-curl -u 'elastic:ElasticRocks' -s -X POST "localhost:9200/ecommerce/_bulk?pretty" -H 'Content-Type: application/json' --data-binary @transformed_data.json
-
-echo -e "${MAJOR}Creating default (emty) query rewriters\n${RESET}"
+echo -e "${MAJOR}Creating default (empty) query rewriters\n${RESET}"
 # Query rewriters are configured empty, without any rules. This ensures that no errors occur when the different
 # relevance algorithms are used in the frontend before any rules are set.
 # For configuring the rules SMUI will be set up and used.
