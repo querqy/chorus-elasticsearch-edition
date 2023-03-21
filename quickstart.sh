@@ -220,6 +220,35 @@ curl -u 'elastic:ElasticRocks' -s --request PUT 'http://localhost:9200/_querqy/r
     }
 }'
 
+curl -u 'elastic:ElasticRocks' -s --request PUT 'http://localhost:9200/_querqy/rewriter/embtext' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "class": "querqy.elasticsearch.rewriter.ElasticsearchEmbeddingsRewriterFactory",
+    "config": {
+                   "model" : {
+                     "class": "querqy.embeddings.ChorusEmbeddingModel",
+                     "url": "http://embeddings:8000/minilm/text/",
+                     "normalize": false,
+                     "cache" : "embeddings"
+                   }
+               }
+}'
+
+curl -u 'elastic:ElasticRocks' -s --request PUT 'http://localhost:9200/_querqy/rewriter/embimg' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "class": "querqy.elasticsearch.rewriter.ElasticsearchEmbeddingsRewriterFactory",
+    "config": {
+                   "model" : {
+                     "class": "querqy.embeddings.ChorusEmbeddingModel",
+                     "url": "http://embeddings:8000/clip/text/",
+                     "normalize": false,
+                     "cache" : "embeddings"
+                   }
+               }
+}'
+
+
 echo -e "${MAJOR}Setting up SMUI\n${RESET}"
 while [ $(curl -s http://localhost:9000/api/v1/solr-index | wc -c) -lt 2 ]; do
     echo "Waiting 5s for SMUI to be ready..."
