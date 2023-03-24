@@ -90,11 +90,13 @@
       },
       "product_vector": {
         "type": "dense_vector",
-        "dims": 384
+        "dims": 384,
+        "index": true
       },
       "product_image_vector": {
         "type": "dense_vector",
-        "dims": 768
+        "dims": 768,
+        "index": true
       },
       "filter_brand": {
         "type": "keyword"

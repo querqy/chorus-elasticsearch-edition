@@ -1,0 +1,8 @@
+sentence-transformers
+fastapi
+uvicorn[standard]
+gunicorn
+pydantic
+torch
+git+https://github.com/openai/CLIP.git
+
