@@ -61,7 +61,7 @@ do
   		;;
     --with-vector-search | -vector)
         vector_search=true
-        log_major "Configuring Chorus with vector search services enabled"
+        echo -e "${MAJOR}Configuring Chorus with vector search services enabled${RESET}"
         ;;
     --shutdown | -s)
 			shutdown=true
@@ -220,34 +220,37 @@ curl -u 'elastic:ElasticRocks' -s --request PUT 'http://localhost:9200/_querqy/r
     }
 }'
 
-curl -u 'elastic:ElasticRocks' -s --request PUT 'http://localhost:9200/_querqy/rewriter/embtext' \
---header 'Content-Type: application/json' \
---data-raw '{
-    "class": "querqy.elasticsearch.rewriter.ElasticsearchEmbeddingsRewriterFactory",
-    "config": {
+if $vector_search; then
+  log_minor "Defining Vector enabled relevancy algorithms using ParamSets."
+
+  curl -u 'elastic:ElasticRocks' -s --request PUT 'http://localhost:9200/_querqy/rewriter/embtext' \
+  --header 'Content-Type: application/json' \
+  --data-raw '{
+      "class": "querqy.elasticsearch.rewriter.EmbeddingsRewriterFactory",
+      "config": {
                    "model" : {
-                     "class": "querqy.embeddings.ChorusEmbeddingModel",
+                     "class": "querqy.elasticsearch.rewriter.ChorusEmbeddingModel",
                      "url": "http://embeddings:8000/minilm/text/",
                      "normalize": false,
                      "cache" : "embeddings"
                    }
                }
-}'
+  }'
 
-curl -u 'elastic:ElasticRocks' -s --request PUT 'http://localhost:9200/_querqy/rewriter/embimg' \
---header 'Content-Type: application/json' \
---data-raw '{
-    "class": "querqy.elasticsearch.rewriter.ElasticsearchEmbeddingsRewriterFactory",
-    "config": {
+  curl -u 'elastic:ElasticRocks' -s --request PUT 'http://localhost:9200/_querqy/rewriter/embimg' \
+  --header 'Content-Type: application/json' \
+  --data-raw '{
+      "class": "querqy.elasticsearch.rewriter.EmbeddingsRewriterFactory",
+      "config": {
                    "model" : {
-                     "class": "querqy.embeddings.ChorusEmbeddingModel",
+                     "class": "querqy.elasticsearch.rewriter.ChorusEmbeddingModel",
                      "url": "http://embeddings:8000/clip/text/",
                      "normalize": false,
                      "cache" : "embeddings"
                    }
                }
-}'
-
+  }'
+fi
 
 echo -e "${MAJOR}Setting up SMUI\n${RESET}"
 while [ $(curl -s http://localhost:9000/api/v1/solr-index | wc -c) -lt 2 ]; do
@@ -278,6 +281,12 @@ if $observability; then
   curl -u admin:password -S -X POST -H "Content-Type: application/json" -d '{"email":"admin@choruselectronics.com", "name":"Chorus Admin", "role":"admin", "login":"admin@choruselectronics.com", "password":"password", "theme":"light"}' http://localhost:9091/api/admin/users
   curl -u admin:password -S -X PUT -H "Content-Type: application/json" -d '{"isGrafanaAdmin": true}' http://localhost:9091/api/admin/users/2/permissions
   curl -u admin:password -S -X POST -H "Content-Type: application/json" http://localhost:9091/api/users/2/using/1
+fi
+
+if $vector_search; then
+  log_major "Setting up Embeddings service"
+  docker-compose up -d --build embeddings
+  ./embeddings/wait-for-api.sh
 fi
 
 echo -e "${MAJOR}Welcome to Chorus ES Edition!${RESET}"
