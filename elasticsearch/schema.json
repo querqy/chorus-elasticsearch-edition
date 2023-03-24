@@ -91,12 +91,14 @@
       "product_vector": {
         "type": "dense_vector",
         "dims": 384,
-        "index": true
+        "index": true,
+        "similarity": "cosine"
       },
       "product_image_vector": {
         "type": "dense_vector",
         "dims": 768,
-        "index": true
+        "index": true,
+        "similarity": "cosine"
       },
       "filter_brand": {
         "type": "keyword"
