@@ -38,7 +38,7 @@ services:
     container_name: elasticsearch
     build: ./elasticsearch/.
     environment:
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "ES_JAVA_OPTS=-Xms768m -Xmx768m"
       - "discovery.type=single-node"
       - xpack.security.enabled=true  # override what is in elasticsearch.yml
       - bootstrap.memory_lock=true
@@ -186,6 +186,22 @@ services:
     command: "java -jar rre-server-1.1.jar"
     depends_on:
       - elasticsearch
+
+  embeddings:
+    container_name: embeddings
+    build:
+      context: ./embeddings
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - OMP_NUM_THREADS=1
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 512M
 
   elasticsearch-exporter:
     image: quay.io/prometheuscommunity/elasticsearch-exporter:latest

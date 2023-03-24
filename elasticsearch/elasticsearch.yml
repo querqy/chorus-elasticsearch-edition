@@ -8,6 +8,9 @@ http.cors:
   allow-methods: OPTIONS, HEAD, GET, POST, PUT, DELETE
   allow-headers: "X-Requested-With, Content-Type, Content-Length, if-modified-since, Authorization"
 
+http.max_content_length: 500mb
+indexing_pressure.memory.limit: 50%
+
 # Anonymous user can read all
 xpack.security.authc:
   anonymous:

@@ -108,7 +108,95 @@ class App extends Component {
                       }
                     }
                   }
-                } else { console.log("Could not determine algorithm"); }
+                } else if (algo === "querqy_boost_by_img_emb") {
+                  return {
+                    query: {
+                      querqy: {
+                        matching_query: {
+                          query: value
+                        },
+                        query_fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"],
+                        rewriters: [
+                          {
+                            "name": "embimg",
+                            "params": {
+                              "topK": 200,
+                              "mode": "BOOST",
+                              "f": "product_image_vector",
+                              "boost": 10.0
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                } else if (algo === "querqy_match_by_img_emb") {
+                  return {
+                    query: {
+                      querqy: {
+                        matching_query: {
+                          query: value
+                        },
+                        query_fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"],
+                        rewriters: [
+                          {
+                            "name": "embimg",
+                            "params": {
+                              "topK": 200,
+                              "mode": "MAIN_QUERY",
+                              "f": "product_image_vector"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                } if (algo === "querqy_boost_by_txt_emb") {
+                  return {
+                    query: {
+                      querqy: {
+                        matching_query: {
+                          query: value
+                        },
+                        query_fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"],
+                        rewriters: [
+                          {
+                            "name": "embtxt",
+                            "params": {
+                              "topK": 200,
+                              "mode": "BOOST",
+                              "f": "product_vector",
+                              "boost": 10.0
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                } else if (algo === "querqy_match_by_txt_emb") {
+                  return {
+                    query: {
+                      querqy: {
+                        matching_query: {
+                          query: value
+                        },
+                        query_fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"],
+                        rewriters: [
+                          {
+                            "name": "embtxt",
+                            "params": {
+                              "topK": 200,
+                              "mode": "MAIN_QUERY",
+                              "f": "product_vector"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                } else {
+                  console.log("Could not determine algorithm");
+                }
               }
             }
           />

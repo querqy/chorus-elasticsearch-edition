@@ -145,7 +145,7 @@ curl -u 'elastic:ElasticRocks' -s -X PUT "localhost:9200/ecommerce/" -H 'Content
 
 if $vector_search; then
   # Populating product data for vector search
-  log_major "Populating products for vector search, please give it a few minutes!"
+  echo "Populating products for vector search, please give it a few minutes!"
   ./index-vectors.sh
 
 else
@@ -221,9 +221,9 @@ curl -u 'elastic:ElasticRocks' -s --request PUT 'http://localhost:9200/_querqy/r
 }'
 
 if $vector_search; then
-  log_minor "Defining Vector enabled relevancy algorithms using ParamSets."
+  echo "Creating embedding rewriters."
 
-  curl -u 'elastic:ElasticRocks' -s --request PUT 'http://localhost:9200/_querqy/rewriter/embtext' \
+  curl -u 'elastic:ElasticRocks' -s --request PUT 'http://localhost:9200/_querqy/rewriter/embtxt' \
   --header 'Content-Type: application/json' \
   --data-raw '{
       "class": "querqy.elasticsearch.rewriter.EmbeddingsRewriterFactory",
@@ -284,7 +284,7 @@ if $observability; then
 fi
 
 if $vector_search; then
-  log_major "Setting up Embeddings service"
+  echo "Setting up Embeddings service"
   docker-compose up -d --build embeddings
   ./embeddings/wait-for-api.sh
 fi
