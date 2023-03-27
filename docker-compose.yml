@@ -38,7 +38,7 @@ services:
     container_name: elasticsearch
     build: ./elasticsearch/.
     environment:
-      - "ES_JAVA_OPTS=-Xms768m -Xmx768m"
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - "discovery.type=single-node"
       - xpack.security.enabled=true  # override what is in elasticsearch.yml
       - bootstrap.memory_lock=true
