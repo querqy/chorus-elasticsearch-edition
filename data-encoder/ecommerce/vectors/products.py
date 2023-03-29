@@ -6,11 +6,18 @@ import requests
 from zipfile import *
 from sentence_transformers import SentenceTransformer
 from PIL import Image
+from transformers import CLIPTokenizer
+import torch
+import clip
 
 PATH_PRODUCTS_DATASET = "data-encoder/ecommerce/vectors/data"
 # Name of the zip file (without .zip extension)
 NAME_DATASET = "1.json"
 PATH_PRODUCTS_MODEL = "all-MiniLM-L6-v2"
+
+# Load the CLIP model
+device = "cuda" if torch.cuda.is_available() else "cpu"
+model, preprocess = clip.load('ViT-L/14', device)
 
 def load_products_dataset():
     with ZipFile(PATH_PRODUCTS_DATASET+"/"+NAME_DATASET+".zip") as dataZip:
@@ -33,10 +40,6 @@ def get_product_image(product):
     return product_img
 
 
-def get_product_images(products_dataset):
-    return [get_product_image(product) for product in products_dataset]
-
-
 def load_products_embedding_model():
     return SentenceTransformer(PATH_PRODUCTS_MODEL)
 
@@ -50,18 +53,24 @@ def calculate_products_vectors(model, products_dataset):
     products_sentences = get_products_sentences(model, products_dataset)
     return model.encode(products_sentences)
 
-def calculate_product_image_vectors(model , product):
+def calculate_product_image_vectors(product):
     try:
         image = get_product_image(product)
         r = requests.get(image, stream=True)
-        pImage = Image.open(io.BytesIO(r.content))
-        return model.encode(image)
+        # Load and preprocess the image
+        validated_image = Image.open(r.raw)
+        preprocess_image = preprocess(validated_image).unsqueeze(0).to(device)
+        # Encode the image
+        with torch.no_grad():
+            image_encoding = model.encode_image(preprocess_image)[0]
+            #print(image_encoding)
+            return image_encoding
     except Exception:
         return []
 
 
-def calculate_products_image_vectors_clip(model, products_dataset):
-    products_images = [calculate_product_image_vectors(model, product) for product in products_dataset]
+def calculate_products_image_vectors_clip(products_dataset):
+    products_images = [calculate_product_image_vectors(product) for product in products_dataset]
     return products_images
 
 
