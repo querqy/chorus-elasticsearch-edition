@@ -1,0 +1,2 @@
+sentence-transformers
+rake_nltk
