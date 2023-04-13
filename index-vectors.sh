@@ -23,19 +23,21 @@ DATA_DIR="./elasticsearch/data"
 #fi
 
 cd $DATA_DIR
+
 for f in docs-vectors*.json;
   do
     f_bulk="${f}.bulk"
+    rm $f_bulk
     for row in $(cat $f | jq -r '.[] | @base64'); do
         my_line=$(echo ${row} | base64 --decode)
         _extract_id() {
           echo ${my_line} | jq -r ._id
         }
         _extract_product() {
-          echo ${my_line} | jq -r ${1}
+          echo ${my_line} | jq -r ._source
         }
-       echo { \"index\" : {\"_id\" : \"$(_extract_id)\"}} >> ${f_bulk}
-       echo $(_extract_product '.') >> ${f_bulk}
+       echo { \"index\" : {\"_id\" : \"$(_extract_id)\" }} >> ${f_bulk}
+       echo $(_extract_product) >> ${f_bulk}
     done
 
     echo "Populating products from ${f}, please give it a few minutes!"
