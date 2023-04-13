@@ -291,11 +291,6 @@
       "content_length" : {
         "type" : "long"
       },
-      "content_minhash" : {
-        "type" : "minhash",
-        "minhash_analyzer" : "minhash_analyzer",
-        "copy_bits_to" : [ ]
-      },
       "content_minhash_bits" : {
         "type" : "keyword"
       },
@@ -640,32 +635,28 @@
       "filter" : {
         "english_keywords" : {
           "type" : "keyword_marker",
-          "keywords_path" : "/usr/share/elasticsearch/config/dictionary/en/protwords.txt"
+          "keywords_path" : "dictionary/en/protwords.txt"
         },
         "hudx_override" : {
           "type" : "stemmer_override",
-          "rules_path" : "/usr/share/elasticsearch/config/dictionary/hudx/stemmer_override.txt"
-        },
-        "alphanum_word_filter" : {
-          "type" : "alphanum_word",
-          "max_token_length" : "20"
+          "rules_path" : "dictionary/hudx/stemmer_override.txt"
         },
         "hudx_synonym_filter" : {
           "type" : "synonym_graph",
-          "synonyms_path" : "/usr/share/elasticsearch/config/dictionary/hudx/synonyms.txt",
+          "synonyms_path" : "dictionary/hudx/synonyms.txt",
           "updateable" : "true"
         },
         "stopword_en_filter" : {
           "type" : "stop",
-          "stopwords_path" : "/usr/share/elasticsearch/config/dictionary/en/stopwords.txt"
+          "stopwords_path" : "dictionary/en/stopwords.txt"
         },
         "hudx_keywords" : {
           "type" : "keyword_marker",
-          "keywords_path" : "/usr/share/elasticsearch/config/dictionary/hudx/protwords.txt"
+          "keywords_path" : "dictionary/hudx/protwords.txt"
         },
         "synonym_filter" : {
           "type" : "synonym_graph",
-          "synonyms_path" : "/usr/share/elasticsearch/config/dictionary/synonym.txt"
+          "synonyms_path" : "dictionary/synonym.txt"
         },
         "truncate10_filter" : {
           "length" : "10",
@@ -677,13 +668,13 @@
         },
         "english_override" : {
           "type" : "stemmer_override",
-          "rules_path" : "/usr/share/elasticsearch/config/dictionary/en/stemmer_override.txt"
+          "rules_path" : "dictionary/en/stemmer_override.txt"
         },
         "minhash_filter" : {
           "bit" : "2",
           "seed" : "1",
           "size" : "64",
-          "type" : "minhash"
+          "type" : "min_hash"
         },
         "shingle" : {
           "max_shingle_size" : "3",
@@ -702,7 +693,7 @@
       "char_filter" : {
         "mapping_ja_filter" : {
           "type" : "mapping",
-          "mappings_path" : "/usr/share/elasticsearch/config/dictionary/ja/mapping.txt"
+          "mappings_path" : "dictionary/ja/mapping.txt"
         },
         "removeall_filter" : {
           "pattern" : "(.*)",
@@ -711,19 +702,18 @@
         },
         "mapping_filter" : {
           "type" : "mapping",
-          "mappings_path" : "/usr/share/elasticsearch/config/dictionary/mapping.txt"
+          "mappings_path" : "dictionary/mapping.txt"
         },
         "zero_width_spaces" : {
           "type" : "mapping",
           "mappings" : [
-            """\u200C=> """
+            "\\u200C=> "
           ]
         }
       },
       "analyzer" : {
         "suggester_search_analyzer" : {
           "filter" : [
-            "alphanum_word_filter",
             "lowercase",
             "english_keywords",
             "english_override",
@@ -737,8 +727,6 @@
         },
         "standard_search_analyzer" : {
           "filter" : [
-            "disable_graph",
-            "alphanum_word_filter",
             "cjk_bigram",
             "lowercase",
             "stopword_en_filter",
@@ -774,8 +762,6 @@
         },
         "synonym_search_analyzer" : {
           "filter" : [
-            "disable_graph",
-            "alphanum_word_filter",
             "cjk_bigram",
             "lowercase",
             "hudx_synonym_filter",
@@ -792,8 +778,6 @@
         },
         "standard_analyzer" : {
           "filter" : [
-            "disable_graph",
-            "alphanum_word_filter",
             "cjk_bigram",
             "lowercase",
             "asciifolding",
@@ -829,7 +813,6 @@
         },
         "minhash_analyzer" : {
           "filter" : [
-            "alphanum_word_filter",
             "cjk_bigram",
             "lowercase",
             "stopword_en_filter",
@@ -862,32 +845,32 @@
       },
       "tokenizer" : {
         "split_on_pipe" : {
-          "pattern" : """\|""",
+          "pattern" : "|",
           "type" : "pattern"
         },
         "unigram_search_tokenizer" : {
           "dynamic_reload" : "true",
           "expand" : "false",
           "reload_interval" : "1m",
-          "type" : "ngram_synonym",
-          "synonyms_path" : "/usr/share/elasticsearch/config/dictionary/synonym.txt",
+          "type" : "ngram",
+          "synonyms_path" : "dictionary/synonym.txt",
           "n" : "1"
         },
         "unigram_tokenizer" : {
           "dynamic_reload" : "true",
           "expand" : "true",
           "reload_interval" : "1m",
-          "type" : "ngram_synonym",
-          "synonyms_path" : "/usr/share/elasticsearch/config/dictionary/synonym.txt",
+          "type" : "ngram",
+          "synonyms_path" : "dictionary/synonym.txt",
           "n" : "1"
         },
         "bigram_tokenizer" : {
           "expand" : "false",
           "expand_ngram" : "true",
-          "synonyms_path" : "/usr/share/elasticsearch/config/dictionary/synonym.txt",
+          "synonyms_path" : "dictionary/synonym.txt",
           "dynamic_reload" : "true",
           "reload_interval" : "1m",
-          "type" : "ngram_synonym",
+          "type" : "ngram",
           "n" : "2"
         }
       }

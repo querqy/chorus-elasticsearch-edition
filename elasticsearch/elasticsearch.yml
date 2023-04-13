@@ -8,8 +8,10 @@ http.cors:
   allow-methods: OPTIONS, HEAD, GET, POST, PUT, DELETE
   allow-headers: "X-Requested-With, Content-Type, Content-Length, if-modified-since, Authorization"
 
+xpack.security.autoconfiguration.enabled: false
+
 # Anonymous user can read all
-xpack.security.authc:
-  anonymous:
-    roles: anonymous_user
-    authz_exception: true
+#xpack.security.authc:
+#  anonymous:
+#    roles: anonymous_user
+#    authz_exception: true

@@ -3,5 +3,10 @@ from transformers import pipeline
 
 summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
 
-def summarise_content(targetContent,maxContentLength,minContentLength):
-    return(summarizer(targetContent, max_length=maxContentLength, min_length=minContentLength, do_sample=False))
+def summarize_content(text: str, max_len: int) -> str:
+    try:
+        summary = summarizer(text, max_length=max_len, min_length=10, do_sample=False)
+        return summary[0]["summary_text"]
+    except IndexError as ex:
+        #print("Sequence length too large")
+        return summarize_content(text[:1000],max_len)

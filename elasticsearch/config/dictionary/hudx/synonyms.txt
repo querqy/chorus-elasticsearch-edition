@@ -1,0 +1,81 @@
+811 pra, 811 project rental assistance
+aedi, appalachia economic development initiative
+affh ui, affirmatively furthering fair housing user interface
+alcp, assisted living conversion program
+apps, active partners performance system
+arc, appalachian regional commission
+bbc, better buildings challenge
+bcci, border community capital initiative
+bedi, brownfields economic development initiative
+brac, base realignment and closure
+caivrs, credit alert verification reporting system
+cdbg-cv, cdbg cares act
+cdbg-mit, cdbg mitigation
+cna e-tool, capital needs assessment e-tool
+cpd, community planning and development
+dasp, distressed asset sale stabilization
+dcci, delta community capital initiative
+dcta, distressed cities technical assistance
+e-snaps, homeless assistance application and grants management system
+ecrp, emergency capital repairs program
+edi, economic development initiative
+eem, energy efficient mortgage
+eiv, enterprise income verification system
+fhap, fair housing assistance program
+fheo, office of fair housing and equal opportunity
+fhip, fair housing initiatives program
+fsrs, ffata subaward reporting system
+gba, grant based accounting
+gmo, grants management and oversight division
+h2, housing-healthcare coordination
+hcs, housing counseling system
+hdx, homelessness data exchange
+hems, hud enforcement management systems
+hmis, homeless management information system
+hopwa, housing opportunities for persons with aids
+hprp, homelessness prevention and rapid re-housing
+htf, housing trust fund
+hud-vash, hud veterans affairs supportive housing
+icdbg, indian community development block grant
+ihbg, indian housing block grant
+ims/pic, inventory management system/pih information center
+irems, integrated real estate management system
+lai, location affordability index
+leap, lender electronic assessment portal
+m2m, mark to market
+mtw, moving to work demonstration
+multifamily fss, multifamily family self sufficiency
+nfhta, national fair housing training academy
+ni, neighborhood initiative grants
+nn, neighborhood networks
+nsp, neighborhood stabilization program
+oh, office of housing
+olhchh, office of lead hazard control and healthy homes
+oz, opportunity zones
+pd&r, office of policy development and research
+pfs-psh, pay for success permanent supportive housing demonstration
+pih, public and indian housing
+pit, point in time
+rad, rental assistance demonstration
+ramps, recovery act management and performance system
+reac, real estate assessment center online systems
+renew300, advancing renewable energy in affordable housing
+rhed, rural housing and economic development
+rhp, recovery housing program
+rhsp, rural housing stability assistance program
+ross, resident opportunity and self-sufficiency
+s+c, shelter plus care
+sc2, strong cities, strong communities initiative
+sci, sustainable communities initiative
+scmf, service coordinators in multifamily housing
+seed, stem energy and economic development
+sfs, standards for success
+shop, self-help homeownership opportunity program
+shp, supportive housing program
+spears, section 3 performance evaluation and registry system
+sprac, senior preservation rental assistance contracts
+sro, section 8 moderate rehabilitation single room occupancy
+tracs, tenant rental assistance certification system
+ura, uniform relocation act
+vhpd, veterans homelessness prevention demonstration
+yhdp, youth homelessness demonstration program

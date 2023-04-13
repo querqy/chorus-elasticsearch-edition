@@ -1,0 +1,109 @@
+811 pra => 811 pra
+
+aedi => aedi
+affh ui => affh ui
+alcp => alcp
+apps => apps
+arc => arc
+
+bbc => bbc
+bcci => bcci
+bedi => bedi
+brac => brac
+
+caivrs => caivrs
+cdbg => cdbg
+cdbg-cv => cdbg-cv
+cdbg-dr => cdbg-dr
+cdbg-mit => cdbg-mit
+cna e-tool => cna e-tool
+coc => coc
+cpd => cpd
+
+dasp => dasp
+dcci => dcci
+dcta => dcta
+drgr => drgr
+
+e-snaps => e-snaps
+ecrp => ecrp
+edi => edi
+eem => eem
+eiv => eiv
+esg => esg
+
+fhap => fhap
+fheo => fheo
+fhip => fhip
+fsrs => fsrs
+fss => fss
+
+gba => gba
+gmo => gmo
+
+h2 => h2
+hcs => hcs
+hdx => hdx
+hems => hems
+heros => heros
+hmis => hmis
+home => home
+hopwa => hopwa
+hprp => hprp
+htf => htf
+hud-vash => hud-vash
+
+icdbg => icdbg
+idis => idis
+ihbg => ihbg
+ims/pic => ims/pic
+irems => irems
+
+lai => lai
+leap => leap
+
+m2m => m2m
+mtw => mtw
+multifamily fss => multifamily fss
+
+nfhta => nfhta
+ni => ni
+nn => nn
+nsp => nsp
+
+oh => oh
+olhchh => olhchh
+oz => oz
+pd&r => pd&r
+
+pfs-psh => pfs-psh
+pih => pih
+
+rad => rad
+ramps => ramps
+reac => reac
+renew300 => renew300
+rhed => rhed
+rhp => rhp
+rhsp => rhsp
+ross => ross
+
+s+c => s+c
+sc2 => sc2
+sci => sci
+scmf => scmf
+seed => seed
+sfs => sfs
+shop => shop
+shp => shp
+spears => spears
+sprac => sprac
+sro => sro
+
+tracs => tracs
+
+ura => ura
+
+vhpd => vhpd
+
+yhdp => yhdp

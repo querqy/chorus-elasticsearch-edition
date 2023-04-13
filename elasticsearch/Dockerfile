@@ -1,5 +1,6 @@
 FROM docker.elastic.co/elasticsearch/elasticsearch:8.5.3
 COPY querqy-elasticsearch-1.8.es853.0-SNAPSHOT.zip /usr/share/elasticsearch/querqy-elasticsearch-1.8.es853.0-SNAPSHOT.zip
+COPY config/dictionary /usr/share/elasticsearch/config/dictionary
 WORKDIR /usr/share/elasticsearch
 
 # Use this once the plugin is released

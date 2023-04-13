@@ -10,11 +10,14 @@ docs_dataset = docs.load_docs_dataset()
 #### Use the embedding model to calculate vectors for all docs
 docs_vectors = docs.calculate_docs_vectors(docs_dataset)
 
+#### Prepare the list of content field for keywords and summarisation
+contentList = docs.get_docs_contents(docs_dataset)
+
 #### Generating keywords over the content for all docs
-docs_keywords = docs.get_raked_keywords(docs_dataset)
+docs_keywords = docs.get_raked_keywords(contentList)
 
 #### Summarising content for all docs
-docs_summarise = docs.get_summarised_content(docs_dataset)
+docs_summarise = docs.get_summarised_content(contentList)
 #print(docs_summarise)
 
 
