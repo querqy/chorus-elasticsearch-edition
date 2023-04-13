@@ -25,7 +25,20 @@ DATA_DIR="./elasticsearch/data"
 cd $DATA_DIR
 for f in docs-vectors*.json;
   do
+    f_bulk="${f}.bulk"
+    for row in $(cat $f | jq -r '.[] | @base64'); do
+        my_line=$(echo ${row} | base64 --decode)
+        _extract_id() {
+          echo ${my_line} | jq -r ._id
+        }
+        _extract_product() {
+          echo ${my_line} | jq -r ${1}
+        }
+       echo { \"index\" : {\"_id\" : \"$(_extract_id)\"}} >> ${f_bulk}
+       echo $(_extract_product '.') >> ${f_bulk}
+    done
+
     echo "Populating products from ${f}, please give it a few minutes!"
-    curl -u 'elastic:ElasticRocks' -s -X POST "localhost:9200/ecommerce/_bulk?pretty" -H --data-binary @"$f" -H 'Content-type:application/json ';
+    curl -u 'elastic:ElasticRocks' -s -X POST "localhost:9200/ecommerce/_bulk?pretty" --data-binary @"$f_bulk" -H 'Content-type:application/json';
     sleep 5
    done;
