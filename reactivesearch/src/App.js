@@ -49,8 +49,8 @@ class App extends Component {
           />
           <MultiList
             componentId="typefilter"
-            dataField="filter_product_type"
-            title="Filter by Product Types"
+            dataField="hudx_ct"
+            title="Filter by Content Types"
             size={20}
             showSearch={false}
             react={{
@@ -158,14 +158,14 @@ class App extends Component {
                         matching_query: {
                           query: value
                         },
-                        query_fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"],
+                        query_fields: ["title", "content" , "hudx_keywords_new", "hudx_digest_new"],
                         rewriters: [
                           {
                             "name": "embtxt",
                             "params": {
                               "topK": 200,
                               "mode": "BOOST",
-                              "f": "product_vector",
+                              "f": "text_vector",
                               "boost": 10.0
                             }
                           }
@@ -180,14 +180,14 @@ class App extends Component {
                         matching_query: {
                           query: value
                         },
-                        query_fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"],
+                        query_fields: ["title", "content" , "hudx_keywords_new", "hudx_digest_new"],
                         rewriters: [
                           {
                             "name": "embtxt",
                             "params": {
                               "topK": 200,
                               "mode": "MAIN_QUERY",
-                              "f": "product_vector"
+                              "f": "text_vector"
                             }
                           }
                         ]
@@ -206,7 +206,7 @@ class App extends Component {
             size={20}
             pagination={true}
             react={{
-              and: ["searchbox", "brandfilter", "typefilter"]
+              and: ["searchbox", "typefilter"]
             }}
             style={{ textAlign: "center" }}
             render={({ data }) => (
@@ -225,9 +225,7 @@ class App extends Component {
                       }}
                     />
                     <ResultCard.Description>
-                      {item.price/100 +
-                        " $ | " +
-                        item.supplier}
+                      {item.hudx_digest_new}
                     </ResultCard.Description>
                   </ResultCard>
                 ))}

@@ -3,7 +3,7 @@
 set -eo pipefail
 
 # The directory where we locally buffer data files before uploading to Elasticsearch
-DATA_DIR="./elasticsearch/data"
+DATA_DIR="elasticsearch/data"
 
 #if [ ! -f ./elasticsearch/data/products-vectors-1.json ]; then
 #  echo -e "${MAJOR}Downloading the products-vectors-1.json.${RESET}"
@@ -23,11 +23,11 @@ DATA_DIR="./elasticsearch/data"
 #fi
 
 cd $DATA_DIR
-
+command pwd
 for f in docs-vectors*.json;
   do
+    echo $f
     f_bulk="${f}.bulk"
-    rm $f_bulk
     for row in $(cat $f | jq -r '.[] | @base64'); do
         my_line=$(echo ${row} | base64 --decode)
         _extract_id() {
@@ -42,5 +42,6 @@ for f in docs-vectors*.json;
 
     echo "Populating products from ${f}, please give it a few minutes!"
     curl -u 'elastic:ElasticRocks' -s -X POST "localhost:9200/ecommerce/_bulk?pretty" --data-binary @"$f_bulk" -H 'Content-type:application/json';
+    rm $f_bulk
     sleep 5
    done;
