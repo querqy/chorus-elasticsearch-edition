@@ -1,4 +1,4 @@
-version: '2.2'
+version: '3.7'
 services:
 
   setup:
@@ -22,7 +22,7 @@ services:
 
   mysql:
     container_name: mysql
-    image: amd64/mysql:5.7.40
+    image: amd64/mysql:5.7.42
     ports:
       - 3306:3306
     environment:
@@ -110,7 +110,7 @@ services:
 
   redis:
     container_name: quepid_redis
-    image: redis:6.2.7-alpine
+    image: redis:7.0.11-alpine
     ports:
       - 6379:6379
 
@@ -216,7 +216,7 @@ services:
       - "9114:9114"
 
   keycloak:
-    image: quay.io/keycloak/keycloak:18.0.2
+    image: quay.io/keycloak/keycloak:21.0.2
     container_name: keycloak
     hostname: keycloak
     command: [ "start-dev", "--import-realm" ]
