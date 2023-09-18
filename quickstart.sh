@@ -41,10 +41,10 @@ do
 	case "$1" in
 		--help | -h)
       echo -e "Use the option --with-offline-lab | -lab to include Quepid and RRE services in Chorus."
-			echo -e "Use the option --with-observability | -obs to include Grafana, Prometheus, and Elasticsearch Exporter services in Chorus."
+			echo -e "Use the option --with-observability | -obs to include Grafana, Prometheus, and OpenSearch Exporter services in Chorus."
       echo -e "Use the option --shutdown | -s to shutdown and remove the Docker containers and data."
       echo -e "Use the option --stop to stop the Docker containers."
-      echo -e "Use the option --online-deployment | -online to update configuration to run on chorus-es-edition.dev.o19s.com environment."
+      echo -e "Use the option --online-deployment | -online to update configuration to run on chorus-os-edition.dev.o19s.com environment."
 			exit
 			;;
 		--with-observability | -obs)
@@ -57,7 +57,7 @@ do
 			;;
     --online-deployment | -online)
   		local_deploy=false
-      echo -e "${MAJOR}Configuring Chorus for chorus-es-edition.dev.o19s.com environment${RESET}"
+      echo -e "${MAJOR}Configuring Chorus for chorus-os-edition.dev.o19s.com environment${RESET}"
   		;;
     --with-vector-search | -vector)
         vector_search=true
@@ -75,9 +75,9 @@ do
 	shift
 done
 
-services="elasticsearch kibana chorus-ui smui"
+services="opensearch opensearch-dashboards chorus-ui smui"
 if $observability; then
-  services="${services} grafana elasticsearch-exporter"
+  services="${services} grafana opensearch-exporter"
 fi
 
 if $offline_lab; then
@@ -86,10 +86,10 @@ fi
 
 if ! $local_deploy; then
   echo -e "${MAJOR}Updating configuration files for online deploy${RESET}"
-  sed -i.bu 's/localhost:3000/chorus-es-edition.dev.o19s.com:3000/g'  ./keycloak/realm-config/chorus-realm.json
-  sed -i.bu 's/keycloak:9080/chorus-es-edition.dev.o19s.com:9080/g'  ./keycloak/wait-for-keycloak.sh
-  sed -i.bu 's/keycloak:9080/chorus-es-edition.dev.o19s.com:9080/g'  ./docker-compose.yml
-  sed -i.bu 's/localhost:9200/chorus-es-edition.dev.o19s.com:9200/g'  ./reactivesearch/src/App.js
+  sed -i.bu 's/localhost:3000/chorus-os-edition.dev.o19s.com:3000/g'  ./keycloak/realm-config/chorus-realm.json
+  sed -i.bu 's/keycloak:9080/chorus-os-edition.dev.o19s.com:9080/g'  ./keycloak/wait-for-keycloak.sh
+  sed -i.bu 's/keycloak:9080/chorus-os-edition.dev.o19s.com:9080/g'  ./docker-compose.yml
+  sed -i.bu 's/localhost:9200/chorus-os-edition.dev.o19s.com:9200/g'  ./reactivesearch/src/App.js
 fi
 
 if $vector_search; then
@@ -104,7 +104,7 @@ fi
 
 
 if $stop; then
-  services="${services} grafana elasticsearch-exporter quepid rre keycloak"
+  services="${services} grafana opensearch-exporter quepid rre keycloak"
   docker-compose stop ${services}
   exit
 fi
@@ -116,10 +116,10 @@ fi
 
 docker-compose up -d --build ${services}
 
-echo -e "${MAJOR}Waiting for Elasticsearch to start up and be online.${RESET}"
-./elasticsearch/wait-for-es.sh # Wait for Elasticsearch to be online
+echo -e "${MAJOR}Waiting for OpenSearch to start up and be online.${RESET}"
+./opensearch/wait-for-os.sh # Wait for OpenSearch to be online
 
-echo -e "${MAJOR}Setting up an admin user to explore Elasticsearch and a role for anonymous access to run RRE offline tests.\n${RESET}"
+echo -e "${MAJOR}Setting up an admin user to explore OpenSearch and a role for anonymous access to run RRE offline tests.\n${RESET}"
 curl -u 'elastic:ElasticRocks' -X POST "localhost:9200/_security/user/chorus_admin?pretty" -H 'Content-Type: application/json' -d'
 {
   "password" : "password",
@@ -141,7 +141,7 @@ curl -u 'elastic:ElasticRocks' -X POST "localhost:9200/_security/role/anonymous_
 '
 
 echo -e "${MAJOR}Creating ecommerce index, defining its mapping & settings\n${RESET}"
-curl -u 'elastic:ElasticRocks' -s -X PUT "localhost:9200/ecommerce/" -H 'Content-Type: application/json' --data-binary @./elasticsearch/schema.json
+curl -u 'elastic:ElasticRocks' -s -X PUT "localhost:9200/ecommerce/" -H 'Content-Type: application/json' --data-binary @./opensearch/schema.json
 
 if $vector_search; then
   # Populating product data for vector search
@@ -187,7 +187,7 @@ echo -e "${MAJOR}Creating default (empty) query rewriters\n${RESET}"
 curl -u 'elastic:ElasticRocks' -s --request PUT 'http://localhost:9200/_querqy/rewriter/common_rules' \
 --header 'Content-Type: application/json' \
 --data-raw '{
-    "class": "querqy.elasticsearch.rewriter.SimpleCommonRulesRewriterFactory",
+    "class": "querqy.opensearch.rewriter.SimpleCommonRulesRewriterFactory",
     "config": {
         "rules": ""
     }
@@ -196,7 +196,7 @@ curl -u 'elastic:ElasticRocks' -s --request PUT 'http://localhost:9200/_querqy/r
 curl -u 'elastic:ElasticRocks' -s --request PUT 'http://localhost:9200/_querqy/rewriter/common_rules_prelive' \
 --header 'Content-Type: application/json' \
 --data-raw '{
-    "class": "querqy.elasticsearch.rewriter.SimpleCommonRulesRewriterFactory",
+    "class": "querqy.opensearch.rewriter.SimpleCommonRulesRewriterFactory",
     "config": {
         "rules": ""
     }
@@ -205,7 +205,7 @@ curl -u 'elastic:ElasticRocks' -s --request PUT 'http://localhost:9200/_querqy/r
 curl -u 'elastic:ElasticRocks' -s --request PUT 'http://localhost:9200/_querqy/rewriter/replace' \
 --header 'Content-Type: application/json' \
 --data-raw '{
-    "class": "querqy.elasticsearch.rewriter.ReplaceRewriterFactory",
+    "class": "querqy.opensearch.rewriter.ReplaceRewriterFactory",
     "config": {
         "rules": ""
     }
@@ -214,7 +214,7 @@ curl -u 'elastic:ElasticRocks' -s --request PUT 'http://localhost:9200/_querqy/r
 curl -u 'elastic:ElasticRocks' -s --request PUT 'http://localhost:9200/_querqy/rewriter/replace_prelive' \
 --header 'Content-Type: application/json' \
 --data-raw '{
-    "class": "querqy.elasticsearch.rewriter.ReplaceRewriterFactory",
+    "class": "querqy.opensearch.rewriter.ReplaceRewriterFactory",
     "config": {
         "rules": ""
     }
@@ -226,10 +226,10 @@ if $vector_search; then
   curl -u 'elastic:ElasticRocks' -s --request PUT 'http://localhost:9200/_querqy/rewriter/embtxt' \
   --header 'Content-Type: application/json' \
   --data-raw '{
-      "class": "querqy.elasticsearch.rewriter.EmbeddingsRewriterFactory",
+      "class": "querqy.opensearch.rewriter.EmbeddingsRewriterFactory",
       "config": {
                    "model" : {
-                     "class": "querqy.elasticsearch.rewriter.ChorusEmbeddingModel",
+                     "class": "querqy.opensearch.rewriter.ChorusEmbeddingModel",
                      "url": "http://embeddings:8000/minilm/text/",
                      "normalize": false,
                      "cache" : "embeddings"
@@ -240,10 +240,10 @@ if $vector_search; then
   curl -u 'elastic:ElasticRocks' -s --request PUT 'http://localhost:9200/_querqy/rewriter/embimg' \
   --header 'Content-Type: application/json' \
   --data-raw '{
-      "class": "querqy.elasticsearch.rewriter.EmbeddingsRewriterFactory",
+      "class": "querqy.opensearch.rewriter.EmbeddingsRewriterFactory",
       "config": {
                    "model" : {
-                     "class": "querqy.elasticsearch.rewriter.ChorusEmbeddingModel",
+                     "class": "querqy.opensearch.rewriter.ChorusEmbeddingModel",
                      "url": "http://embeddings:8000/clip/text/",
                      "normalize": false,
                      "cache" : "embeddings"

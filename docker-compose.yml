@@ -2,7 +2,7 @@ version: '3.7'
 services:
 
   setup:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.5.3
+    image: opensearchproject/opensearch:2.3.0
     user: "0"
     command: >
       bash -c '
@@ -32,15 +32,14 @@ services:
       - ./mysql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
       - mysql_data:/var/lib/mysql
 
-  elasticsearch:
+  opensearch:
     depends_on:
       - setup
-    container_name: elasticsearch
-    build: ./elasticsearch/.
+    container_name: opensearch
+    build: ./opensearch/.
     environment:
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
       - "discovery.type=single-node"
-      - xpack.security.enabled=true  # override what is in elasticsearch.yml
       - bootstrap.memory_lock=true
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}  # default username is elastic
     ulimits:
@@ -48,8 +47,8 @@ services:
         soft: -1
         hard: -1
     volumes:
-      - ./elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
-      - es_data:/usr/share/elasticsearch/data
+      - ./opensearch/opensearch.yml:/usr/share/opensearch/config/opensearch.yml
+      - os_data:/usr/share/opensearch/data
     ports:
       - "9200:9200"
     healthcheck:
@@ -58,16 +57,17 @@ services:
       timeout: 10s
       retries: 50
 
-  kibana:
-    container_name: kibana
-    image: docker.elastic.co/kibana/kibana:8.5.3
-    environment:
-      - SERVERNAME=kibana
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-      - ELASTICSEARCH_USERNAME=kibana_system
-      - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
-    ports:
-      - 5601:5601
+
+#  opensearch-dashboards:
+#    container_name: opensearch-dashboards
+#    image: opensearchproject/opensearch-dashboards:2
+#    environment:
+#      - SERVERNAME=opensearch-dashboards
+#      - OPENSEARCH_HOSTS=http://opensearch:9200
+#      - ELASTICSEARCH_USERNAME=kibana_system
+#      - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
+#    ports:
+#      - 5601:5601
 
   chorus-ui:
     container_name: chorus_ui
@@ -125,9 +125,9 @@ services:
       - SMUI_DB_URL=jdbc:mysql://mysql:3306/smui?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
       - SMUI_DB_USER=root
       - SMUI_DB_PASSWORD=${SMUI_DB_PASSWORD}
-      - SMUI_DEPLOY_PRELIVE_SOLR_HOST=elasticsearch:9200
+      - SMUI_DEPLOY_PRELIVE_SOLR_HOST=opensearch:9200
       - SMUI_TOGGLE_UI_WITH_SOLR_FIELDS=false
-      - SMUI_2SOLR_SOLR_HOST=elasticsearch:9200
+      - SMUI_2SOLR_SOLR_HOST=opensearch:9200
       - SMUI_TOGGLE_DEPL_PRELIVE=true
       - SMUI_TOGGLE_SPELLING=true
       - SMUI_TOGGLE_DEPL_CUSTOM_SCRIPT=true
@@ -203,17 +203,17 @@ services:
         reservations:
           memory: 512M
 
-  elasticsearch-exporter:
-    image: quay.io/prometheuscommunity/elasticsearch-exporter:latest
-    container_name: elasticsearch-exporter
-    command:
-      - '--es.uri=http://elasticsearch:9200'
-    environment:
-      - ES_USERNAME=elastic
-      - ES_PASSWORD=${ELASTIC_PASSWORD}
-    restart: always
-    ports:
-      - "9114:9114"
+#  opensearch-exporter:
+#    image: quay.io/prometheuscommunity/elasticsearch-exporter:latest
+#    container_name: elasticsearch-exporter
+#    command:
+#      - '--es.uri=http://elasticsearch:9200'
+#    environment:
+#      - ES_USERNAME=elastic
+#      - ES_PASSWORD=${ELASTIC_PASSWORD}
+#    restart: always
+#    ports:
+#      - "9114:9114"
 
   keycloak:
     image: quay.io/keycloak/keycloak:21.0.2
