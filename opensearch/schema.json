@@ -3,7 +3,9 @@
     "index": {
       "number_of_shards": 1,
       "number_of_replicas": 0,
-      "mapping.total_fields.limit": 10000
+      "mapping.total_fields.limit": 10000,
+      "knn": true,
+      "knn.algo_param.ef_search": 100
     },
     "analysis": {
       "filter": {
@@ -89,16 +91,30 @@
         "fielddata": true
       },
       "product_vector": {
-        "type": "dense_vector",
-        "dims": 384,
-        "index": true,
-        "similarity": "cosine"
+        "type": "knn_vector",
+        "dimension": 384,
+        "method": {
+          "name": "hnsw",
+          "space_type": "l2",
+          "engine": "lucene",
+          "parameters": {
+            "ef_construction": 128,
+            "m": 24
+          }
+        }
       },
       "product_image_vector": {
-        "type": "dense_vector",
-        "dims": 768,
-        "index": true,
-        "similarity": "cosine"
+        "type": "knn_vector",
+        "dimension": 768,
+        "method": {
+          "name": "hnsw",
+          "space_type": "l2",
+          "engine": "lucene",
+          "parameters": {
+            "ef_construction": 128,
+            "m": 24
+          }
+        }
       },
       "filter_brand": {
         "type": "keyword"
@@ -112,8 +128,17 @@
         "vector_attributes_768": {
           "match": "*_768",
           "mapping": {
-            "type": "dense_vector",
-            "dims": 768
+            "type": "knn_vector",
+            "dimension": 768,
+            "method": {
+              "name": "hnsw",
+              "space_type": "l2",
+              "engine": "lucene",
+              "parameters": {
+                "ef_construction": 128,
+                "m": 24
+              }
+            }
           }
         }
       },
@@ -121,8 +146,17 @@
       "vector_attributes_384": {
         "match": "*_384",
         "mapping": {
-          "type": "dense_vector",
-          "dims": 384
+          "type": "knn_vector",
+          "dimension": 384,
+          "method": {
+            "name": "hnsw",
+            "space_type": "l2",
+            "engine": "lucene",
+            "parameters": {
+              "ef_construction": 128,
+              "m": 24
+            }
+          }
         }
       }
       },

@@ -3,7 +3,7 @@
 set -eo pipefail
 
 # The directory where we locally buffer data files before uploading to Elasticsearch
-DATA_DIR="./elasticsearch/data"
+DATA_DIR="./opensearch/data"
 
 # The URL prefix we're downloading from
 REMOTE_URL="https://o19s-public-datasets.s3.amazonaws.com/chorus/product-vectors-2023-03-23"
@@ -34,9 +34,13 @@ for ((i=1; i<=NUM_FILES;i++));
       fi
     fi
 
-    echo -e "${MAJOR}Converting JSON to NDJSON${RESET}"
     LOCAL_NDJSON_FILE="${LOCAL_JSON_FILE}.nd"
-    cat "$LOCAL_JSON_FILE" | jq -c '.[]' > $LOCAL_NDJSON_FILE
+    if [ -f "$LOCAL_NDJSON_FILE" ]; then
+      echo -e "${MAJOR}Skipping conversion from JSON to NDJSON.${RESET}"
+    else
+      echo -e "${MAJOR}Converting JSON to NDJSON${RESET}"
+      cat "$LOCAL_JSON_FILE" | jq -c '.[]' > $LOCAL_NDJSON_FILE
+    fi
 
     echo -e "${MAJOR}Splitting ${LOCAL_NDJSON_FILE} to a maximum of ${BULK_MAX} rows.${RESET}"
     split -l${BULK_MAX} $LOCAL_NDJSON_FILE "${DATA_DIR}/${PRODUCT_VECTORS_FILE}.splitted.nd."
@@ -46,6 +50,6 @@ for ((i=1; i<=NUM_FILES;i++));
         echo -e "${MAJOR}Converting ${f} to ES bulk format.${RESET}"
         awk '{print "{\"index\": {}}\n" $0}' ${f} > "${f}.bulk"
         echo -e "${MAJOR}Populating products from ${f}.bulk.${RESET}"
-        curl -sS -o /dev/null -u 'elastic:ElasticRocks' -X POST "localhost:9200/ecommerce/_bulk?pretty" --data-binary @"${f}.bulk" -H 'Content-type:application/x-ndjson ';
+        curl -sS -o /dev/null -u 'admin:admin' -X POST "localhost:9200/ecommerce/_bulk?pretty" --data-binary @"${f}.bulk" -H 'Content-type:application/x-ndjson ';
       done;
   done;

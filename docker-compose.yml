@@ -2,21 +2,16 @@ version: '3.7'
 services:
 
   setup:
-    image: opensearchproject/opensearch:2.3.0
+    image: opensearchproject/opensearch:2.9.0
     user: "0"
     command: >
       bash -c '
-        if [ x${ELASTIC_PASSWORD} == x ]; then
-          echo "Set the ELASTIC_PASSWORD environment variable in the .env file";
-          exit 1;
-        elif [ x${KIBANA_PASSWORD} == x ]; then
-          echo "Set the KIBANA_PASSWORD environment variable in the .env file";
+        if [ x${OPENSEARCH_PASSWORD} == x ]; then
+          echo "Set the OPENSEARCH_PASSWORD environment variable in the .env file";
           exit 1;
         fi;
-        echo "Waiting for Elasticsearch availability";
-        until curl -u 'elastic:${ELASTIC_PASSWORD}' -s elasticsearch:9200/_cluster/health | grep "yellow"; do sleep 30; done;
-        echo "Setting kibana_system password";
-        until curl -s -X POST -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" http://elasticsearch:9200/_security/user/kibana_system/_password -d "{\"password\":\"${KIBANA_PASSWORD}\"}" | grep -q "^{}"; do sleep 10; done;
+        echo "Waiting for OpenSearch availability";
+        until curl -u 'admin:${OPENSEARCH_PASSWORD}' -s opensearch:9200/_cluster/health | grep "yellow"; do sleep 30; done;
         echo "All done!";
       '
 
@@ -41,7 +36,8 @@ services:
       - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
       - "discovery.type=single-node"
       - bootstrap.memory_lock=true
-      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}  # default username is elastic
+      - OPENSEARCH_PASSWORD=${OPENSEARCH_PASSWORD}  # default username is admin
+      - DISABLE_SECURITY_PLUGIN=true
     ulimits:
       memlock:
         soft: -1
@@ -57,17 +53,16 @@ services:
       timeout: 10s
       retries: 50
 
-
-#  opensearch-dashboards:
-#    container_name: opensearch-dashboards
-#    image: opensearchproject/opensearch-dashboards:2
-#    environment:
-#      - SERVERNAME=opensearch-dashboards
-#      - OPENSEARCH_HOSTS=http://opensearch:9200
-#      - ELASTICSEARCH_USERNAME=kibana_system
-#      - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
-#    ports:
-#      - 5601:5601
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:latest
+    container_name: opensearch-dashboards
+    ports:
+      - 5601:5601 # Map host port 5601 to container port 5601
+    expose:
+      - "5601" # Expose port 5601 for web access to OpenSearch Dashboards
+    environment:
+      - 'OPENSEARCH_HOSTS=["http://opensearch:9200"]'
+      - "DISABLE_SECURITY_DASHBOARDS_PLUGIN=true" # disables security dashboards plugin in OpenSearch Dashboards
 
   chorus-ui:
     container_name: chorus_ui
@@ -114,94 +109,81 @@ services:
     ports:
       - 6379:6379
 
-  smui:
-    container_name: smui
-    build: ./smui
-    ports:
-      - 9000:9000
-    init: true
-    environment:
-      - SMUI_HEADLINE=Chorus SMUI
-      - SMUI_DB_URL=jdbc:mysql://mysql:3306/smui?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
-      - SMUI_DB_USER=root
-      - SMUI_DB_PASSWORD=${SMUI_DB_PASSWORD}
-      - SMUI_DEPLOY_PRELIVE_SOLR_HOST=opensearch:9200
-      - SMUI_TOGGLE_UI_WITH_SOLR_FIELDS=false
-      - SMUI_2SOLR_SOLR_HOST=opensearch:9200
-      - SMUI_TOGGLE_DEPL_PRELIVE=true
-      - SMUI_TOGGLE_SPELLING=true
-      - SMUI_TOGGLE_DEPL_CUSTOM_SCRIPT=true
-      - SMUI_TOGGLE_DEPL_CUSTOM_SCRIPT_PATH=/smui/conf/smui2es.sh
-      - SMUI_DEPLOY_PRELIVE_FN_RULES_TXT=/configs/ecommerce/rules.txt
-      - SMUI_DEPLOY_PRELIVE_FN_REPLACE_TXT=/configs/ecommerce/replace-rules.txt
-      - SMUI_TOGGLE_RULE_ID_LOGGING=true
-      - SMUI_TOGGLE_EVENTHISTORY=true
-      - SMUI_RULE_TAGGING_ACTIVE=true
-      - SMUI_PREDEFINED_TAGS_FILE=/smui/conf/predefined_tags.json
-    depends_on:
-      - mysql
+#  smui:
+#    container_name: smui
+#    build: ./smui
+#    ports:
+#      - 9000:9000
+#    init: true
+#    environment:
+#      - SMUI_HEADLINE=Chorus SMUI
+#      - SMUI_DB_URL=jdbc:mysql://mysql:3306/smui?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
+#      - SMUI_DB_USER=root
+#      - SMUI_DB_PASSWORD=${SMUI_DB_PASSWORD}
+#      - SMUI_DEPLOY_PRELIVE_SOLR_HOST=opensearch:9200
+#      - SMUI_TOGGLE_UI_WITH_SOLR_FIELDS=false
+#      - SMUI_2SOLR_SOLR_HOST=opensearch:9200
+#      - SMUI_TOGGLE_DEPL_PRELIVE=true
+#      - SMUI_TOGGLE_SPELLING=true
+#      - SMUI_TOGGLE_DEPL_CUSTOM_SCRIPT=true
+#      - SMUI_TOGGLE_DEPL_CUSTOM_SCRIPT_PATH=/smui/conf/smui2es.sh
+#      - SMUI_DEPLOY_PRELIVE_FN_RULES_TXT=/configs/ecommerce/rules.txt
+#      - SMUI_DEPLOY_PRELIVE_FN_REPLACE_TXT=/configs/ecommerce/replace-rules.txt
+#      - SMUI_TOGGLE_RULE_ID_LOGGING=true
+#      - SMUI_TOGGLE_EVENTHISTORY=true
+#      - SMUI_RULE_TAGGING_ACTIVE=true
+#      - SMUI_PREDEFINED_TAGS_FILE=/smui/conf/predefined_tags.json
+#    depends_on:
+#      - mysql
 
-  prometheus:
-    image: prom/prometheus:v2.32.1
-    container_name: prometheus
-    restart: always
-    ports:
-      - 9090:9090
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-    healthcheck:
-      test: [ "CMD", "wget", "--tries=1", "--spider", "http://localhost:9090" ]
-      interval: 5s
-      timeout: 10s
-    volumes:
-      - ./prometheus/:/etc/prometheus/
+#  prometheus:
+#    image: prom/prometheus:v2.32.1
+#    container_name: prometheus
+#    restart: always
+#    ports:
+#      - 9090:9090
+#    command:
+#      - '--config.file=/etc/prometheus/prometheus.yml'
+#    healthcheck:
+#      test: [ "CMD", "wget", "--tries=1", "--spider", "http://localhost:9090" ]
+#      interval: 5s
+#      timeout: 10s
+#    volumes:
+#      - ./prometheus/:/etc/prometheus/
 
-  grafana:
-    image: grafana/grafana:7.5.17
-    container_name: grafana
-    restart: always
-    ports:
-      - 9091:3000
-    volumes:
-      - ./grafana/provisioning/:/etc/grafana/provisioning/
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
-      - GF_USERS_ALLOW_SIGN_UP=true
-    healthcheck:
-      test: [ "CMD", "wget", "--tries=1", "--spider", "http://localhost:3000" ]
-      interval: 5s
-      timeout: 10s
-    depends_on:
-      - prometheus
-
-  rre:
-    container_name: rre
-    build:
-      context: ./rre
-      dockerfile: Dockerfile
-    volumes:
-      - ./rre:/rre
-    ports:
-      - "7979:8080"
-    command: "java -jar rre-server-1.1.jar"
-    depends_on:
-      - elasticsearch
+#  grafana:
+#    image: grafana/grafana:7.5.17
+#    container_name: grafana
+#    restart: always
+#    ports:
+#      - 9091:3000
+#    volumes:
+#      - ./grafana/provisioning/:/etc/grafana/provisioning/
+#    environment:
+#      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
+#      - GF_USERS_ALLOW_SIGN_UP=true
+#    healthcheck:
+#      test: [ "CMD", "wget", "--tries=1", "--spider", "http://localhost:3000" ]
+#      interval: 5s
+#      timeout: 10s
+#    depends_on:
+#      - prometheus
 
   embeddings:
-    container_name: embeddings
-    build:
-      context: ./embeddings
-      dockerfile: Dockerfile
-    ports:
-      - "8000:8000"
-    environment:
-      - OMP_NUM_THREADS=1
-    deploy:
-      resources:
-        limits:
-          memory: 4G
-        reservations:
-          memory: 512M
+   container_name: embeddings
+   build:
+     context: ./embeddings
+     dockerfile: Dockerfile
+   ports:
+     - "8000:8000"
+   environment:
+     - OMP_NUM_THREADS=1
+   deploy:
+     resources:
+       limits:
+         memory: 4G
+       reservations:
+         memory: 512M
 
 #  opensearch-exporter:
 #    image: quay.io/prometheuscommunity/elasticsearch-exporter:latest
@@ -235,4 +217,4 @@ services:
 
 volumes:
   mysql_data: {}
-  es_data: {}
+  os_data: {}
