@@ -36,3 +36,5 @@ http.cors.allow-credentials: true
 # plugins.security.system_indices.indices: [".plugins-ml-model", ".plugins-ml-task", ".opendistro-alerting-config", ".opendistro-alerting-alert*", ".opendistro-anomaly-results*", ".opendistro-anomaly-detector*", ".opendistro-anomaly-checkpoints", ".opendistro-anomaly-detection-state", ".opendistro-reports-*", ".opensearch-notifications-*", ".opensearch-notebooks", ".opensearch-observability", ".opendistro-asynchronous-search-response*", ".replication-metadata-store"]
 # node.max_local_storage_nodes: 3
 ######## End OpenSearch Security Demo Configuration ########
+
+plugins.ml_commons.only_run_on_ml_node: false

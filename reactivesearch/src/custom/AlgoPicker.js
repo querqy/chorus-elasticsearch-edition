@@ -29,6 +29,7 @@ class AlgoPicker extends Component {
 				)}
         <select value={this.state.selectedValue} onChange={this.onChangeValue} style={{display: "flex", flexDirection: "column"}} id="algopicker">
           <option checked={this.state.selectedValue === "default"} value="default">Default</option>
+          <option checked={this.state.selectedValue === "neural_minilm"} value="neural_minilm">Neural MiniLM</option>
           <option checked={this.state.selectedValue === "querqy_preview"} value="querqy_preview">Querqy Preview</option>
           <option checked={this.state.selectedValue === "querqy_live"} value="querqy_live">Querqy Live</option>
           <option checked={this.state.selectedValue === "querqy_boost_by_img_emb"} value="querqy_boost_by_img_emb">Querqy boost by image vector</option>

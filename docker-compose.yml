@@ -27,15 +27,18 @@ services:
       - ./mysql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
       - mysql_data:/var/lib/mysql
 
-  opensearch:
+  opensearch-node1:
     depends_on:
       - setup
-    container_name: opensearch
+    container_name: opensearch-node1
     build: ./opensearch/.
     environment:
-      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
-      - "discovery.type=single-node"
+      - cluster.name=opensearch-cluster
+      - node.name=opensearch-node1
+      - discovery.seed_hosts=opensearch-node1,opensearch-node2
+      - cluster.initial_cluster_manager_nodes=opensearch-node1,opensearch-node2
       - bootstrap.memory_lock=true
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
       - OPENSEARCH_PASSWORD=${OPENSEARCH_PASSWORD}  # default username is admin
       - DISABLE_SECURITY_PLUGIN=true
     ulimits:
@@ -44,7 +47,7 @@ services:
         hard: -1
     volumes:
       - ./opensearch/opensearch.yml:/usr/share/opensearch/config/opensearch.yml
-      - os_data:/usr/share/opensearch/data
+      - os_data1:/usr/share/opensearch/data
     ports:
       - "9200:9200"
     healthcheck:
@@ -52,6 +55,28 @@ services:
       interval: 30s
       timeout: 10s
       retries: 50
+
+  opensearch-node2:
+    depends_on:
+      - setup
+    container_name: opensearch-node2
+    build: ./opensearch/.
+    environment:
+      - cluster.name=opensearch-cluster
+      - node.name=opensearch-node2
+      - discovery.seed_hosts=opensearch-node1,opensearch-node2
+      - cluster.initial_cluster_manager_nodes=opensearch-node1,opensearch-node2
+      - bootstrap.memory_lock=true
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+      - OPENSEARCH_PASSWORD=${OPENSEARCH_PASSWORD}  # default username is admin
+      - DISABLE_SECURITY_PLUGIN=true
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - ./opensearch/opensearch.yml:/usr/share/opensearch/config/opensearch.yml
+      - os_data2:/usr/share/opensearch/data
 
   opensearch-dashboards:
     image: opensearchproject/opensearch-dashboards:latest
@@ -61,7 +86,7 @@ services:
     expose:
       - "5601" # Expose port 5601 for web access to OpenSearch Dashboards
     environment:
-      - 'OPENSEARCH_HOSTS=["http://opensearch:9200"]'
+      - 'OPENSEARCH_HOSTS=["http://opensearch-node1:9200","http://opensearch-node2:9200"]'
       - "DISABLE_SECURITY_DASHBOARDS_PLUGIN=true" # disables security dashboards plugin in OpenSearch Dashboards
 
   chorus-ui:
@@ -217,4 +242,5 @@ services:
 
 volumes:
   mysql_data: {}
-  os_data: {}
+  os_data1: {}
+  os_data2: {}

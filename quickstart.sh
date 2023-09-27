@@ -77,7 +77,7 @@ do
 	shift
 done
 
-services="opensearch opensearch-dashboards chorus-ui"
+services="opensearch-node1 opensearch-node2 opensearch-dashboards chorus-ui"
 #services="opensearch opensearch-dashboards chorus-ui smui"
 #if $observability; then
 #  services="${services} grafana opensearch-exporter"

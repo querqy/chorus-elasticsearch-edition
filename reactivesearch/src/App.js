@@ -84,6 +84,23 @@ class App extends Component {
                       }
                     }
                   }
+                } else if (algo === "neural_minilm") {
+                  return {
+                    "query": {
+                      "bool": {
+                        "must": [
+                          {
+                            "neural": {
+                              "product_vector": {
+                                "query_text": value,
+                                "model_id": "IZVRuYoB9pn48M2pKtCX",
+                                "k": 10
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }                                    }
                 } else if (algo === "querqy_preview") {
                   return {
                     query: {

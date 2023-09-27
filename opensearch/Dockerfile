@@ -13,5 +13,4 @@ COPY --chown=opensearch:opensearch opensearch.yml /usr/share/opensearch/config/
 
 # The following plugins are installed by default on 2.9, and default conf requires > 1 shard
 # An alternative would be to override their configuration during image creation
-RUN ./bin/opensearch-plugin remove opensearch-ml
 RUN ./bin/opensearch-plugin remove opensearch-security-analytics
