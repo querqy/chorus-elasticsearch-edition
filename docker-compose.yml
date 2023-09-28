@@ -2,7 +2,7 @@ version: '3.7'
 services:
 
   setup:
-    image: opensearchproject/opensearch:2.9.0
+    image: opensearchproject/opensearch:2.10.0
     user: "0"
     command: >
       bash -c '
@@ -79,7 +79,7 @@ services:
       - os_data2:/usr/share/opensearch/data
 
   opensearch-dashboards:
-    image: opensearchproject/opensearch-dashboards:latest
+    image: opensearchproject/opensearch-dashboards:2.10.0
     container_name: opensearch-dashboards
     ports:
       - 5601:5601 # Map host port 5601 to container port 5601
@@ -194,21 +194,21 @@ services:
 #    depends_on:
 #      - prometheus
 
-  embeddings:
-   container_name: embeddings
-   build:
-     context: ./embeddings
-     dockerfile: Dockerfile
-   ports:
-     - "8000:8000"
-   environment:
-     - OMP_NUM_THREADS=1
-   deploy:
-     resources:
-       limits:
-         memory: 4G
-       reservations:
-         memory: 512M
+#  embeddings:
+#   container_name: embeddings
+#   build:
+#     context: ./embeddings
+#     dockerfile: Dockerfile
+#   ports:
+#     - "8000:8000"
+#   environment:
+#     - OMP_NUM_THREADS=1
+#   deploy:
+#     resources:
+#       limits:
+#         memory: 4G
+#       reservations:
+#         memory: 512M
 
 #  opensearch-exporter:
 #    image: quay.io/prometheuscommunity/elasticsearch-exporter:latest

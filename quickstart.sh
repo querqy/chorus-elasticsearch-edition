@@ -283,10 +283,10 @@ if $observability; then
   curl -u admin:password -S -X POST -H "Content-Type: application/json" http://localhost:9091/api/users/2/using/1
 fi
 
-if $vector_search; then
-  echo "Setting up Embeddings service"
-  ${COMPOSE_CMD} up -d --build embeddings
-  ./embeddings/wait-for-api.sh
-fi
+#if $vector_search; then
+#  echo "Setting up Embeddings service"
+#  ${COMPOSE_CMD} up -d --build embeddings
+#  ./embeddings/wait-for-api.sh
+#fi
 
 echo -e "${MAJOR}Welcome to Chorus OS Edition!${RESET}"

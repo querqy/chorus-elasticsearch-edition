@@ -1,4 +1,4 @@
-FROM opensearchproject/opensearch:2.9.0
+FROM opensearchproject/opensearch:2.10.0
 #COPY opensearch-querqy-1.0.os2.3.0-SNAPSHOT.zip /usr/share/opensearch/opensearch-querqy-1.0.os2.3.0-SNAPSHOT.zip
 WORKDIR /usr/share/opensearch
 
