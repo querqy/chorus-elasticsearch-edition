@@ -16,25 +16,19 @@ Chorus makes deploying powerful ecommerce search easier by shifting the **buy vs
 
 3. ***Sharing Knowledge is a Must!*** It isn't enough to just have conference talks. We need code and data samples in order to share knowledge about improving ecommerce search. Chorus is a public environment that you can use to profit from the community and also to share your next great idea!
 
-This is the project that enables Chorus to use Elasticsearch as the search engine. For those interested in the Solr version of this stack: You can visit the [Solr version of Chorus](https://github.com/querqy/chorus)
+This is the project that enables Chorus to use OpenSearch as the search engine. For those interested in the Solr version of this stack: You can visit the [Solr version of Chorus](https://github.com/querqy/chorus)
 
 Want to stay up-to-date with the community? Visit https://querqy.org/ to learn more, and join the [E-Commerce Search Slack](https://ecom-search.slack.com/) group for tips, tricks, help and news on what's new in the Chorus ecosystem.
 
 ## News
 
-* 23 February 2023: [Revolutionizing E-commere Search with Vectors](https://opensourceconnections.com/blog/2023/03/15/revolutionizing-e-commerce-search-with-vectors/) - Vector search is added to Chorus.
-* 23 March 2022: [Chorus, now also for Elasticsearch!](https://opensourceconnections.com/blog/2022/03/23/chorus-now-also-for-elasticsearch/) - Chorus is now available for Elasticsearch.
-* 17th June 2021: [Encores? - Going beyond matching and ranking of search results](https://www.slideshare.net/o19s/encores) - Chorus is used at BerlinBuzzwords.
-* 15th November 2020: [Chorus Workshop Series Announced](https://plainschwarz.com/ps-salon/) - Learn from the creators of the components of Chorus via six workshops.
-* 17th October 2020: [Chorus featured at ApacheCon @Home](https://www.youtube.com/watch?v=NGtmSbOoFjA) - René and Eric give a talk at ApacheCon on Chorus.
-* 10th June 2020: [Chorus Announced at BerlinBuzzwords](https://2020.berlinbuzzwords.de/session/towards-open-source-tool-stack-e-commerce-search) - First release of Chorus shared with the world at a workshop.
-* April 2020: [Paul Maria Bartusch](https://twitter.com/paulbartusch), [René Kriegler](https://twitter.com/renekrie), [Johannes Peter](https://github.com/JohannesDaniel) & [Eric Pugh](https://twitter.com/dep4b) brainstorm challenges with search teams adopting technologies like Querqy and come up with the Chorus idea.
+* September 2023: First release of Chorus for OpenSearch for OpenSearchCon.
 
 # What Runs Where
 
 * The UI (Reactivesearch) runs at http://localhost:4000  |  http://chorus-os-edition.dev.o19s.com:4000
-* Elasticsearch runs at http://localhost:9200  |  http://chorus-os-edition.dev.o19s.com:9200
-* Kibana runs at http://localhost:5601  |  http://chorus-os-edition.dev.o19s.com:5601
+* OpenSearch runs at http://localhost:9200  |  http://chorus-os-edition.dev.o19s.com:9200
+* OpenSearch Dashboard runs at http://localhost:5601  |  http://chorus-os-edition.dev.o19s.com:5601
 * SMUI runs at http://localhost:9000  |  http://chorus-os-edition.dev.o19s.com:9000
 * Quepid runs at http://localhost:3000  |  http://chorus-os-edition.dev.o19s.com:3000
 * The embedding service runs at http://localhost:8000 |  http://chorus-os-edition.dev.o19s.com:8000
@@ -53,7 +47,7 @@ If you are impatient, we provide a quick start script, `./quickstart.sh` that se
 
 After setting up Chorus you can check out [Kata 1: Lets Optimize a Query](katas/001_optimize_a_query.md) for an introduction to the world of active search management.
 
-[More Katas can be found in the Solr version of Chorus](https://github.com/querqy/chorus#structured-learning-using-chorus) and many can be transferred to this Elasticsearch based stack. Some are also covered in a video series called [Meet Pete](https://opensourceconnections.com/blog/2020/07/07/meet-pete-the-e-commerce-search-product-manager/). Feel free to open PRs to add Katas you find useful or open issues if you want to see specific Katas included. Every contribution is welcome! 
+[More Katas can be found in the Solr version of Chorus](https://github.com/querqy/chorus#structured-learning-using-chorus) and many can be transferred to this OpenSearch based stack. Some are also covered in a video series called [Meet Pete](https://opensourceconnections.com/blog/2020/07/07/meet-pete-the-e-commerce-search-product-manager/). Feel free to open PRs to add Katas you find useful or open issues if you want to see specific Katas included. Every contribution is welcome! 
 
 # Useful Commands for Chorus
 
@@ -63,7 +57,7 @@ To start your environment, but still run each command to set up the integrations
 docker-compose up --build -d
 ```
 
-The quickstart script will launch Elasticsearch, download and index the sample product data for the _ecommerce_ index:
+The quickstart script will launch OpenSearch, download and index the sample product data for the _ecommerce_ index:
 
 ```
 ./quickstart.sh
@@ -97,7 +91,7 @@ If you want to see the logs of just one component of the Chorus stack, use:
 
 ```
 docker-compose ps                       # list out the names of the components
-docker-compose logs -tf elasticsearch   # tail elasticsearch only
+docker-compose logs -tf opensearch      # tail OpenSearch only
 ```
 
 To stop all containers, you can run:
@@ -140,7 +134,7 @@ The version of the Icecat product data that Chorus [provides](https://querqy.org
 
 # Known Issues
 
-1. SMUI stands for \'search management UI\'. It is designed to work with Solr. We provided some scripts for basic functionality with Elasticsearch but there are still limitations. You get a feeling what's currently possible by going through [Kata 1: Optimize a Query](katas/001_optimize_a_query.md).
+1. SMUI stands for \'search management UI\'. It is designed to work with Solr. We provided some scripts for basic functionality with OpenSearch but there are still limitations. You get a feeling what's currently possible by going through [Kata 1: Optimize a Query](katas/001_optimize_a_query.md).
 2. RRE: The technical integration is able to run queries and get the correct results from Elasticsearch, but apparently it computes the search metrics incorrectly.
 
 Of course, contributions are very welcome to improve Chorus - The Elasticsearch Edition!
