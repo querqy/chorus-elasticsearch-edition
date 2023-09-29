@@ -42,6 +42,7 @@ while [ ! $# -eq 0 ]
 do
 	case "$1" in
 		--help | -h)
+		  echo -e "Use the option --with-vector-search | -vector to include Vector services in Chorus."      
       echo -e "Use the option --with-offline-lab | -lab to include Quepid and RRE services in Chorus."
 			echo -e "Use the option --with-observability | -obs to include Grafana, Prometheus, and OpenSearch Exporter services in Chorus."
       echo -e "Use the option --shutdown | -s to shutdown and remove the Docker containers and data."

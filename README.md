@@ -33,8 +33,6 @@ Want to stay up-to-date with the community? Visit https://querqy.org/ to learn m
 * Quepid runs at http://localhost:3000  |  http://chorus-os-edition.dev.o19s.com:3000
 * The embedding service runs at http://localhost:8000 |  http://chorus-os-edition.dev.o19s.com:8000
 * Keycloak runs at http://keycloak:9080 |  http://chorus-os-edition.dev.o19s.com:9080
-* Prometheus runs at http://localhost:9090  |  http://chorus-os-edition.dev.o19s.com:9090
-* Grafana runs at http://localhost:9091  |  http://chorus-os-edition.dev.o19s.com:9091
 
 Working with macOS? Pop open all the tuning related web pages with one terminal command:
 > open http://localhost:4000 http://localhost:9200 http://localhost:5601 http://localhost:9000 http://localhost:3000
