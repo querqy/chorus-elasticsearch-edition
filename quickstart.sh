@@ -101,7 +101,7 @@ if $vector_search; then
 
   if (( $docker_memory_allocated < 10737418240 )); then
     docker_memory_allocated_in_gb=$((docker_memory_allocated/1024/1024/1024))
-    log_red "You have only ${docker_memory_allocated_in_gb} GB memory allocated to Docker, and you need at least 10GB for vectors demo."
+    echo -e "${ERROR}You have only ${docker_memory_allocated_in_gb} GB memory allocated to Docker, and you need at least 10GB for vectors demo.${RESET}"
   fi
 fi
 
