@@ -135,6 +135,5 @@ The version of the Icecat product data that Chorus [provides](https://querqy.org
 # Known Issues
 
 1. SMUI stands for \'search management UI\'. It is designed to work with Solr. We provided some scripts for basic functionality with OpenSearch but there are still limitations. You get a feeling what's currently possible by going through [Kata 1: Optimize a Query](katas/001_optimize_a_query.md).
-2. RRE: The technical integration is able to run queries and get the correct results from Elasticsearch, but apparently it computes the search metrics incorrectly.
 
-Of course, contributions are very welcome to improve Chorus - The Elasticsearch Edition!
+Of course, contributions are very welcome to improve Chorus - The OpenSearch Edition!
