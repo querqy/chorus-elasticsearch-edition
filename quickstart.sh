@@ -40,6 +40,7 @@ while [ ! $# -eq 0 ]
 do
 	case "$1" in
 		--help | -h)
+		  echo -e "Use the option --with-vector-search | -vector to include Vector services in Chorus."
       echo -e "Use the option --with-offline-lab | -lab to include Quepid and RRE services in Chorus."
 			echo -e "Use the option --with-observability | -obs to include Grafana, Prometheus, and Elasticsearch Exporter services in Chorus."
       echo -e "Use the option --shutdown | -s to shutdown and remove the Docker containers and data."
@@ -98,7 +99,7 @@ if $vector_search; then
 
   if (( $docker_memory_allocated < 10737418240 )); then
     docker_memory_allocated_in_gb=$((docker_memory_allocated/1024/1024/1024))
-    log_red "You have only ${docker_memory_allocated_in_gb} GB memory allocated to Docker, and you need at least 10GB for vectors demo."
+    echo -e "${ERROR}You have only ${docker_memory_allocated_in_gb} GB memory allocated to Docker, and you need at least 10GB for vectors demo.${RESET}"
   fi
 fi
 
