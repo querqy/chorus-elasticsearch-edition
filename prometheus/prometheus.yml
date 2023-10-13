@@ -28,6 +28,6 @@ scrape_configs:
     static_configs:
     - targets: ['localhost:9090']
 
-  - job_name: 'elasticsearch'
+  - job_name: 'opensearch'
     static_configs:
-      - targets: ['elasticsearch-exporter:9114']
+      - targets: ['opensearch-exporter:9114']

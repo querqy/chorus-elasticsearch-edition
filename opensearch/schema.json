@@ -1,0 +1,195 @@
+{
+  "settings": {
+    "index": {
+      "number_of_shards": 1,
+      "number_of_replicas": 0,
+      "mapping.total_fields.limit": 10000,
+      "knn": true,
+      "knn.algo_param.ef_search": 100
+    },
+    "analysis": {
+      "filter": {
+        "english_minimal_stem": {
+          "type": "stemmer",
+          "language": "minimal_english"
+        }
+      },
+      "analyzer": {
+        "english_stemmed": {
+          "type": "custom",
+          "tokenizer": "standard",
+          "filter": [
+            "lowercase",
+            "english_minimal_stem"
+          ]
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "id": {
+        "type": "keyword"
+      },
+      "name": {
+        "type": "text",
+        "analyzer": "english_stemmed"
+      },
+      "title": {
+        "type": "text",
+        "analyzer": "english_stemmed"
+      },
+      "ean": {
+        "type": "keyword"
+      },
+      "price": {
+        "type": "double"
+      },
+      "short_description": {
+        "type": "text",
+        "analyzer": "english_stemmed"
+      },
+      "img_high": {
+        "type": "keyword"
+      },
+      "img_low": {
+        "type": "keyword"
+      },
+      "img_500x500": {
+        "type": "keyword"
+      },
+      "img_thumb": {
+        "type": "keyword"
+      },
+      "date_released": {
+        "type": "date"
+      },
+      "supplier": {
+        "type": "keyword",
+        "copy_to": [
+          "brand",
+          "filter_brand"
+        ]
+      },
+      "search_attributes": {
+        "type": "text",
+        "analyzer": "english_stemmed",
+        "fielddata": true
+      },
+      "attr_t_product_type": {
+        "type": "text",
+        "analyzer": "english_stemmed",
+        "copy_to": ["filter_product_type", "product_type"]
+      },
+      "product_type": {
+        "type": "text",
+        "analyzer": "english_stemmed",
+        "fielddata": true
+      },
+      "brand": {
+        "type": "text",
+        "fielddata": true
+      },
+      "product_vector": {
+        "type": "knn_vector",
+        "dimension": 384,
+        "method": {
+          "name": "hnsw",
+          "space_type": "l2",
+          "engine": "lucene",
+          "parameters": {
+            "ef_construction": 128,
+            "m": 24
+          }
+        }
+      },
+      "product_image_vector": {
+        "type": "knn_vector",
+        "dimension": 768,
+        "method": {
+          "name": "hnsw",
+          "space_type": "l2",
+          "engine": "lucene",
+          "parameters": {
+            "ef_construction": 128,
+            "m": 24
+          }
+        }
+      },
+      "filter_brand": {
+        "type": "keyword"
+      },
+      "filter_product_type": {
+        "type": "keyword"
+      }
+    },
+    "dynamic_templates": [
+      {
+        "vector_attributes_768": {
+          "match": "*_768",
+          "mapping": {
+            "type": "knn_vector",
+            "dimension": 768,
+            "method": {
+              "name": "hnsw",
+              "space_type": "l2",
+              "engine": "lucene",
+              "parameters": {
+                "ef_construction": 128,
+                "m": 24
+              }
+            }
+          }
+        }
+      },
+      {
+      "vector_attributes_384": {
+        "match": "*_384",
+        "mapping": {
+          "type": "knn_vector",
+          "dimension": 384,
+          "method": {
+            "name": "hnsw",
+            "space_type": "l2",
+            "engine": "lucene",
+            "parameters": {
+              "ef_construction": 128,
+              "m": 24
+            }
+          }
+        }
+      }
+      },
+      {
+        "numerical_attributes": {
+          "match": "attr_n_*",
+          "mapping": {
+            "type": "double"
+          }
+        }
+      },
+      {
+        "boolean_attributes": {
+          "match_mapping_type": "boolean",
+          "match": "attr_b_*",
+          "mapping": {
+            "type": "boolean"
+          }
+        }
+      },
+      {
+        "textual_attributes": {
+          "match_mapping_type": "string",
+          "match": "attr_t_*",
+          "mapping": {
+            "type": "text",
+            "analyzer": "english_stemmed",
+            "copy_to": "search_attributes"
+          }
+        }
+      }
+    ]
+  }
+}
+
+

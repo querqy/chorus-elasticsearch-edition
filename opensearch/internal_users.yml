@@ -1,0 +1,15 @@
+# This is the internal user database
+# The hash value is a bcrypt hash and can be generated with plugins/opensearch-security/tools/hash.sh
+
+_meta:
+    type: "internalusers"
+    config_version: 2
+
+# Define your internal users here
+
+admin:
+    hash: "$2y$12$y.lmwluwtMN9S4ktIQPfIu578/7AL2hgdgapQfcQBNjy2kzx4GrH6"
+    reserved: true
+    backend_roles:
+        - "admin"
+    description: "Admin user"
