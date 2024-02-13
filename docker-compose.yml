@@ -1,25 +1,5 @@
 version: '3.7'
 services:
-
-  setup:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.5.3
-    user: "0"
-    command: >
-      bash -c '
-        if [ x${ELASTIC_PASSWORD} == x ]; then
-          echo "Set the ELASTIC_PASSWORD environment variable in the .env file";
-          exit 1;
-        elif [ x${KIBANA_PASSWORD} == x ]; then
-          echo "Set the KIBANA_PASSWORD environment variable in the .env file";
-          exit 1;
-        fi;
-        echo "Waiting for Elasticsearch availability";
-        until curl -u 'elastic:${ELASTIC_PASSWORD}' -s elasticsearch:9200/_cluster/health | grep "yellow"; do sleep 30; done;
-        echo "Setting kibana_system password";
-        until curl -s -X POST -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" http://elasticsearch:9200/_security/user/kibana_system/_password -d "{\"password\":\"${KIBANA_PASSWORD}\"}" | grep -q "^{}"; do sleep 10; done;
-        echo "All done!";
-      '
-
   mysql:
     container_name: mysql
     image: amd64/mysql:5.7.42
@@ -32,24 +12,28 @@ services:
       - ./mysql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
       - mysql_data:/var/lib/mysql
 
-  elasticsearch:
-    depends_on:
-      - setup
-    container_name: elasticsearch
-    build: ./elasticsearch/.
+  opensearch:
+    container_name: opensearch
+    build: ./opensearch/.
     environment:
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-      - "discovery.type=single-node"
-      - xpack.security.enabled=true  # override what is in elasticsearch.yml
-      - bootstrap.memory_lock=true
-      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}  # default username is elastic
+      discovery.type: single-node
+      node.name: opensearch
+      plugins.security.disabled: "true"
+#      See https://forum.opensearch.org/t/how-to-enable-cors-cross-origin-resource-sharing/426/3 for more
+      http.cors.enabled: true 
+#      Warning: this is opening it up to all cross domains
+#      http.cors.allow-origin: "http://localhost"...
+      http.cors.allow-origin: "*"
+      http.cors.allow-methods: OPTIONS,HEAD,GET,POST,PUT,DELETE
+      http.cors.allow-credentials: true
+      http.cors.allow-headers: X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization
     ulimits:
       memlock:
         soft: -1
         hard: -1
-    volumes:
-      - ./elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
-      - es_data:/usr/share/elasticsearch/data
+    #volumes:
+    #  - ./elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+    #  - es_data:/usr/share/opensearch/data
     ports:
       - "9200:9200"
     healthcheck:
@@ -58,16 +42,18 @@ services:
       timeout: 10s
       retries: 50
 
-  kibana:
-    container_name: kibana
-    image: docker.elastic.co/kibana/kibana:8.5.3
-    environment:
-      - SERVERNAME=kibana
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-      - ELASTICSEARCH_USERNAME=kibana_system
-      - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
+  opensearch-dashboards:
+    build: ./opensearch-dashboards/.
+    container_name: opensearch-dashboards
     ports:
       - 5601:5601
+    expose:
+      - 5601
+    environment:
+      OPENSEARCH_HOSTS: '["http://opensearch:9200"]'
+      DISABLE_SECURITY_DASHBOARDS_PLUGIN: true
+    depends_on:
+      - opensearch
 
   chorus-ui:
     container_name: chorus_ui
@@ -125,9 +111,9 @@ services:
       - SMUI_DB_URL=jdbc:mysql://mysql:3306/smui?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
       - SMUI_DB_USER=root
       - SMUI_DB_PASSWORD=${SMUI_DB_PASSWORD}
-      - SMUI_DEPLOY_PRELIVE_SOLR_HOST=elasticsearch:9200
+      - SMUI_DEPLOY_PRELIVE_SOLR_HOST=opensearch:9200
       - SMUI_TOGGLE_UI_WITH_SOLR_FIELDS=false
-      - SMUI_2SOLR_SOLR_HOST=elasticsearch:9200
+      - SMUI_2SOLR_SOLR_HOST=opensearch:9200
       - SMUI_TOGGLE_DEPL_PRELIVE=true
       - SMUI_TOGGLE_SPELLING=true
       - SMUI_TOGGLE_DEPL_CUSTOM_SCRIPT=true
@@ -140,98 +126,6 @@ services:
       - SMUI_PREDEFINED_TAGS_FILE=/smui/conf/predefined_tags.json
     depends_on:
       - mysql
-
-  prometheus:
-    image: prom/prometheus:v2.32.1
-    container_name: prometheus
-    restart: always
-    ports:
-      - 9090:9090
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-    healthcheck:
-      test: [ "CMD", "wget", "--tries=1", "--spider", "http://localhost:9090" ]
-      interval: 5s
-      timeout: 10s
-    volumes:
-      - ./prometheus/:/etc/prometheus/
-
-  grafana:
-    image: grafana/grafana:7.5.17
-    container_name: grafana
-    restart: always
-    ports:
-      - 9091:3000
-    volumes:
-      - ./grafana/provisioning/:/etc/grafana/provisioning/
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
-      - GF_USERS_ALLOW_SIGN_UP=true
-    healthcheck:
-      test: [ "CMD", "wget", "--tries=1", "--spider", "http://localhost:3000" ]
-      interval: 5s
-      timeout: 10s
-    depends_on:
-      - prometheus
-
-  rre:
-    container_name: rre
-    build:
-      context: ./rre
-      dockerfile: Dockerfile
-    volumes:
-      - ./rre:/rre
-    ports:
-      - "7979:8080"
-    command: "java -jar rre-server-1.1.jar"
-    depends_on:
-      - elasticsearch
-
-  embeddings:
-    container_name: embeddings
-    build:
-      context: ./embeddings
-      dockerfile: Dockerfile
-    ports:
-      - "8000:8000"
-    environment:
-      - OMP_NUM_THREADS=1
-    deploy:
-      resources:
-        limits:
-          memory: 4G
-        reservations:
-          memory: 512M
-
-  elasticsearch-exporter:
-    image: quay.io/prometheuscommunity/elasticsearch-exporter:latest
-    container_name: elasticsearch-exporter
-    command:
-      - '--es.uri=http://elasticsearch:9200'
-    environment:
-      - ES_USERNAME=elastic
-      - ES_PASSWORD=${ELASTIC_PASSWORD}
-    restart: always
-    ports:
-      - "9114:9114"
-
-  keycloak:
-    image: quay.io/keycloak/keycloak:21.0.2
-    container_name: keycloak
-    hostname: keycloak
-    command: [ "start-dev", "--import-realm" ]
-    restart: unless-stopped
-    healthcheck:
-      test: [ "CMD", "curl", "--fail", "http://localhost:8080/health" ]
-    ports:
-      - 9080:9080
-    environment:
-      KC_HTTP_PORT: 9080
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
-      DB_VENDOR: h2
-    volumes:
-      - ./keycloak/realm-config/chorus-realm.json:/opt/keycloak/data/import/chorus-realm.json:ro
 
 volumes:
   mysql_data: {}
