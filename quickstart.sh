@@ -16,8 +16,8 @@ if ! [ -x "$(command -v curl)" ]; then
   echo "${ERROR}Error: curl is not installed.${RESET}" >&2
   exit 1
 fi
-if ! [ -x "$(command -v docker-compose)" ]; then
-  echo "${ERROR}Error: docker-compose is not installed.${RESET}" >&2
+if ! [ -x "$(command -v docker)" ]; then
+  echo "${ERROR}Error: docker is not installed.${RESET}" >&2
   exit 1
 fi
 if ! [ -x "$(command -v jq)" ]; then
@@ -105,16 +105,16 @@ fi
 
 if $stop; then
   services="${services} grafana elasticsearch-exporter quepid rre keycloak"
-  docker-compose stop ${services}
+  docker compose stop ${services}
   exit
 fi
 
 if $shutdown; then
-  docker-compose down -v
+  docker compose down -v
   exit
 fi
 
-docker-compose up -d --build ${services}
+docker compose up -d --build ${services}
 
 echo -e "${MAJOR}Waiting for Elasticsearch to start up and be online.${RESET}"
 ./elasticsearch/wait-for-es.sh # Wait for Elasticsearch to be online
@@ -268,12 +268,12 @@ if $offline_lab; then
 
   echo -e "${MAJOR}Setting up Quepid${RESET}"
 
-  docker-compose run --rm quepid bin/rake db:setup
-  docker-compose run quepid thor user:create -a admin@choruselectronics.com "Chorus Admin" password
+  docker compose run --rm quepid bin/rake db:setup
+  docker compose run quepid thor user:create -a admin@choruselectronics.com "Chorus Admin" password
 
   echo -e "${MAJOR}Setting up RRE\n${RESET}"
-  docker-compose run rre mvn rre:evaluate
-  docker-compose run rre mvn rre-report:report
+  docker compose run rre mvn rre:evaluate
+  docker compose run rre mvn rre-report:report
 fi
 
 if $observability; then
@@ -285,7 +285,7 @@ fi
 
 if $vector_search; then
   echo "Setting up Embeddings service"
-  docker-compose up -d --build embeddings
+  docker compose up -d --build embeddings
   ./embeddings/wait-for-api.sh
 fi
 
