@@ -154,12 +154,12 @@ curl -s -X POST "localhost:9200/ecommerce/_bulk?pretty" -H 'Content-Type: applic
 #     }
 # }'
 
-echo -e "${MAJOR}Setting up SMUI\n${RESET}"
-while [ $(curl -s http://localhost:9000/api/v1/solr-index | wc -c) -lt 2 ]; do
-    echo "Waiting 5s for SMUI to be ready..."
-    sleep 5
-done
-curl -X PUT -H "Content-Type: application/json" -d '{"name":"ecommerce", "description":"Chorus Webshop"}' http://localhost:9000/api/v1/solr-index
+# echo -e "${MAJOR}Setting up SMUI\n${RESET}"
+# while [ $(curl -s http://localhost:9000/api/v1/solr-index | wc -c) -lt 2 ]; do
+#     echo "Waiting 5s for SMUI to be ready..."
+#     sleep 5
+# done
+# curl -X PUT -H "Content-Type: application/json" -d '{"name":"ecommerce", "description":"Chorus Webshop"}' http://localhost:9000/api/v1/solr-index
 
 if $offline_lab; then
 
