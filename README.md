@@ -18,13 +18,13 @@ Chorus makes deploying powerful ecommerce search easier by shifting the **buy vs
 
 This is the project that enables Chorus to use OpenSearch as the search engine. For others:
 * You can visit the [Solr version of Chorus](https://github.com/querqy/chorus)
-* You can visit the [Elasticsearch version of Chorus](https://github.com/querqy/querqy-elasticsearch)
+* You can visit the [Elasticsearch version of Chorus](https://github.com/querqy/chorus-elasticsearch-edition)
 
 Want to stay up-to-date with the community? Visit https://querqy.org/ to learn more, and join the [E-Commerce Search Slack](https://ecom-search.slack.com/) group for tips, tricks, help and news on what's new in the Chorus ecosystem.
 
 ## About this Project
 
-This is a fork of [querqy-elasticsearch](https://github.com/querqy/querqy-elasticsearch). Refer to that repository for more information on Chorus.
+This is a fork of [querqy-elasticsearch](https://github.com/querqy/chorus-elasticsearch-edition). Refer to that repository for more information on Chorus.
 
 # What Runs Where
 
@@ -33,7 +33,6 @@ This is a fork of [querqy-elasticsearch](https://github.com/querqy/querqy-elasti
 * OpenSearch Dashboards runs at http://localhost:5601
 * SMUI runs at http://localhost:9000  |  http://chorus-es-edition.dev.o19s.com:9000
 * Quepid runs at http://localhost:3000  |  http://chorus-es-edition.dev.o19s.com:3000
-* Keycloak runs at http://keycloak:9080 |  http://chorus-es-edition.dev.o19s.com:9080
 
 Working with macOS? Pop open all the tuning related web pages with one terminal command:
 > open http://localhost:4000 http://localhost:9200 http://localhost:5601 http://localhost:9000 http://localhost:3000
