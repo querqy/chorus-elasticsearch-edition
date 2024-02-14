@@ -8,7 +8,7 @@ Chorus
 
 *Towards an open source tool stack for e-commerce search*
 
-**This is a fork of [querqy-elasticsearch](https://github.com/querqy/chorus-elasticsearch-edition). Refer to that repository for more information on Chorus.**
+**This is a fork of [chorus-elasticsearch-edition](https://github.com/querqy/chorus-elasticsearch-edition). Refer to that repository for more information on Chorus.**
 
 Chorus makes deploying powerful ecommerce search easier by shifting the **buy vs build** decision in favour of **build**, so you can own your search! Chorus deals with three issues:
 
