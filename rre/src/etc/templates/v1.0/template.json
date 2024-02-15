@@ -1,8 +1,0 @@
-{
-  "query": {
-    "multi_match": {
-        "query": "$query",
-        "fields": [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes" ]
-    }
-  }
-}

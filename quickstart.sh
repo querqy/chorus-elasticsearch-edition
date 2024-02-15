@@ -167,10 +167,6 @@ if $offline_lab; then
   docker compose run --rm quepid bin/rake db:setup
   docker compose run quepid thor user:create -a admin@choruselectronics.com "Chorus Admin" password
 
-  echo -e "${MAJOR}Setting up RRE\n${RESET}"
-  docker compose run rre mvn rre:evaluate
-  docker compose run rre mvn rre-report:report
-
 fi
 
-echo -e "${MAJOR}Welcome to Chorus ES Edition!${RESET}"
+echo -e "${MAJOR}Welcome to Chorus OpenSearch Edition!${RESET}"
