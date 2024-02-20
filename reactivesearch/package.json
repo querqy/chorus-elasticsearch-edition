@@ -18,7 +18,7 @@
     "react-scripts": "^5.0.1",
     "search-collector": "^1.0.0-alpha-29",
     "shx": "^0.3.4",
-    "typescript": "^5.3.3",
+    "typescript": "^3.2.1",
     "webpack": "^5.90.3",
     "webpack-cli": "^5.1.4"
   },

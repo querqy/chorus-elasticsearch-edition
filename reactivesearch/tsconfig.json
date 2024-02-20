@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
 	  "allowSyntheticDefaultImports": true,
-	  "outDir": "./src/js",
+	  "outDir": "./public/js",
 	  "target": "ESNext",
 	  "module": "ESNext",
 	  "moduleResolution": "node",
@@ -10,9 +10,9 @@
 	},
 	"include": [
 	  "src/ts"
-	  ,"*.js"
 	],
 	"exclude": [
-	  "dist"
+	  "public"
+	  ,"build"
 	]
  }
