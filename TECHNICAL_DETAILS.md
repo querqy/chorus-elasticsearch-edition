@@ -12,6 +12,7 @@ This table contains the username and password combinations for each of the compo
 | Grafana       | admin@choruselectronics.com | password     | `quickstart.sh`      | Admin User     |
 | Keycloak      | admin                       | password     | `docker-compose.yml` | Admin User     |
 | MySQL         | root                        | password     | `docker-compose.yml` | Admin User     |
+| SMUI         | admin                        | password     | `docker-compose.yml` | Admin User     |
 
 Keycloak can be used to log in to Quepid via OpenID.
 
@@ -25,4 +26,3 @@ https://github.com/prometheus-community/elasticsearch_exporter
 Grafana Dashboard: https://grafana.com/grafana/dashboards/4377
 
 In the Grafana dashboard, all instances of ${DS_PROMETHEUS} or DS_PROMETHEUS were replaced by Prometheus.
-

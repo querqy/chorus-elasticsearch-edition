@@ -254,11 +254,11 @@ if $vector_search; then
 fi
 
 echo -e "${MAJOR}Setting up SMUI\n${RESET}"
-while [ $(curl -s http://localhost:9000/api/v1/solr-index | wc -c) -lt 2 ]; do
+while [ $(curl -u 'admin:password' -s http://localhost:9000/api/v1/solr-index | wc -c) -lt 2 ]; do
     echo "Waiting 5s for SMUI to be ready..."
     sleep 5
 done
-curl -X PUT -H "Content-Type: application/json" -d '{"name":"ecommerce", "description":"Chorus Webshop"}' http://localhost:9000/api/v1/solr-index
+curl -u 'admin:password' -X PUT -H "Content-Type: application/json" -d '{"name":"ecommerce", "description":"Chorus Webshop"}' http://localhost:9000/api/v1/solr-index
 
 if $offline_lab; then
   if $local_deploy; then
