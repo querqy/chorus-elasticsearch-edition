@@ -9,8 +9,10 @@
   },
   "dependencies": {
     "@appbaseio/reactivesearch": "^3.28.0",
+    "@opensearch-project/opensearch": "^2.5.0",
     "axios": "^1.6.7",
     "clean-webpack-plugin": "^4.0.0",
+    "onchange": "^7.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "^5.0.1",
@@ -22,7 +24,8 @@
   },
   "scripts": {
     "build:ts": "webpack --mode=development && shx cp -R src/search_collector.window.bundle.js public/js",
-    "start": "npm run build:ts && cross-env NODE_OPTIONS=--openssl-legacy-provider && react-scripts start",
+    "watch:ts": "onchange \"src/ts\" -- npm run build:ts",
+    "start": "cross-env NODE_OPTIONS=--openssl-legacy-provider && react-scripts start && npm run watch:ts",
     "build": "npm run build:ts && cross-env NODE_OPTIONS=--openssl-legacy-provider && react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
