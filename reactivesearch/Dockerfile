@@ -9,7 +9,6 @@ RUN     npm install -g typescript
 
 COPY ["package.json", "package-lock.json*", "./"]
 RUN     npm install
-#RUN     tsc
 
 RUN yarn
 
