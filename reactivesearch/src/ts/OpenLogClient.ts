@@ -1,4 +1,6 @@
 import axios, {AxiosRequestConfig, AxiosProxyConfig, AxiosInstance} from "axios";
+import Client from '@opensearch-project/opensearch'
+
 /**
  * Methods and client to talk directly with OpenSearch for logging
  * 
@@ -10,16 +12,17 @@ import axios, {AxiosRequestConfig, AxiosProxyConfig, AxiosInstance} from "axios"
  * Class to handle OpenSearch authentication (eventually) log connectivity
  */
 export class OpenLogClient {
-    static readonly API = '/_plugins/search_relevance/';
+    static readonly API = '/_plugins/ubl/';
 
     private readonly baseUrl:string;
     private readonly url:string;
     private readonly log_name:string;
-	private readonly client:AxiosInstance;
+	private readonly raw_client:AxiosInstance;
 	private readonly config:AxiosRequestConfig;
 
     constructor(baseUrl:string, log_name:string) {
 
+        
         //TODO: param checking
         this.baseUrl = baseUrl;
         this.url = baseUrl + OpenLogClient.API;
@@ -32,12 +35,14 @@ export class OpenLogClient {
 			//baseUrl
 			headers :{
 				//'Content-Type':'application/x-www-form-urlencoded',
-				'Content-Type': 'application/json',
+				'Content-type': 'application/json',
+                //'Cookie': 'X-ubi-store:' + this.log_name
 			},
 			//httpAgent
 			//httpsAgent
 			//proxy :proxy
 			//data
+            //data: {'X-ubi-store': this.log_name}
 			//timeout
 			//withCredentials
 			//responseType
@@ -46,9 +51,10 @@ export class OpenLogClient {
 		};
 
         //TODO: replace with more precise client configuration
-        this.client = axios.create({
+        this.raw_client = axios.create({
             baseURL: baseUrl,
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-type': 'application/json' },
+            withCredentials:true
         });
 		
     }
@@ -76,7 +82,7 @@ export class OpenLogClient {
      */
     async delete() {
         try {
-            const response = await this.client.delete(this.url + this.log_name );
+            const response = await this.raw_client.delete(this.url + this.log_name );
             return response.data;
         } catch (error) {
             console.error(error);
@@ -84,7 +90,7 @@ export class OpenLogClient {
     }
     async _get(url) {
         try {
-            const response = await this.client.get(url);
+            const response = await this.raw_client.get(url);
             return response.data;
         } catch (error) {
             console.error(error);
@@ -93,7 +99,8 @@ export class OpenLogClient {
 
     async _post(data) {
         try {
-            const response = await this.client.post(this.url + this.log_name, data, this.config);
+            document.cookie = 'X-ubi-store:' + this.log_name
+            const response = await this.raw_client.post(this.url + this.log_name, data, this.config);
             return response.data;
         } catch (error) {
             console.error(error);
@@ -102,7 +109,7 @@ export class OpenLogClient {
 
     async _put(data=null) {
         try {
-            const response = await this.client.put(this.url + this.log_name , data);
+            const response = await this.raw_client.put(this.url + this.log_name , data);
             return response.data;
         } catch (error) {
             console.error(error);
