@@ -4,73 +4,7 @@ import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 
 
-//import OpenLogClient from './js/OpenLogClient'
-var OpenLogClient = require('./ts/OpenLogClient.ts').OpenLogClient;
 
-const {
-	CollectorModule,
-	Context,
-	cookieSessionResolver,
-	debounce,
-	DefaultWriter,
-	FiredSearchCollector,
-	InstantSearchQueryCollector,
-	positionResolver,
-	Query,
-	Sentinel,
-	Trail,
-	TrailType,
-	DebugWriter,
-	QueryWriter,
-	TrailWriter,
-	JSONEnvelopeWriter,
-	RedirectCollector,
-	BrowserTrackingWriter,
-	ProductClickCollector,
-	ImpressionCollector,
-	SearchResultCollector,
-	BasketClickCollector,
-	CheckoutClickCollector,
-	ConsoleTransport,
-	SuggestSearchCollector,
-	AssociatedProductCollector,
-	ListenerType,
-} = window.SearchCollector;
-
-
-/**
- * Used for demo purposes only, store all events in localstorage.
- * For live environments rely on DefaultWriter class shipped with the search-collector packages
- */
-class DemoWriter {
-
-	constructor(queryResolver, sessionResolver, channel, debug) {
-
-		const localstorageWriter = {
-			write: (data) => {
-				const dataArr = JSON.parse(localStorage.getItem("____localstorageWriter") || "[]");
-				dataArr.push(data);
-				localStorage.setItem("____localstorageWriter", JSON.stringify(dataArr));
-			}
-		}
-		const SearchCollector = window.SearchCollector;
-		let writer = new SearchCollector.DebugWriter(localstorageWriter, debug);
-		writer = new SearchCollector.QueryWriter(writer, queryResolver);
-		writer = new SearchCollector.TrailWriter(writer, new SearchCollector.Trail(queryResolver, sessionResolver), queryResolver);
-		writer = new SearchCollector.JSONEnvelopeWriter(writer, sessionResolver, channel);
-		writer = new SearchCollector.BrowserTrackingWriter(writer, {
-			recordReferrer: true,
-			recordUrl: true,
-			recordLanguage: true
-		});
-
-		this.writer = writer;
-	}
-
-	write(data) {
-		this.writer.write(data);
-	}
-}
 
 const sessionResolver = () => cookieSessionResolver();
 
