@@ -1,4 +1,4 @@
-FROM querqy/smui:3.14
+FROM querqy/smui:4.0.9
 
 COPY conf/smui2es.sh /smui/conf/smui2es.sh
 COPY conf/*.py /smui/conf/
