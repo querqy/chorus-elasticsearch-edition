@@ -31,9 +31,6 @@ services:
       memlock:
         soft: -1
         hard: -1
-    #volumes:
-    #  - ./elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
-    #  - es_data:/usr/share/opensearch/data
     ports:
       - "9200:9200"
     healthcheck:
@@ -97,33 +94,6 @@ services:
     image: redis:7.0.11-alpine
     ports:
       - 6379:6379
-
-  smui:
-    container_name: smui
-    build: ./smui
-    ports:
-      - 9000:9000
-    init: true
-    environment:
-      - SMUI_HEADLINE=Chorus SMUI
-      - SMUI_DB_URL=jdbc:mysql://mysql:3306/smui?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
-      - SMUI_DB_USER=root
-      - SMUI_DB_PASSWORD=${SMUI_DB_PASSWORD}
-      - SMUI_DEPLOY_PRELIVE_SOLR_HOST=opensearch:9200
-      - SMUI_TOGGLE_UI_WITH_SOLR_FIELDS=false
-      - SMUI_2SOLR_SOLR_HOST=opensearch:9200
-      - SMUI_TOGGLE_DEPL_PRELIVE=true
-      - SMUI_TOGGLE_SPELLING=true
-      - SMUI_TOGGLE_DEPL_CUSTOM_SCRIPT=true
-      - SMUI_TOGGLE_DEPL_CUSTOM_SCRIPT_PATH=/smui/conf/smui2es.sh
-      - SMUI_DEPLOY_PRELIVE_FN_RULES_TXT=/configs/ecommerce/rules.txt
-      - SMUI_DEPLOY_PRELIVE_FN_REPLACE_TXT=/configs/ecommerce/replace-rules.txt
-      - SMUI_TOGGLE_RULE_ID_LOGGING=true
-      - SMUI_TOGGLE_EVENTHISTORY=true
-      - SMUI_RULE_TAGGING_ACTIVE=true
-      - SMUI_PREDEFINED_TAGS_FILE=/smui/conf/predefined_tags.json
-    depends_on:
-      - mysql
 
 volumes:
   mysql_data: {}

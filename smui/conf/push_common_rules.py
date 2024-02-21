@@ -3,7 +3,7 @@ import sys,json,requests
 if __name__ == "__main__":
 
     if len(sys.argv) != 3:
-        print('Usage: push_common_rules.py <rules.txt> <http://<elasticsearch_host:port>/_querqy/rewriter/<rewriter_name>')
+        print('Usage: push_common_rules.py <rules.txt> <http://<opensearch_host:port>/_querqy/rewriter/<rewriter_name>')
         sys.exit(1)
 
     rules_file = sys.argv[1]
@@ -19,6 +19,6 @@ if __name__ == "__main__":
         }
     }
 
-    resp = requests.put(rewriter_url, auth = ('elastic', 'ElasticRocks'), json=req)
+    resp = requests.put(rewriter_url, auth = ('??username', '??password'), json=req)
     if resp.status_code != 200:
         sys.exit(2)

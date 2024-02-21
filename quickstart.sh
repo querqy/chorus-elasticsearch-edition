@@ -58,14 +58,13 @@ do
 	shift
 done
 
-services="opensearch opensearch-dashboards chorus-ui smui"
+services="opensearch opensearch-dashboards chorus-ui"
 
 if $offline_lab; then
-  services="${services} quepid rre"
+  services="${services} quepid"
 fi
 
 if $stop; then
-  services="${services} quepid rre"
   docker compose stop ${services}
   exit
 fi
@@ -112,54 +111,6 @@ if [ ! -f ./transformed_data.json ]; then
 fi
 echo -e "${MAJOR}Indexing the sample product data, please wait...\n${RESET}"
 curl -s -X POST "localhost:9200/ecommerce/_bulk?pretty" -H 'Content-Type: application/json' --data-binary @transformed_data.json
-
-
-# echo -e "${MAJOR}Creating default (empty) query rewriters\n${RESET}"
-# # Query rewriters are configured empty, without any rules. This ensures that no errors occur when the different
-# # relevance algorithms are used in the frontend before any rules are set.
-# # For configuring the rules SMUI will be set up and used.
-# curl -s --request PUT 'http://localhost:9200/_querqy/rewriter/common_rules' \
-# --header 'Content-Type: application/json' \
-# --data-raw '{
-#     "class": "querqy.elasticsearch.rewriter.SimpleCommonRulesRewriterFactory",
-#     "config": {
-#         "rules": ""
-#     }
-# }'
-
-# curl -s --request PUT 'http://localhost:9200/_querqy/rewriter/common_rules_prelive' \
-# --header 'Content-Type: application/json' \
-# --data-raw '{
-#     "class": "querqy.elasticsearch.rewriter.SimpleCommonRulesRewriterFactory",
-#     "config": {
-#         "rules": ""
-#     }
-# }'
-
-# curl -s --request PUT 'http://localhost:9200/_querqy/rewriter/replace' \
-# --header 'Content-Type: application/json' \
-# --data-raw '{
-#     "class": "querqy.elasticsearch.rewriter.ReplaceRewriterFactory",
-#     "config": {
-#         "rules": ""
-#     }
-# }'
-
-# curl -s --request PUT 'http://localhost:9200/_querqy/rewriter/replace_prelive' \
-# --header 'Content-Type: application/json' \
-# --data-raw '{
-#     "class": "querqy.elasticsearch.rewriter.ReplaceRewriterFactory",
-#     "config": {
-#         "rules": ""
-#     }
-# }'
-
-# echo -e "${MAJOR}Setting up SMUI\n${RESET}"
-# while [ $(curl -s http://localhost:9000/api/v1/solr-index | wc -c) -lt 2 ]; do
-#     echo "Waiting 5s for SMUI to be ready..."
-#     sleep 5
-# done
-# curl -X PUT -H "Content-Type: application/json" -d '{"name":"ecommerce", "description":"Chorus Webshop"}' http://localhost:9000/api/v1/solr-index
 
 if $offline_lab; then
 

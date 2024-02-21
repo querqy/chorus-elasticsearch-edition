@@ -51,110 +51,110 @@ const queries = {
       }
     }
   }},
-  'querqy_preview':function( value ) { return{
-    query: {
-      querqy: {
-        matching_query: {
-          query: value
-        },
-        query_fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"],
-        rewriters: ["replace_prelive", "common_rules_prelive"]
-      }
-    }
-  }},
-  'querqy_live':function( value ) { return{
-    query: {
-      querqy: {
-        matching_query: {
-          query: value
-        },
-        query_fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"],
-        rewriters: ["replace", "common_rules"]
-      }
-    }
-  }},
-  'querqy_boost_by_img_emb':function( value ) { return{
-    query: {
-      querqy: {
-        matching_query: {
-          query: value
-        },
-        query_fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"],
-        rewriters: [
-          {
-            "name": "embimg",
-            "params": {
-              "topK": 200,
-              "mode": "BOOST",
-              "f": "product_image_vector",
-              "boost": 10.0
-            }
-          }
-        ]
-      }
-    }
-  }},
-  'querqy_match_by_img_emb':function( value ) { return{
-    query: {
-      querqy: {
-        matching_query: {
-          query: value
-        },
-        query_fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"],
-        rewriters: [
-          {
-            "name": "embimg",
-            "params": {
-              "topK": 200,
-              "mode": "MAIN_QUERY",
-              "f": "product_image_vector"
-            }
-          }
-        ]
-      }
-    }
-  }},
-  'querqy_boost_by_txt_emb': function( value ) { return{
-    query: {
-      querqy: {
-        matching_query: {
-          query: value
-        },
-        query_fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"],
-        rewriters: [
-          {
-            "name": "embtxt",
-            "params": {
-              "topK": 200,
-              "mode": "BOOST",
-              "f": "product_vector",
-              "boost": 10.0
-            }
-          }
-        ]
-      }
-    }
-  }},
-  'querqy_match_by_txt_emb':function( value ) { return{
-    query: {
-      querqy: {
-        matching_query: {
-          query: value
-        },
-        query_fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"],
-        rewriters: [
-          {
-            "name": "embtxt",
-            "params": {
-              "topK": 200,
-              "mode": "MAIN_QUERY",
-              "f": "product_vector"
-            }
-          }
-        ]
-      }
-    }
-  }},
+  // 'querqy_preview':function( value ) { return{
+  //   query: {
+  //     querqy: {
+  //       matching_query: {
+  //         query: value
+  //       },
+  //       query_fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"],
+  //       rewriters: ["replace_prelive", "common_rules_prelive"]
+  //     }
+  //   }
+  // }},
+  // 'querqy_live':function( value ) { return{
+  //   query: {
+  //     querqy: {
+  //       matching_query: {
+  //         query: value
+  //       },
+  //       query_fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"],
+  //       rewriters: ["replace", "common_rules"]
+  //     }
+  //   }
+  // }},
+  // 'querqy_boost_by_img_emb':function( value ) { return{
+  //   query: {
+  //     querqy: {
+  //       matching_query: {
+  //         query: value
+  //       },
+  //       query_fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"],
+  //       rewriters: [
+  //         {
+  //           "name": "embimg",
+  //           "params": {
+  //             "topK": 200,
+  //             "mode": "BOOST",
+  //             "f": "product_image_vector",
+  //             "boost": 10.0
+  //           }
+  //         }
+  //       ]
+  //     }
+  //   }
+  // }},
+  // 'querqy_match_by_img_emb':function( value ) { return{
+  //   query: {
+  //     querqy: {
+  //       matching_query: {
+  //         query: value
+  //       },
+  //       query_fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"],
+  //       rewriters: [
+  //         {
+  //           "name": "embimg",
+  //           "params": {
+  //             "topK": 200,
+  //             "mode": "MAIN_QUERY",
+  //             "f": "product_image_vector"
+  //           }
+  //         }
+  //       ]
+  //     }
+  //   }
+  // }},
+  // 'querqy_boost_by_txt_emb': function( value ) { return{
+  //   query: {
+  //     querqy: {
+  //       matching_query: {
+  //         query: value
+  //       },
+  //       query_fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"],
+  //       rewriters: [
+  //         {
+  //           "name": "embtxt",
+  //           "params": {
+  //             "topK": 200,
+  //             "mode": "BOOST",
+  //             "f": "product_vector",
+  //             "boost": 10.0
+  //           }
+  //         }
+  //       ]
+  //     }
+  //   }
+  // }},
+  // 'querqy_match_by_txt_emb':function( value ) { return{
+  //   query: {
+  //     querqy: {
+  //       matching_query: {
+  //         query: value
+  //       },
+  //       query_fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"],
+  //       rewriters: [
+  //         {
+  //           "name": "embtxt",
+  //           "params": {
+  //             "topK": 200,
+  //             "mode": "MAIN_QUERY",
+  //             "f": "product_vector"
+  //           }
+  //         }
+  //       ]
+  //     }
+  //   }
+  // }},
 }
 
 

@@ -29,7 +29,6 @@ Want to stay up-to-date with the community? Visit https://querqy.org/ to learn m
 * The UI (Reactivesearch) runs at http://localhost:4000 
 * OpenSearch runs at http://localhost:9200
 * OpenSearch Dashboards runs at http://localhost:5601/app/home
-* SMUI runs at http://localhost:9000  |  http://chorus-es-edition.dev.o19s.com:9000
 * Quepid runs at http://localhost:3000  |  http://chorus-es-edition.dev.o19s.com:3000
 
 Working with macOS? Pop open all the tuning related web pages with one terminal command:
@@ -118,6 +117,7 @@ The version of the Icecat product data that Chorus [provides](https://querqy.org
 
 # Known Issues
 
-1. SMUI stands for \'search management UI\'. It is designed to work with Solr. We provided some scripts for basic functionality with OpenSearch but there are still limitations. You get a feeling what's currently possible by going through [Kata 1: Optimize a Query](katas/001_optimize_a_query.md).
+1. We have removed SMUI until Querqy is updated to OpenSearch 1.12.
+1. We have removed the kata `001_optimize_a_query.md` until SMUI is back.
 
 Of course, contributions are very welcome to improve Chorus - The OpenSearch Edition!

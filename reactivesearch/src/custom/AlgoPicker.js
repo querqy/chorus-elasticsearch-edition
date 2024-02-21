@@ -29,12 +29,6 @@ class AlgoPicker extends Component {
 				)}
         <select value={this.state.selectedValue} onChange={this.onChangeValue} style={{display: "flex", flexDirection: "column"}} id="algopicker">
           <option checked={this.state.selectedValue === "default"} value="default">Default</option>
-          <option checked={this.state.selectedValue === "querqy_preview"} value="querqy_preview">Querqy Preview</option>
-          <option checked={this.state.selectedValue === "querqy_live"} value="querqy_live">Querqy Live</option>
-          <option checked={this.state.selectedValue === "querqy_boost_by_img_emb"} value="querqy_boost_by_img_emb">Querqy boost by image vector</option>
-          <option checked={this.state.selectedValue === "querqy_match_by_img_emb"} value="querqy_match_by_img_emb">Querqy match by image vector</option>
-          <option checked={this.state.selectedValue === "querqy_boost_by_txt_emb"} value="querqy_boost_by_txt_emb">Querqy boost by text vector</option>
-          <option checked={this.state.selectedValue === "querqy_match_by_txt_emb"} value="querqy_match_by_txt_emb">Querqy match by text vector</option>
         </select>
       </Container>
     )
