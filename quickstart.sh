@@ -58,7 +58,7 @@ do
 	shift
 done
 
-services="opensearch opensearch-dashboards chorus-ui smui"
+services="opensearch opensearch-dashboards chorus-ui"
 
 if $offline_lab; then
   services="${services} quepid"
