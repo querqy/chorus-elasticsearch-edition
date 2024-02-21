@@ -3,19 +3,41 @@ import Title from '../styles/Title';
 import Container from '../styles/Container';
 import {getClassName} from '@appbaseio/reactivecore/lib/utils/helper';
 
+var UbiWriter = require('.././ts/UbiWriter.ts').UbiWriter;
+var Ubi = require('.././ts/UbiEvent.ts');
 
 class AlgoPicker extends Component {
+  
+  writer = null;
   state = {
     algo: 'default',
     selectedValue: 'default',
+//    writer: this.writer
   };
+
+
+  setWriter(writer){
+    this.writer = writer;
+  }
+
 
   onChangeValue = (event) => {
     this.setState({
       algo: event.target.value,
       selectedValue: event.target.value,
+    //  writer: this.writer
     });
-    console.log(this);
+    console.log('AlgorPicker.onChange ' + this.value);
+
+    if('writer' in this.props){
+      const writer = this.props['writer']
+      let e = new Ubi.UbiEvent('algo_change', 'user123', '');
+      e.message = 'Algorithm changed to ' + this.value
+    //  e['outer'] =  'outer test';
+      writer.write_event(e);
+    }
+    else
+      console.log('null writer');
 
   };
 
