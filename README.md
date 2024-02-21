@@ -28,7 +28,7 @@ Want to stay up-to-date with the community? Visit https://querqy.org/ to learn m
 
 * The UI (Reactivesearch) runs at http://localhost:4000 
 * OpenSearch runs at http://localhost:9200
-* OpenSearch Dashboards runs at http://localhost:5601
+* OpenSearch Dashboards runs at http://localhost:5601/app/home
 * SMUI runs at http://localhost:9000  |  http://chorus-es-edition.dev.o19s.com:9000
 * Quepid runs at http://localhost:3000  |  http://chorus-es-edition.dev.o19s.com:3000
 
