@@ -61,11 +61,10 @@ done
 services="opensearch opensearch-dashboards chorus-ui smui"
 
 if $offline_lab; then
-  services="${services} quepid rre"
+  services="${services} quepid"
 fi
 
 if $stop; then
-  services="${services} quepid rre"
   docker compose stop ${services}
   exit
 fi
