@@ -1,7 +1,8 @@
 import {Writer} from "search-collector";
 //import {} from '../search_collector.window.bundle'
-import {OpenLogClient} from "./OpenLogClient";
-import { default as olPost } from "./OpenLogClient";
+import {UbiLogger} from "./UbiLogger";
+import { default as olPost } from "./UbiLogger";
+import { UbiEvent } from "./UbiEvent";
 
 /*
 const {
@@ -36,14 +37,15 @@ const {
 */
 
 /**
- * This connects the OpenLogClient to the search-collector's DemoWriter code
+ * This connects the UbiLogger to the search-collector's DemoWriter code
  */
-export class OLWriter implements Writer {
-	private readonly logger:OpenLogClient;
+export class UbiWriter implements Writer {
+	private readonly logger:UbiLogger;
 
 	constructor(olUrl, channel, queryResolver, sessionResolver, debug) {
 
-		this.logger = new OpenLogClient(olUrl, channel);
+
+		this.logger = new UbiLogger(olUrl, channel);
 
 		const localstorageWriter = {
 			write: (data) => {
@@ -69,9 +71,16 @@ export class OLWriter implements Writer {
 	}
 
 	write(data) {
-		//olPost(data);
-		this.logger.info(data);
-		//alert(data);
+		//TODO: chicken/egg?
+
+		//this.logger.info(data);
 		//this.writer.write(data);
+	}
+
+	write_event(e:UbiEvent){
+		this.logger.log_event(e);
+		console.log(e.toJson());
+
+		//TODO: xx this.write(e);  ?
 	}
 }

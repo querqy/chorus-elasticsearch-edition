@@ -4,19 +4,18 @@ import {
   DataSearch,
   MultiList,
   ReactiveList,
-  SingleRange,
   ResultCard,
   StateProvider,
-  SingleList, DataSearchProps
 } from "@appbaseio/reactivesearch";
 import AlgoPicker from './custom/AlgoPicker';
 
 import {CollectorModule, Context, InstantSearchQueryCollector, Trail, Query, cookieSessionResolver, ConsoleTransport} from "search-collector";
 
-var OpenLogClient = require('./ts/OpenLogClient.ts').OpenLogClient;
-var OLWriter = require('./ts/OLWriter.ts').OLWriter;
+var UbiWriter = require('./ts/UbiWriter.ts').UbiWriter;
+var UbiEvent = require('./ts/UbiEvent.ts').UbiEvent;
+var UbiAttributes = require('./ts/UbiEvent.ts').UbiEventAttributes;
+var UbiData = require('./ts/UbiEvent.ts').UbiEventData;
 
-//import OLWriter from 'OLWriter';
 const sessionResolver = () => cookieSessionResolver();
 
 const queryResolver = () => {
@@ -30,9 +29,20 @@ const queryResolver = () => {
 const debug = true;
 const trail = new Trail(queryResolver, sessionResolver);
 const context = new Context(window, document);
-const writer = new OLWriter('http://127.0.0.1:9200', 'ubl_log', queryResolver, sessionResolver,  debug);
 
-//alert('writer =>' + writer)
+
+// TODO: move parameters to properties file
+const writer = new UbiWriter('http://127.0.0.1:9200', 'ubl_log', queryResolver, sessionResolver,  debug);
+
+
+//##################################################################
+//on document load, hook things up here
+document.addEventListener('DOMContentLoaded', function () {
+
+
+});
+//##################################################################
+
 
 // utils.js - string format function
 String.prototype.f = function () {
@@ -157,28 +167,9 @@ const queries = {
   // }},
 }
 
-
-function new_render(value) {
-
-  var elem = document.getElementById('algopicker');
-  var algo = "";
-  if (elem) {
-    algo = elem.value
-  } else {console.log("Unable to determine selected algorithm!");}
-  if (algo in queries) {
-    console.log(JSON.stringify(queries[ algo ](value)));
-    return queries[ algo ](value);
-  } else {
-    console.log("Could not determine algorithm");
-  }
-}
-
-
 class App extends Component {
   constructor(){
     super();
-    //this.customQuery = queries['default']('');
-    //this.x = 'asdfa'
   }
 
   search_text=''
@@ -193,15 +184,35 @@ class App extends Component {
   };
 
 
-
   componentDidMount(){
     console.log('mounted ' + this);
+
+
+    let e = new UbiEvent('logon', 'user123', 'query_token');
+    e.message = 'This is a test message'
+    e['outer'] =  'outer test';
+    
+    //xx console.log(JSON.stringify(e));
+
+    e.page_id = 'chorus_page1';
+    e.session_id = '18734032'
+    e.event_attributes['test'] =  'this is a test';
+    e.event_attributes['test2'] =  1234;
+    //xx console.log(JSON.stringify(e));
+
+    e.event_attributes.data = new UbiData('test_data', 'not real data', {'inner':'data object'});
+    //xx console.log(e.toJson());
+
+    //writer.write(e.toJson());
+
+    
   }
 
   
 
   render(){
   return (
+    //TODO: move url and other configs to proerties file
     <ReactiveBase
       url="http://localhost:9200"
       app="ecommerce"
@@ -211,10 +222,8 @@ class App extends Component {
       <StateProvider
           onChange={(prevState, nextState) => {
             let queryString = nextState;
-            //alert('xx');
-            console.log('onChange - ' + queryString.searchbox.value);
-            this.setState(nextState)
-            this.search_text = queryString.searchbox.value;
+            console.log('Page.onChange - ' + queryString.searchbox.value);
+            //this.search_text = queryString.searchbox.value;
           }}
           
       />
@@ -233,7 +242,9 @@ class App extends Component {
         >
           <AlgoPicker
             title="Pick your Algo"
-            componentId="algopicker" />
+            componentId="algopicker" 
+            writer={writer}
+            />
           <MultiList
             componentId="brandfilter"
             dataField="supplier"
@@ -260,24 +271,19 @@ class App extends Component {
         <div style={{ display: "flex", flexDirection: "column", width: "75%" }}>
           <DataSearch 
           
-         // value='iphone' 
           onValueChange={
             function(value) {
-              console.log("onValueChanged current value: ", value)
-              writer.write(value);
-              //App.handleSearch(value)
-              //handleSearch(value);
-              //this.search_text = value;
-              //App.customQuery = new_render(value);
-              //this.customQuery(value);
-              // set the state
-              // use the value with other js code
-              //this.setCustomQuery(new_render(value))
+              console.log("onValueChanged search value: ", value)
+
+              //TODO: pull in user id, query id, page id, etc.
+              let e = new UbiEvent('on_search', 'user123', 'query_id', 'Searched on: ' + value);
+              writer.write_event(e);
+              //writer.write(value);
             }
           }
           onChange={
             function(value, cause, source) {
-              console.log("onChange current value: ", value)
+            //  console.log("onChange current value: ", value)
             }
           } 
           onValueSelected={
@@ -294,7 +300,7 @@ class App extends Component {
                 //this.state.searchText = value
                 //alert(this.state)
 
-              console.log("beforeValueChanged current value: ", value)
+          //    console.log("beforeValueChanged current value: ", value)
             
         }}
           onQueryChange={
@@ -321,7 +327,9 @@ class App extends Component {
                 } else {console.log("Unable to determine selected algorithm!");}
                 if (algo in queries) {
                   //xx console.log(JSON.stringify(queries[ algo ](value)));
+                  
                   return queries[ algo ](value);
+
                 } else {
                   console.log("Could not determine algorithm");
                 }

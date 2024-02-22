@@ -1,11 +1,12 @@
-// Checkout out the demo at https://github.com/searchhub/search-collector/tree/master/demo and https://www.searchhub.io/search-collector/demo/ for collector implementation details
+//TODO: place holder for demo, most of what is below is old code 
+// to link search collector in to an old demo
+
+
+// from the demo at https://github.com/searchhub/search-collector/tree/master/demo and https://www.searchhub.io/search-collector/demo/ for collector implementation details
 
 import {CollectorModule, Context, DefaultWriter, FiredSearchCollector, InstantSearchQueryCollector, Trail, Query, cookieSessionResolver, ConsoleTransport, positionResolver, ListenerType, ProductClickCollector} from "search-collector";
-import { OLWriter } from "./OLWriter";
-import { default as olPost } from "./OpenLogClient";
-
-//let debug_events = '[{"type":"search","action":"search","url":"http://localhost:10202/demo.html","ref":"","lang":"en-US","timestamp":1706109997947,"session":"rbn3lg0","channel":"demo-channel","query":""},{"type":"instant-search","keywords":"knvmjhvbkj","timestamp":1706110004006,"url":"http://localhost:10202/demo.html","ref":"","lang":"en-US","session":"rbn3lg0","channel":"demo-channel","query":""},{"type":"fired-search","keywords":"knvmjhvbkj","query":"$s=knvmjhvbkj/","url":"http://localhost:10202/demo.html","ref":"","lang":"en-US","timestamp":1706110006726,"session":"rbn3lg0","channel":"demo-channel"},{"type":"search","keywords":"knvmjhvbkj","action":"search","url":"http://localhost:10202/demo.html?query=knvmjhvbkj","ref":"http://localhost:10202/demo.html","lang":"en-US","timestamp":1706110009040,"session":"rbn3lg0","channel":"demo-channel","query":"$s=knvmjhvbkj/"}]'
-
+import { UbiWriter } from "./UbiWriter";
+import { default as olPost } from "./UbiLogger";
 
 export function post(msg){
 	return olPost(msg);
@@ -82,7 +83,7 @@ const context = new Context(window, document);
 
 
 /**/
-const writer = new OLWriter('http://127.0.0.1:9200', 'ubl_log', queryResolver, sessionResolver,  debug);
+const writer = new UbiWriter('http://127.0.0.1:9200', 'ubl_log', queryResolver, sessionResolver,  debug);
 
 const collector = new CollectorModule({
 	writer,
