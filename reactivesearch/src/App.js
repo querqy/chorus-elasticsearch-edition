@@ -11,13 +11,11 @@ import AlgoPicker from './custom/AlgoPicker';
 
 import {CollectorModule, Context, InstantSearchQueryCollector, Trail, Query, cookieSessionResolver, ConsoleTransport} from "search-collector";
 
-//var UbiLogger = require('./ts/UbiLogger.ts').UbiLogger;
 var UbiWriter = require('./ts/UbiWriter.ts').UbiWriter;
 var UbiEvent = require('./ts/UbiEvent.ts').UbiEvent;
 var UbiAttributes = require('./ts/UbiEvent.ts').UbiEventAttributes;
 var UbiData = require('./ts/UbiEvent.ts').UbiEventData;
 
-//import UbiWriter from 'UbiWriter';
 const sessionResolver = () => cookieSessionResolver();
 
 const queryResolver = () => {
@@ -32,28 +30,15 @@ const debug = true;
 const trail = new Trail(queryResolver, sessionResolver);
 const context = new Context(window, document);
 
+
 // TODO: move parameters to properties file
 const writer = new UbiWriter('http://127.0.0.1:9200', 'ubl_log', queryResolver, sessionResolver,  debug);
+
 
 //##################################################################
 //on document load, hook things up here
 document.addEventListener('DOMContentLoaded', function () {
 
-
-  var elem = document.getElementById('algopicker');
-  var algo = "";
-  if (elem) {
-    algo = elem.value
-    
-    //elem.setState({'writer':writer});
-    elem.setAttribute('writer', writer);
-    elem.setWriter(writer);
-  
-    //elem.writer = writer;
-    console.log('Writer assignment');
-  }
-  else
-  console.log('no algo')
 
 });
 //##################################################################

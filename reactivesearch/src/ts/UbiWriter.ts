@@ -44,6 +44,7 @@ export class UbiWriter implements Writer {
 
 	constructor(olUrl, channel, queryResolver, sessionResolver, debug) {
 
+
 		this.logger = new UbiLogger(olUrl, channel);
 
 		const localstorageWriter = {
@@ -70,9 +71,7 @@ export class UbiWriter implements Writer {
 	}
 
 	write(data) {
-		//olPost(data);
 		//this.logger.info(data);
-		//alert(data);
 		//this.writer.write(data);
 	}
 
