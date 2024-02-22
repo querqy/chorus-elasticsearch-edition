@@ -40,21 +40,6 @@ const writer = new UbiWriter('http://127.0.0.1:9200', 'ubl_log', queryResolver, 
 document.addEventListener('DOMContentLoaded', function () {
 
 
-  var elem = document.getElementById('algopicker');
-  var algo = "";
-  if (elem) {
-    algo = elem.value
-    
-    //elem.setState({'writer':writer});
-    elem.setAttribute('writer', writer);
-    elem.setWriter(writer);
-  
-    //elem.writer = writer;
-    console.log('Writer assignment');
-  }
-  else
-  console.log('no algo')
-
 });
 //##################################################################
 
