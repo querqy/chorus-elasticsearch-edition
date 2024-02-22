@@ -10,7 +10,7 @@ while [[ "$(curl -s localhost:9200/_cluster/health | jq '."status"')" != "\"gree
     elapsed_time=$((current_time - start_time))
 
     if [[ $elapsed_time -ge $timeout ]]; then
-        echo "Timeout reached. Exiting."
+        echo "Timeout waiting for 'green' OpenSearch status reached. Proceeding on."
         exit 1
     fi
 done
