@@ -76,6 +76,7 @@ fi
 
 docker compose up -d --build ${services}
 
+#TODO: is this needed with the depends_on config in the docker compose?
 echo -e "${MAJOR}Waiting for OpenSearch to start up and be online.${RESET}"
 ./opensearch/wait-for-os.sh # Wait for OpenSearch to be online
 

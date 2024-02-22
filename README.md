@@ -115,6 +115,18 @@ The version of the Icecat product data that Chorus [provides](https://querqy.org
 * Products that don't have a 500x500 pixel image listed are removed.
 * The Prices of ~19,000 products got extracted from the https://www.upcitemdb.com/ service, using EAN codes.
 
+# Tips for installing on Windows
+* Ensure that docker desktop is running
+* install in a linux WSL. 
+* You might need to `apt-get install ` jq, wget & dos2unix
+* if you have \r issues with running `source quickstart.sh`:
+  * `dos2unix *.sh`
+  * `dos2unix opensearch/*.sh`
+* if your subsystem is blocked from outside ports:
+  * the easiest solution is to manually download and unpack https://querqy.org/datasets/icecat/icecat-products-w_price-19k-20201127.tar.gz in the project root.  Then run `source quickstart.sh` to index the data
+  * or just figure out how to open the subsystem ports :)
+
+
 # Known Issues
 
 1. We have removed SMUI until Querqy is updated to OpenSearch 1.12.
