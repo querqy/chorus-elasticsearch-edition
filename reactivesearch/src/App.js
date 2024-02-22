@@ -8,6 +8,36 @@ import {
   StateProvider,
 } from "@appbaseio/reactivesearch";
 import AlgoPicker from './custom/AlgoPicker';
+import fetchIntercept from 'fetch-intercept';
+
+/*
+const unregister = fetchIntercept.register({
+
+  response: function (response) {
+    console.log("\n\ncalled function!");
+    console.log("body:" + response.body);
+
+    // Do something with the response
+    console.log(response.headers);
+    console.log("header: " + response.headers.get('Refresh-Token') );
+    if (response.ok && 'Refresh-Token' in response) {
+      const token = response['Refresh-Token'];
+      console.log("saving " + token);
+      sessionStorage.setItem('token', token)
+    }
+    return response;
+  },
+
+*/
+const unregister = fetchIntercept.register({
+  response: function (response) {
+    console.log("response:", response);
+    const headersObj = Object.fromEntries([...response.headers.entries()]);
+    console.error(headersObj);
+
+    return response;
+  }
+});
 
 import {CollectorModule, Context, InstantSearchQueryCollector, Trail, Query, cookieSessionResolver, ConsoleTransport} from "search-collector";
 
@@ -15,6 +45,8 @@ var UbiWriter = require('./ts/UbiWriter.ts').UbiWriter;
 var UbiEvent = require('./ts/UbiEvent.ts').UbiEvent;
 var UbiAttributes = require('./ts/UbiEvent.ts').UbiEventAttributes;
 var UbiData = require('./ts/UbiEvent.ts').UbiEventData;
+
+const log_store = 'ubl_log'
 
 const sessionResolver = () => cookieSessionResolver();
 
@@ -32,7 +64,7 @@ const context = new Context(window, document);
 
 
 // TODO: move parameters to properties file
-const writer = new UbiWriter('http://127.0.0.1:9200', 'ubl_log', queryResolver, sessionResolver,  debug);
+const writer = new UbiWriter('http://127.0.0.1:9200', log_store, queryResolver, sessionResolver,  debug);
 
 
 //##################################################################
@@ -61,28 +93,28 @@ const queries = {
       }
     }
   }},
-  // 'querqy_preview':function( value ) { return{
-  //   query: {
-  //     querqy: {
-  //       matching_query: {
-  //         query: value
-  //       },
-  //       query_fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"],
-  //       rewriters: ["replace_prelive", "common_rules_prelive"]
-  //     }
-  //   }
-  // }},
-  // 'querqy_live':function( value ) { return{
-  //   query: {
-  //     querqy: {
-  //       matching_query: {
-  //         query: value
-  //       },
-  //       query_fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"],
-  //       rewriters: ["replace", "common_rules"]
-  //     }
-  //   }
-  // }},
+  'querqy_preview':function( value ) { return{
+    query: {
+      querqy: {
+        matching_query: {
+          query: value
+        },
+        query_fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"],
+        rewriters: ["replace_prelive", "common_rules_prelive"]
+      }
+    }
+  }},
+  'querqy_live':function( value ) { return{
+    query: {
+      querqy: {
+        matching_query: {
+          query: value
+        },
+        query_fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"],
+        rewriters: ["replace", "common_rules"]
+      }
+    }
+  }},
   // 'querqy_boost_by_img_emb':function( value ) { return{
   //   query: {
   //     querqy: {
@@ -217,7 +249,41 @@ class App extends Component {
       url="http://localhost:9200"
       app="ecommerce"
       credentials="elastic:ElasticRocks"
-      enableAppbase={false}
+      //enableAppbase={true}  <- TODO: to allow auto analytics
+      //enableAppbase={false} <- orig
+      
+      headers={{   
+        'X-ubl-store':log_store,
+        'X-ubl-query-id':'fake query id',
+        'X-ubl-user-id': 'fake user id',
+        'X-ubl-session-id':'fake session id',
+      }}
+
+      recordAnalytics={true}
+      searchStateHeader={true}
+      
+      transformResponse={async (response, componentId) => {
+        if( componentId == 'typefilter'){
+          console.log('** Type change =>' + response);
+        } else if(componentId == 'brandfilter'){
+          console.log('** Brand change =>' + response);
+        } else if(componentId == 'results'){
+          console.log('** Search results =>' + response);
+        }
+        else{
+          console.warn(response, componentId);
+        }
+
+        
+        return response;
+      }}
+      transformRequest={async (request) => {
+        request.headers['test'] = 'xyz';
+       console.log(request);
+        
+        return request;
+      }}
+      
     >
       <StateProvider
           onChange={(prevState, nextState) => {
@@ -370,6 +436,16 @@ class App extends Component {
                 ))}
               </ReactiveList.ResultCardsWrapper>
             )}
+            onNoResults={
+              function(results) {
+                console.warn('no results');
+              }
+            }
+            onData={
+              function(results) {
+                console.warn('data results => ' + results);
+              }
+            }
           />
         </div>
       </div>
