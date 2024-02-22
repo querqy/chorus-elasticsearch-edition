@@ -10,34 +10,28 @@ import {
 import AlgoPicker from './custom/AlgoPicker';
 import fetchIntercept from 'fetch-intercept';
 
-/*
-const unregister = fetchIntercept.register({
+const log_store = 'ubl_log';
+let query_id = 'need to generate an id';
+let session_id = 'fake session id';
+let user_id = 'fake user id';
 
-  response: function (response) {
-    console.log("\n\ncalled function!");
-    console.log("body:" + response.body);
+(function(send) { 
+  XMLHttpRequest.prototype.send = function(data) { 
+      this.addEventListener('readystatechange', function() { 
+        console.log('ready');
+        if (this.readyState == 4 ){//} && this.status == 200) {
+          let headers = this.getAllResponseHeaders();
+          if(headers.search('X-ubl-query-id') != -1) {
+            console.log('query token = ' + this.getResponseHeader('X-ubl-query-id')) ;
+            query_id = this.getResponseHeader('X-ubl-query-id');
+          }
+          console.log(headers);
+        }
 
-    // Do something with the response
-    console.log(response.headers);
-    console.log("header: " + response.headers.get('Refresh-Token') );
-    if (response.ok && 'Refresh-Token' in response) {
-      const token = response['Refresh-Token'];
-      console.log("saving " + token);
-      sessionStorage.setItem('token', token)
-    }
-    return response;
-  },
-
-*/
-const unregister = fetchIntercept.register({
-  response: function (response) {
-    console.log("response:", response);
-    const headersObj = Object.fromEntries([...response.headers.entries()]);
-    console.error(headersObj);
-
-    return response;
-  }
-});
+      }, false); 
+      send.call(this, data);
+  }; 
+})(XMLHttpRequest.prototype.send);
 
 import {CollectorModule, Context, InstantSearchQueryCollector, Trail, Query, cookieSessionResolver, ConsoleTransport} from "search-collector";
 
@@ -46,7 +40,6 @@ var UbiEvent = require('./ts/UbiEvent.ts').UbiEvent;
 var UbiAttributes = require('./ts/UbiEvent.ts').UbiEventAttributes;
 var UbiData = require('./ts/UbiEvent.ts').UbiEventData;
 
-const log_store = 'ubl_log'
 
 const sessionResolver = () => cookieSessionResolver();
 
@@ -234,10 +227,7 @@ class App extends Component {
 
     e.event_attributes.data = new UbiData('test_data', 'not real data', {'inner':'data object'});
     //xx console.log(e.toJson());
-
     //writer.write(e.toJson());
-
-    
   }
 
   
@@ -254,9 +244,9 @@ class App extends Component {
       
       headers={{   
         'X-ubl-store':log_store,
-        'X-ubl-query-id':'fake query id',
-        'X-ubl-user-id': 'fake user id',
-        'X-ubl-session-id':'fake session id',
+        'X-ubl-query-id': query_id,
+        'X-ubl-user-id': user_id,
+        'X-ubl-session-id':session_id,
       }}
 
       recordAnalytics={true}
@@ -283,7 +273,8 @@ class App extends Component {
         
         return request;
       }}
-      
+
+            
     >
       <StateProvider
           onChange={(prevState, nextState) => {
@@ -342,7 +333,7 @@ class App extends Component {
               console.log("onValueChanged search value: ", value)
 
               //TODO: pull in user id, query id, page id, etc.
-              let e = new UbiEvent('on_search', 'user123', 'query_id', 'Searched on: ' + value);
+              let e = new UbiEvent('on_search', user_id, query_id, 'Searched on: ' + value);
               writer.write_event(e);
               //writer.write(value);
             }
@@ -443,7 +434,7 @@ class App extends Component {
             }
             onData={
               function(results) {
-                console.warn('data results => ' + results);
+                console.log('data query results => ' + results);
               }
             }
           />

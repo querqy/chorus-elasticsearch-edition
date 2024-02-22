@@ -44,6 +44,8 @@ class AlgoPicker extends Component {
 				)}
         <select value={this.state.selectedValue} onChange={this.onChangeValue} style={{display: "flex", flexDirection: "column"}} id="algopicker">
           <option checked={this.state.selectedValue === "default"} value="default">Default</option>
+          <option checked={this.state.selectedValue === "querqy_preview"} value="querqy_preview">Querqy Preview</option>
+          <option checked={this.state.selectedValue === "querqy_live"} value="querqy_live">Querqy Live</option>
         </select>
       </Container>
     )
