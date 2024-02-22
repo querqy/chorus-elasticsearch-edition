@@ -71,6 +71,8 @@ export class UbiWriter implements Writer {
 	}
 
 	write(data) {
+		//TODO: chicken/egg?
+
 		//this.logger.info(data);
 		//this.writer.write(data);
 	}
@@ -78,6 +80,7 @@ export class UbiWriter implements Writer {
 	write_event(e:UbiEvent){
 		this.logger.log_event(e);
 		console.log(e.toJson());
-		//TODO: xx this.write(e);
+
+		//TODO: xx this.write(e);  ?
 	}
 }

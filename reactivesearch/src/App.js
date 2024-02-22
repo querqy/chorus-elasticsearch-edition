@@ -279,15 +279,6 @@ class App extends Component {
               let e = new UbiEvent('on_search', 'user123', 'query_id', 'Searched on: ' + value);
               writer.write_event(e);
               //writer.write(value);
-
-              //App.handleSearch(value)
-              //handleSearch(value);
-              //this.search_text = value;
-              //App.customQuery = new_render(value);
-              //this.customQuery(value);
-              // set the state
-              // use the value with other js code
-              //this.setCustomQuery(new_render(value))
             }
           }
           onChange={

@@ -12,33 +12,26 @@ class AlgoPicker extends Component {
   state = {
     algo: 'default',
     selectedValue: 'default',
-//    writer: this.writer
   };
 
-
-  setWriter(writer){
-    this.writer = writer;
-  }
 
 
   onChangeValue = (event) => {
     this.setState({
       algo: event.target.value,
       selectedValue: event.target.value,
-    //  writer: this.writer
     });
+
     console.log('AlgorPicker.onChange ' + this.value);
 
     if('writer' in this.props){
       const writer = this.props['writer']
       let e = new Ubi.UbiEvent('algo_change', 'user123', '');
       e.message = 'Algorithm changed to ' + this.value
-    //  e['outer'] =  'outer test';
       writer.write_event(e);
     }
     else
       console.log('null writer');
-
   };
 
   render() {
