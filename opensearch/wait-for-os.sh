@@ -11,7 +11,6 @@ while [[ "$(curl -s localhost:9200/_cluster/health | jq '."status"')" != "\"gree
 
     if [[ $elapsed_time -ge $timeout ]]; then
         echo "Timeout waiting for 'green' OpenSearch status reached. Proceeding on."
-        exit 1
     fi
 done
 
