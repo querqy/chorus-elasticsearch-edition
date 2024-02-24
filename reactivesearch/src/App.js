@@ -6,6 +6,7 @@ import {
   ReactiveList,
   ResultCard,
   StateProvider,
+  ResultList,
 } from "@appbaseio/reactivesearch";
 import AlgoPicker from './custom/AlgoPicker';
 import fetchIntercept from 'fetch-intercept';
@@ -162,111 +163,7 @@ const queries = {
         fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"]
       }
     }
-  }},
-/*   'querqy_preview':function( value ) { return{
-    query: {
-      querqy: {
-        matching_query: {
-          query: value
-        },
-        query_fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"],
-        rewriters: ["replace_prelive", "common_rules_prelive"]
-      }
-    }
-  }},
-  'querqy_live':function( value ) { return{
-    query: {
-      querqy: {
-        matching_query: {
-          query: value
-        },
-        query_fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"],
-        rewriters: ["replace", "common_rules"]
-      }
-    }
-  }}, */
-  // 'querqy_boost_by_img_emb':function( value ) { return{
-  //   query: {
-  //     querqy: {
-  //       matching_query: {
-  //         query: value
-  //       },
-  //       query_fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"],
-  //       rewriters: [
-  //         {
-  //           "name": "embimg",
-  //           "params": {
-  //             "topK": 200,
-  //             "mode": "BOOST",
-  //             "f": "product_image_vector",
-  //             "boost": 10.0
-  //           }
-  //         }
-  //       ]
-  //     }
-  //   }
-  // }},
-  // 'querqy_match_by_img_emb':function( value ) { return{
-  //   query: {
-  //     querqy: {
-  //       matching_query: {
-  //         query: value
-  //       },
-  //       query_fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"],
-  //       rewriters: [
-  //         {
-  //           "name": "embimg",
-  //           "params": {
-  //             "topK": 200,
-  //             "mode": "MAIN_QUERY",
-  //             "f": "product_image_vector"
-  //           }
-  //         }
-  //       ]
-  //     }
-  //   }
-  // }},
-  // 'querqy_boost_by_txt_emb': function( value ) { return{
-  //   query: {
-  //     querqy: {
-  //       matching_query: {
-  //         query: value
-  //       },
-  //       query_fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"],
-  //       rewriters: [
-  //         {
-  //           "name": "embtxt",
-  //           "params": {
-  //             "topK": 200,
-  //             "mode": "BOOST",
-  //             "f": "product_vector",
-  //             "boost": 10.0
-  //           }
-  //         }
-  //       ]
-  //     }
-  //   }
-  // }},
-  // 'querqy_match_by_txt_emb':function( value ) { return{
-  //   query: {
-  //     querqy: {
-  //       matching_query: {
-  //         query: value
-  //       },
-  //       query_fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"],
-  //       rewriters: [
-  //         {
-  //           "name": "embtxt",
-  //           "params": {
-  //             "topK": 200,
-  //             "mode": "MAIN_QUERY",
-  //             "f": "product_vector"
-  //           }
-  //         }
-  //       ]
-  //     }
-  //   }
-  // }},
+  }}
 }
 
 class App extends Component {
@@ -314,7 +211,7 @@ class App extends Component {
     //TODO: move url and other configs to proerties file
     <ReactiveBase
       url="http://localhost:9200"
-      app="ecommerce"
+      app={"ecommerce" }//+",." + log_store + '_events'}
       credentials="elastic:ElasticRocks"
       //enableAppbase={true}  <- TODO: to allow auto analytics
       //enableAppbase={false} <- orig
@@ -338,8 +235,9 @@ class App extends Component {
         } else if(componentId == 'results'){
           console.log('** Search results =>' + response);
           has_results = true;
-        }
-        else{
+        }else if(componentId == 'logresults'){
+          //event log update
+        } else{
           console.warn(response, componentId);
         }
 
@@ -378,7 +276,7 @@ class App extends Component {
           }}
         >
           <AlgoPicker
-            title="Pick your Algo"
+            title="Product Sort"
             componentId="algopicker" 
             writer={writer}
             user_id={user_id}
@@ -488,30 +386,11 @@ class App extends Component {
             placeholder="Search for products, brands or EAN"
             autosuggest={false}
             dataField={["id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"]}
-            /**/ 
             customQuery={ 
-              
               function(value) {
                   return queries[ 'default' ](value);
               }
             }
-                /*
-                var elem = document.getElementById('algopicker');
-                var algo = "";
-                if (elem) {
-                  algo = elem.value
-                } else {console.log("Unable to determine selected algorithm!");}
-                if (algo in queries) {
-                  //xx console.log(JSON.stringify(queries[ algo ](value)));
-                  
-                  return queries[ algo ](value);
-
-                } else {
-                  console.log("Could not determine algorithm");
-                }
-              }
-             }
-             /**/
           />
           <ReactiveList
             componentId="results"
