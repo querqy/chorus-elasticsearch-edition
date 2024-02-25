@@ -6,33 +6,117 @@ import {
   ReactiveList,
   ResultCard,
   StateProvider,
+  ResultList,
 } from "@appbaseio/reactivesearch";
 import AlgoPicker from './custom/AlgoPicker';
 import fetchIntercept from 'fetch-intercept';
 
+
+//######################################
+// global variables
+let has_results = false;//debug
+
+
 const log_store = 'ubl_log';
-let query_id = 'need to generate an id';
-let session_id = 'fake session id';
-let user_id = 'fake user id';
+const user_id = 'DEMO-eeed-43de-959d-90e6040e84f9'; // demo user id
+const session_id = ((sessionStorage.hasOwnProperty('session_id')) ?
+          sessionStorage.getItem('session_id') 
+          : 'DEMO-' + guiid()); //<- new fake session, otherwise it should reuse the sessionStorage version
+let query_id = ((sessionStorage.hasOwnProperty('query_id')) ?
+          sessionStorage.getItem('query_id') 
+          : 'need a query id');
+
+sessionStorage.setItem('user_id', user_id);
+sessionStorage.setItem('session_id', session_id);
+sessionStorage.setItem('query_id', query_id);
+
+
+//######################################
+// util functions, TODO: reorganize
+function guiid() {
+  let id = '';
+  try{
+    id = crypto.randomUUID();
+  }
+  catch(error){
+    console.log('tried to generate a guiid in insecure context')
+    id ='10000000-1000-4000-8000-100000000000'.replace(/[018]/g, c =>
+      (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    );
+  }
+  return id;
+};
+
+//string format function
+String.prototype.f = function () {
+  var args = arguments;
+  return this.replace(/{([0-9]+)}/g, function (match, index) {
+    return typeof args[index] == 'undefined' ? match : args[index];
+  });
+};
+
+function getGenerateQueryId(){
+  let id = sessionStorage.getItem('query_id');
+  if(id == null){
+    id = 'DEMO-'+ guiid();
+  }
+  query_id = id;
+  return id;
+}
+
+function genDataId(){
+  return 'DEMO-'+guiid();
+}
+
+
 
 (function(send) { 
   XMLHttpRequest.prototype.send = function(data) { 
       this.addEventListener('readystatechange', function() { 
-        console.log('ready');
         if (this.readyState == 4 ){//} && this.status == 200) {
           let headers = this.getAllResponseHeaders();
-          if(headers.search('X-ubl-query-id') != -1) {
-            console.log('query token = ' + this.getResponseHeader('X-ubl-query-id')) ;
-            query_id = this.getResponseHeader('X-ubl-query-id');
+          //if(headers.search('X-ubl-query-id') != -1) {
+          if(headers.search('query-id') != -1) {
+            console.log('query token = ' + this.getResponseHeader('query-id')) ;
+            query_id = this.getResponseHeader('query-id');
           }
           console.log(headers);
         }
 
       }, false); 
-      send.call(this, data);
+      try{
+        send.call(this, data);
+      }
+      catch(error){
+        console.warm('POST error: ' + error);
+        console.log(data);
+      }
+      //if(has_results){
+      //  console.log('posted');
+     // }
   }; 
 })(XMLHttpRequest.prototype.send);
 
+
+/*
+XMLHttpRequest.setDisableHeaderCheck = function(data) { 
+  return false;
+}; 
+(function(setDisableHeaderCheck) { 
+  XMLHttpRequest.prototype.setDisableHeaderCheck = function(data) { 
+      return true;
+  }; 
+})(XMLHttpRequest.prototype.setDisableHeaderCheck);
+*/
+/*
+(function(getAllResponseHeaders) { 
+  XMLHttpRequest.prototype.getAllResponseHeaders = function() { 
+
+    console.log('getting headers');
+    return getAllResponseHeaders.call(this);
+  }; 
+})(XMLHttpRequest.prototype.getAllResponseHeaders);
+*/
 import {CollectorModule, Context, InstantSearchQueryCollector, Trail, Query, cookieSessionResolver, ConsoleTransport} from "search-collector";
 
 var UbiWriter = require('./ts/UbiWriter.ts').UbiWriter;
@@ -69,13 +153,7 @@ document.addEventListener('DOMContentLoaded', function () {
 //##################################################################
 
 
-// utils.js - string format function
-String.prototype.f = function () {
-  var args = arguments;
-  return this.replace(/{([0-9]+)}/g, function (match, index) {
-    return typeof args[index] == 'undefined' ? match : args[index];
-  });
-};
+
 
 const queries = {
   'default': function( value ) { return {
@@ -85,111 +163,7 @@ const queries = {
         fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"]
       }
     }
-  }},
-  'querqy_preview':function( value ) { return{
-    query: {
-      querqy: {
-        matching_query: {
-          query: value
-        },
-        query_fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"],
-        rewriters: ["replace_prelive", "common_rules_prelive"]
-      }
-    }
-  }},
-  'querqy_live':function( value ) { return{
-    query: {
-      querqy: {
-        matching_query: {
-          query: value
-        },
-        query_fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"],
-        rewriters: ["replace", "common_rules"]
-      }
-    }
-  }},
-  // 'querqy_boost_by_img_emb':function( value ) { return{
-  //   query: {
-  //     querqy: {
-  //       matching_query: {
-  //         query: value
-  //       },
-  //       query_fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"],
-  //       rewriters: [
-  //         {
-  //           "name": "embimg",
-  //           "params": {
-  //             "topK": 200,
-  //             "mode": "BOOST",
-  //             "f": "product_image_vector",
-  //             "boost": 10.0
-  //           }
-  //         }
-  //       ]
-  //     }
-  //   }
-  // }},
-  // 'querqy_match_by_img_emb':function( value ) { return{
-  //   query: {
-  //     querqy: {
-  //       matching_query: {
-  //         query: value
-  //       },
-  //       query_fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"],
-  //       rewriters: [
-  //         {
-  //           "name": "embimg",
-  //           "params": {
-  //             "topK": 200,
-  //             "mode": "MAIN_QUERY",
-  //             "f": "product_image_vector"
-  //           }
-  //         }
-  //       ]
-  //     }
-  //   }
-  // }},
-  // 'querqy_boost_by_txt_emb': function( value ) { return{
-  //   query: {
-  //     querqy: {
-  //       matching_query: {
-  //         query: value
-  //       },
-  //       query_fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"],
-  //       rewriters: [
-  //         {
-  //           "name": "embtxt",
-  //           "params": {
-  //             "topK": 200,
-  //             "mode": "BOOST",
-  //             "f": "product_vector",
-  //             "boost": 10.0
-  //           }
-  //         }
-  //       ]
-  //     }
-  //   }
-  // }},
-  // 'querqy_match_by_txt_emb':function( value ) { return{
-  //   query: {
-  //     querqy: {
-  //       matching_query: {
-  //         query: value
-  //       },
-  //       query_fields: [ "id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"],
-  //       rewriters: [
-  //         {
-  //           "name": "embtxt",
-  //           "params": {
-  //             "topK": 200,
-  //             "mode": "MAIN_QUERY",
-  //             "f": "product_vector"
-  //           }
-  //         }
-  //       ]
-  //     }
-  //   }
-  // }},
+  }}
 }
 
 class App extends Component {
@@ -213,7 +187,7 @@ class App extends Component {
     console.log('mounted ' + this);
 
 
-    let e = new UbiEvent('logon', 'user123', 'query_token');
+    let e = new UbiEvent('logon', user_id, query_id);
     e.message = 'This is a test message'
     e['outer'] =  'outer test';
     
@@ -225,7 +199,7 @@ class App extends Component {
     e.event_attributes['test2'] =  1234;
     //xx console.log(JSON.stringify(e));
 
-    e.event_attributes.data = new UbiData('test_data', 'not real data', {'inner':'data object'});
+    e.event_attributes.data = new UbiData('test_data', genDataId(), {'inner':'data object'});
     //xx console.log(e.toJson());
     //writer.write(e.toJson());
   }
@@ -236,8 +210,9 @@ class App extends Component {
   return (
     //TODO: move url and other configs to proerties file
     <ReactiveBase
+      componentId="market-place"
       url="http://localhost:9200"
-      app="ecommerce"
+      app={"ecommerce" }//+",." + log_store + '_events'}
       credentials="elastic:ElasticRocks"
       //enableAppbase={true}  <- TODO: to allow auto analytics
       //enableAppbase={false} <- orig
@@ -247,6 +222,7 @@ class App extends Component {
         'X-ubl-query-id': query_id,
         'X-ubl-user-id': user_id,
         'X-ubl-session-id':session_id,
+        'Access-Control-Expose-Headers':'query_id'
       }}
 
       recordAnalytics={true}
@@ -254,13 +230,15 @@ class App extends Component {
       
       transformResponse={async (response, componentId) => {
         if( componentId == 'typefilter'){
-          console.log('** Type change =>' + response);
+          //console.log('** Type change =>' + response);
         } else if(componentId == 'brandfilter'){
-          console.log('** Brand change =>' + response);
+          //console.log('** Brand change =>' + response);
         } else if(componentId == 'results'){
           console.log('** Search results =>' + response);
-        }
-        else{
+          has_results = true;
+        }else if(componentId == 'logresults'){
+          //event log update
+        } else{
           console.warn(response, componentId);
         }
 
@@ -269,7 +247,8 @@ class App extends Component {
       }}
       transformRequest={async (request) => {
         request.headers['test'] = 'xyz';
-       console.log(request);
+        //request.headers['Access-Control-Expose-Headers'] = 'query_id';
+       //console.log(request);
         
         return request;
       }}
@@ -298,9 +277,12 @@ class App extends Component {
           }}
         >
           <AlgoPicker
-            title="Pick your Algo"
+            title="Product Sort"
             componentId="algopicker" 
             writer={writer}
+            user_id={user_id}
+            query_id={query_id}
+            session_id={session_id}
             />
           <MultiList
             componentId="brandfilter"
@@ -308,6 +290,20 @@ class App extends Component {
             title="Filter by Brands"
             size={20}
             showSearch={false}
+            onQueryChange={  
+              function(prevQuery, nextQuery) {
+                if(nextQuery != prevQuery){
+                  console.log('filtering on brands');
+                  let e = new UbiEvent('brand_filter', user_id, query_id);
+                  e.message = 'filtering on brands'
+                  e.session_id = session_id
+                  e.page_id = 'main'
+
+                  e.event_attributes.data = new UbiData('filter_data', genDataId(), nextQuery);
+                  writer.write_event(e);
+                }
+              }
+            }
             react={{
               and: ["searchbox", "typefilter"]
             }}
@@ -319,6 +315,20 @@ class App extends Component {
             title="Filter by Product Types"
             size={20}
             showSearch={false}
+            onQueryChange={  
+              function(prevQuery, nextQuery) {
+                if(nextQuery != prevQuery){
+                  console.log('filtering on product types');
+                  let e = new UbiEvent('type_filter', user_id, query_id);
+                  e.message = 'filtering on product types'
+                  e.session_id = session_id
+                  e.page_id = 'main'
+
+                  e.event_attributes.data = new UbiData('filter_data', genDataId(), nextQuery);
+                  writer.write_event(e);
+                }
+              }
+            }
             react={{
               and: ["searchbox", "brandfilter"]
             }}
@@ -333,7 +343,10 @@ class App extends Component {
               console.log("onValueChanged search value: ", value)
 
               //TODO: pull in user id, query id, page id, etc.
-              let e = new UbiEvent('on_search', user_id, query_id, 'Searched on: ' + value);
+              let e = new UbiEvent('on_search', user_id, query_id, value);
+              e.message_type = 'QUERY'
+              e.session_id = session_id
+              e.page_id = 'main'
               writer.write_event(e);
               //writer.write(value);
             }
@@ -374,25 +387,11 @@ class App extends Component {
             placeholder="Search for products, brands or EAN"
             autosuggest={false}
             dataField={["id", "name", "title", "product_type" , "short_description", "ean", "search_attributes"]}
-            /**/ 
             customQuery={ 
               function(value) {
-                var elem = document.getElementById('algopicker');
-                var algo = "";
-                if (elem) {
-                  algo = elem.value
-                } else {console.log("Unable to determine selected algorithm!");}
-                if (algo in queries) {
-                  //xx console.log(JSON.stringify(queries[ algo ](value)));
-                  
-                  return queries[ algo ](value);
-
-                } else {
-                  console.log("Could not determine algorithm");
-                }
+                  return queries[ 'default' ](value);
               }
-             }
-             /**/
+            }
           />
           <ReactiveList
             componentId="results"
