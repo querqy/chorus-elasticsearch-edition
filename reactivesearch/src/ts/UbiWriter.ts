@@ -80,7 +80,7 @@ export class UbiWriter implements Writer {
 
 	write_event(e:UbiEvent){
 		this.logger.log_event(e);
-		//console.log(e.toJson());
+		console.log('Just logged: ' + e.toJson());
 
 		//TODO: xx this.write(e);  ?
 	}
