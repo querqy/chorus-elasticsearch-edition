@@ -4,7 +4,7 @@ import { UbiEvent } from "./UbiEvent";
 
 /**
  * Methods and client to talk directly with OpenSearch for logging
- * 
+ *
  */
 
 
@@ -13,8 +13,7 @@ import { UbiEvent } from "./UbiEvent";
  * Class to handle OpenSearch authentication (eventually) log connectivity
  */
 export class UbiLogger {
-    //TODO: change to ubi
-    static readonly API = '/_plugins/ubl/';
+    static readonly API = '/_plugins/ubi/';
 
     private readonly baseUrl:string;
     private readonly url:string;
@@ -25,7 +24,7 @@ export class UbiLogger {
 
     constructor(baseUrl:string, log_name:string) {
 
-        
+
         //TODO: param checking
         this.baseUrl = baseUrl;
         this.url = baseUrl + UbiLogger.API;
@@ -63,7 +62,7 @@ export class UbiLogger {
             headers: { 'Content-type': 'application/json' },
             withCredentials:true
         });
-		
+
     }
 
     //TODO: ubi headers/cookies
@@ -82,12 +81,12 @@ export class UbiLogger {
                 e.message_type = message_type;
             }
         }
-        
+
         return this._post(e.toJson());
     }
 
     async log(level, message:string, data=null){
-        var json = (data == null) ? 
+        var json = (data == null) ?
             JSON.stringify({'level':level, 'text': message}) :
             JSON.stringify({'level':level, 'text': message, 'data':data});
         return this._post(json);
@@ -105,7 +104,7 @@ export class UbiLogger {
 
     /**
      * Delete the index.  Allow clients to do this?
-     * @returns 
+     * @returns
      */
     async delete() {
         try {
@@ -182,7 +181,7 @@ export default function post(msg) {
         rq.open("POST", "http://127.0.0.1:9200/_plugins/search_relevance/os_logger");
 
         /**
-        * changing from form-urlencoded to json, will trigger an 
+        * changing from form-urlencoded to json, will trigger an
         * addtional CORS HTTP query of "OPTIONS"
         * before actually POSTing, which *could* throw errors before the POST
         * could even be triggered
@@ -199,5 +198,3 @@ export default function post(msg) {
         }
 
 }
-
-
