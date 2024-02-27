@@ -1,9 +1,9 @@
+//##########################
 //TODO: place holder for demo, most of what is below is old code 
+//##########################
+
 // to link search collector in to an old demo
-
-
 // from the demo at https://github.com/searchhub/search-collector/tree/master/demo and https://www.searchhub.io/search-collector/demo/ for collector implementation details
-
 import {CollectorModule, Context, DefaultWriter, FiredSearchCollector, InstantSearchQueryCollector, Trail, Query, cookieSessionResolver, ConsoleTransport, positionResolver, ListenerType, ProductClickCollector} from "search-collector";
 import { UbiWriter } from "./UbiWriter";
 import { default as olPost } from "./UbiLogger";
@@ -83,7 +83,7 @@ const context = new Context(window, document);
 
 
 /**/
-const writer = new UbiWriter('http://127.0.0.1:9200', 'ubl_log', queryResolver, sessionResolver,  debug);
+const writer = new UbiWriter('http://127.0.0.1:9200', 'bad_log_shouldnt_exist', queryResolver, sessionResolver,  debug);
 
 const collector = new CollectorModule({
 	writer,

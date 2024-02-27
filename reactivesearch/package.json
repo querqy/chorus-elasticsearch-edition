@@ -5,24 +5,38 @@
   "keywords": [],
   "main": "src/index.js",
   "engines": {
-    "node": "<17"
+    "node": "<20"
   },
   "dependencies": {
     "@appbaseio/reactivesearch": "^3.28.0",
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@opensearch-project/opensearch": "^2.5.0",
+    "assert": "^2.1.0",
     "axios": "^1.6.7",
+    "browserify-zlib": "^0.2.0",
     "clean-webpack-plugin": "^4.0.0",
     "fetch-intercept": "^2.4.0",
+    "http": "^0.0.1-security",
+    "https-browserify": "^1.0.0",
+    "node-polyfill-webpack-plugin": "^3.0.0",
     "onchange": "^7.1.0",
+    "os": "^0.1.2",
+    "os-browserify": "^0.3.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "^5.0.1",
     "search-collector": "^1.0.0-alpha-29",
     "shx": "^0.3.4",
+    "stream-browserify": "^3.0.0",
+    "stream-http": "^3.2.0",
     "typescript": "^3.2.1",
+    "url": "^0.11.3",
+    "util": "^0.12.5",
+    "v8": "^0.1.0",
+    "vm-browserify": "^1.1.2",
     "webpack": "^5.90.3",
-    "webpack-cli": "^5.1.4"
+    "webpack-cli": "^5.1.4",
+    "zlib": "^1.0.5"
   },
   "scripts": {
     "build:ts": "webpack --mode=development && shx cp -R src/search_collector.window.bundle.js public/js",

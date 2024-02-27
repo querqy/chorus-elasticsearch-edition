@@ -16,16 +16,21 @@ import fetchIntercept from 'fetch-intercept';
 // global variables
 let has_results = false;//debug
 
+const event_server = "http://127.0.0.1:9200";
 
-const log_store = 'ubl_log';
 const user_id = 'DEMO-eeed-43de-959d-90e6040e84f9'; // demo user id
+const log_store =  ((sessionStorage.hasOwnProperty('log_store')) ?
+          sessionStorage.getItem('log_store')  
+          : 'ubi_log');
 const session_id = ((sessionStorage.hasOwnProperty('session_id')) ?
           sessionStorage.getItem('session_id') 
-          : 'DEMO-' + guiid()); //<- new fake session, otherwise it should reuse the sessionStorage version
+          : 'dev-SESSIONID-' + guiid()); //<- new fake session, otherwise it should reuse the sessionStorage version
 let query_id = ((sessionStorage.hasOwnProperty('query_id')) ?
           sessionStorage.getItem('query_id') 
           : 'need a query id');
 
+sessionStorage.setItem('log_store', log_store);
+sessionStorage.setItem('event_server', event_server);
 sessionStorage.setItem('user_id', user_id);
 sessionStorage.setItem('session_id', session_id);
 sessionStorage.setItem('query_id', query_id);
@@ -58,14 +63,14 @@ String.prototype.f = function () {
 function getGenerateQueryId(){
   let id = sessionStorage.getItem('query_id');
   if(id == null){
-    id = 'DEMO-'+ guiid();
+    id = 'dev-QUERYID-'+ guiid();
   }
   query_id = id;
   return id;
 }
 
 function genDataId(){
-  return 'DEMO-'+guiid();
+  return 'dev-OBJECTID-'+guiid();
 }
 
 
@@ -75,12 +80,17 @@ function genDataId(){
       this.addEventListener('readystatechange', function() { 
         if (this.readyState == 4 ){//} && this.status == 200) {
           let headers = this.getAllResponseHeaders();
-          //if(headers.search('X-ubl-query-id') != -1) {
-          if(headers.search('query-id') != -1) {
-            console.log('query token = ' + this.getResponseHeader('query-id')) ;
-            query_id = this.getResponseHeader('query-id');
+          console.log('response headers => ' + headers);
+          try{
+            query_id = this.getResponseHeader('query_id');
+            sessionStorage.setItem('query_id', query_id);
           }
-          console.log(headers);
+          catch(error){
+            console.log(error);
+            console.warn('query_id not exposed in the response');
+
+          }
+        
         }
 
       }, false); 
@@ -141,7 +151,7 @@ const context = new Context(window, document);
 
 
 // TODO: move parameters to properties file
-const writer = new UbiWriter('http://127.0.0.1:9200', log_store, queryResolver, sessionResolver,  debug);
+const writer = new UbiWriter(event_server, log_store, queryResolver, sessionResolver,  debug);
 
 
 //##################################################################
@@ -193,7 +203,7 @@ class App extends Component {
     
     //xx console.log(JSON.stringify(e));
 
-    e.page_id = 'chorus_page1';
+    e.page_id = window.location.pathname;
     e.session_id = '18734032'
     e.event_attributes['test'] =  'this is a test';
     e.event_attributes['test2'] =  1234;
@@ -211,19 +221,23 @@ class App extends Component {
     //TODO: move url and other configs to proerties file
     <ReactiveBase
       componentId="market-place"
-      url="http://localhost:9200"
-      app={"ecommerce" }//+",." + log_store + '_events'}
+      url={event_server}
+      app={"ecommerce" }
       credentials="elastic:ElasticRocks"
       //enableAppbase={true}  <- TODO: to allow auto analytics
       //enableAppbase={false} <- orig
       
+      //**************************************************************
+      //TODO: add headers back once fully integrated with ubl->ubi name changes
+      // else products won't show
       headers={{   
-        'X-ubl-store':log_store,
-        'X-ubl-query-id': query_id,
-        'X-ubl-user-id': user_id,
-        'X-ubl-session-id':session_id,
+        'X-ubi-store': log_store,
+        'X-ubi-query-id': query_id,
+        'X-ubi-user-id': user_id,
+        'X-ubi-session-id':session_id,
         'Access-Control-Expose-Headers':'query_id'
       }}
+      //**************************************************************
 
       recordAnalytics={true}
       searchStateHeader={true}
@@ -297,7 +311,7 @@ class App extends Component {
                   let e = new UbiEvent('brand_filter', user_id, query_id);
                   e.message = 'filtering on brands'
                   e.session_id = session_id
-                  e.page_id = 'main'
+                  e.page_id = window.location.pathname;
 
                   e.event_attributes.data = new UbiData('filter_data', genDataId(), nextQuery);
                   writer.write_event(e);
@@ -322,7 +336,7 @@ class App extends Component {
                   let e = new UbiEvent('type_filter', user_id, query_id);
                   e.message = 'filtering on product types'
                   e.session_id = session_id
-                  e.page_id = 'main'
+                  e.page_id = window.location.pathname;
 
                   e.event_attributes.data = new UbiData('filter_data', genDataId(), nextQuery);
                   writer.write_event(e);
@@ -346,7 +360,7 @@ class App extends Component {
               let e = new UbiEvent('on_search', user_id, query_id, value);
               e.message_type = 'QUERY'
               e.session_id = session_id
-              e.page_id = 'main'
+              e.page_id = window.location.pathname;
               writer.write_event(e);
               //writer.write(value);
             }
@@ -365,9 +379,7 @@ class App extends Component {
             // The update is accepted by default
             //if (value) {
                 // To reject the update, throw an error
-                //throw Error('Search value should not contain social.');
-                //this.setState({searchText:value});
-                //this.state.searchText = value
+           
                 //alert(this.state)
 
           //    console.log("beforeValueChanged current value: ", value)

@@ -1,5 +1,5 @@
 import axios, {AxiosRequestConfig, AxiosProxyConfig, AxiosInstance} from "axios";
-import OS from '@opensearch-project/opensearch'
+import {Client} from '@opensearch-project/opensearch'
 import { UbiEvent } from "./UbiEvent";
 
 /**
@@ -13,6 +13,7 @@ import { UbiEvent } from "./UbiEvent";
  * Class to handle OpenSearch authentication (eventually) log connectivity
  */
 export class UbiLogger {
+    //TODO: change to ubi
     static readonly API = '/_plugins/ubl/';
 
     private readonly baseUrl:string;
@@ -20,7 +21,7 @@ export class UbiLogger {
     private readonly log_name:string;
 	private readonly rest_client:AxiosInstance; //client for direct http work
 	private readonly rest_config:AxiosRequestConfig;
-    private readonly os_client:OS.Client;       //client for OpenSearch general interactions
+    private readonly os_client:Client;       //client for OpenSearch general interactions
 
     constructor(baseUrl:string, log_name:string) {
 
@@ -29,6 +30,10 @@ export class UbiLogger {
         this.baseUrl = baseUrl;
         this.url = baseUrl + UbiLogger.API;
         this.log_name = log_name;
+
+        //TODO: uncomment to work through webpack fallback errors
+        // this.os_client = new Client({node:baseUrl});
+
 
         //TODO: add authentication
         this.rest_config = {
