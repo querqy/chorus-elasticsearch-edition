@@ -13,7 +13,7 @@ import { UbiEvent } from "./UbiEvent";
  * Class to handle OpenSearch authentication (eventually) log connectivity
  */
 export class UbiLogger {
-    static readonly API = '/_plugins/ubl/';
+    static readonly API = '/_plugins/ubi/';
 
     private readonly baseUrl:string;
     private readonly url:string;
