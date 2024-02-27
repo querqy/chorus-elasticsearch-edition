@@ -6,11 +6,12 @@ import {getClassName} from '@appbaseio/reactivecore/lib/utils/helper';
 var UbiWriter = require('.././ts/UbiWriter.ts').UbiWriter;
 var Ubi = require('.././ts/UbiEvent.ts');
 
+//TODO: change name to something like ChoicePicker
 class AlgoPicker extends Component {
   
   writer = null;
   state = {
-    algo: 'default',
+    value: 'default',
     selectedValue: 'default',
   };
 
@@ -18,16 +19,23 @@ class AlgoPicker extends Component {
 
   onChangeValue = (event) => {
     this.setState({
-      algo: event.target.value,
+      value: event.target.value,
       selectedValue: event.target.value,
     });
+    const selection = event.target.value;
 
-    console.log('AlgorPicker.onChange ' + this.value);
+    console.log('SortPicker.onChange ' + selection);
 
     if('writer' in this.props){
       const writer = this.props['writer']
-      let e = new Ubi.UbiEvent('algo_change', 'user123', '');
-      e.message = 'Algorithm changed to ' + this.value
+      const user_id = this.props['user_id'];
+      const query_id = this.props['query_id'];
+      const session_id = this.props['session_id'];
+      let e = new Ubi.UbiEvent('product_sort', user_id, query_id);
+      e.message = selection;
+      e.message_type = 'SORT'
+      e.event_attributes['session_id'] = session_id;
+      e.event_attributes.data = new Ubi.UbiEventData('sort_event', 'fake object id', ''. event);
       writer.write_event(e);
     }
     else
@@ -44,8 +52,9 @@ class AlgoPicker extends Component {
 				)}
         <select value={this.state.selectedValue} onChange={this.onChangeValue} style={{display: "flex", flexDirection: "column"}} id="algopicker">
           <option checked={this.state.selectedValue === "default"} value="default">Default</option>
-          <option checked={this.state.selectedValue === "querqy_preview"} value="querqy_preview">Querqy Preview</option>
-          <option checked={this.state.selectedValue === "querqy_live"} value="querqy_live">Querqy Live</option>
+          <option checked={this.state.selectedValue === "sort_price"} value="sort_price">Sort by price</option>
+          <option checked={this.state.selectedValue === "sort_ratings"} value="sort_ratings">Sort by ratings</option>
+          <option checked={this.state.selectedValue === "sort_name"} value="sort_name">Sort by name</option>
         </select>
       </Container>
     )

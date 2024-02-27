@@ -26,9 +26,9 @@ services:
       http.cors.allow-origin: "*"
       http.cors.allow-methods: OPTIONS,HEAD,GET,POST,PUT,DELETE
       http.cors.allow-credentials: true
-      http.cors.allow-headers: X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization,test,access-control-allow-headers,x-search-query,X-Search-Id,X-Search-Filters,X-ubl-query-id,X-ubl-store,X-ubl-user-id,X-ubl-session-id,x-search-client
+      http.cors.allow-headers: X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization,test,access-control-allow-headers,x-search-query,X-Search-Id,X-Search-Filters,X-ubl-query-id,X-ubl-store,X-ubl-user-id,X-ubl-session-id,x-search-client,Access-Control-Expose-Headers
       # indexes faster if we don't log each row (i.e. logger.level: debug/info)
-      logger.level: warn
+      logger.level: info
     ulimits:
       memlock:
         soft: -1
