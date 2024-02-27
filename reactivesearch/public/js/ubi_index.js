@@ -37,7 +37,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
   \*************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   post: () => (/* binding */ post)\n/* harmony export */ });\n/* harmony import */ var search_collector__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! search-collector */ \"./node_modules/search-collector/index.js\");\n/* harmony import */ var _UbiWriter__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./UbiWriter */ \"./src/ts/UbiWriter.ts\");\n/* harmony import */ var _UbiLogger__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./UbiLogger */ \"./src/ts/UbiLogger.ts\");\nvar _document$querySelect, _document$querySelect2;\n//TODO: place holder for demo, most of what is below is old code \n// to link search collector in to an old demo\n\n// from the demo at https://github.com/searchhub/search-collector/tree/master/demo and https://www.searchhub.io/search-collector/demo/ for collector implementation details\n\n\n\n\nfunction post(msg) {\n  return (0,_UbiLogger__WEBPACK_IMPORTED_MODULE_2__[\"default\"])(msg);\n}\nconst lastPathSegmentRegex = /\\/(?:.(?!\\/))+$/g;\nfunction redirect(path) {\n  document.location.href = window.location.href.replace(lastPathSegmentRegex, \"\") + path;\n}\nfunction resetEvents() {\n  localStorage.setItem(\"____localstorageWriter\", \"[]\");\n  localStorage.setItem(\"search-collector-trail\", \"{}\");\n  sessionStorage.setItem(\"search-collector-trail\", \"{}\");\n  document.cookie = \"SearchCollectorSession=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;\";\n  let e = document.querySelector(\"#events\");\n  if (e != null) e.innerHTML = \"\";else console.log(\"#events control is null\");\n}\n\n/**\r\n * Clear Events\r\n */\n(_document$querySelect = document.querySelector(\"#clearEvents\")) === null || _document$querySelect === void 0 || _document$querySelect.addEventListener(\"click\", () => {\n  resetEvents();\n  document.location.reload();\n});\nconst sessionResolver = () => (0,search_collector__WEBPACK_IMPORTED_MODULE_0__.cookieSessionResolver)();\nconst queryResolver = () => {\n  const params = new URLSearchParams(window.location.search);\n  const query = new search_collector__WEBPACK_IMPORTED_MODULE_0__.Query();\n  query.setSearch(params.get(\"query\"));\n  return query;\n};\nconst firedSearchCallback = callback => {\n  const searchBox = document.querySelector('[data-track-id=\"searchBox\"]');\n  const searchButton = document.querySelector('[data-track-id=\"searchButton\"]');\n\n  /*\r\n  searchBox?.addEventListener(\"keypress\", (event) => {\r\n  \tif (event.key === \"Enter\" && searchBox.value && event.repeat === false) {\r\n  \t\tcallback(searchBox.value);\r\n  \t}\r\n  });\r\n  \n  searchButton?.addEventListener(\"click\", (event) => {\r\n  \tif (searchBox.value)\r\n  \t\tcallback(searchBox.value);\r\n  });\r\n  */\n};\n\n//##################################################################\n//on document load, hook things up here\ndocument.addEventListener('DOMContentLoaded', function () {\n\n  //alert('LOADED');\n});\n//##################################################################\n\nconst debug = true;\nconst trail = new search_collector__WEBPACK_IMPORTED_MODULE_0__.Trail(queryResolver, sessionResolver);\nconst context = new search_collector__WEBPACK_IMPORTED_MODULE_0__.Context(window, document);\n\n/**/\nconst writer = new _UbiWriter__WEBPACK_IMPORTED_MODULE_1__.UbiWriter('http://127.0.0.1:9200', 'ubl_log', queryResolver, sessionResolver, debug);\nconst collector = new search_collector__WEBPACK_IMPORTED_MODULE_0__.CollectorModule({\n  writer,\n  context\n});\ncollector.addLogTransport(new search_collector__WEBPACK_IMPORTED_MODULE_0__.ConsoleTransport());\n//xx ListenerType.Sentinel ?\ncollector.add(\n//TODO: fake product selection\nnew search_collector__WEBPACK_IMPORTED_MODULE_0__.ProductClickCollector('[data-track-id=\"timeButton\"]', {\n  idResolver: element => '42',\n  //element.getAttribute('data-product-id'),\n  positionResolver: element => (0,search_collector__WEBPACK_IMPORTED_MODULE_0__.positionResolver)('[data-track-id=\"timeButton\"]', element),\n  priceResolver: element => 42,\n  // extractPrice(element.querySelector('[data-track-id=\"priceContainer\"]')?.textContent),\n  metadataResolver: element => void 42,\n  // metadata can be anything\n  trail\n}));\n(_document$querySelect2 = document.querySelector('[data-track-id=\"searchButton\"]')) === null || _document$querySelect2 === void 0 || _document$querySelect2.addEventListener(\"click\", event => {\n  //writer.write(JSON.stringify(\"I am here xx3\"))\n  //writer.write(location)\n  redirect('/events.html?onclick');\n});\ncollector.add(new search_collector__WEBPACK_IMPORTED_MODULE_0__.InstantSearchQueryCollector('[data-track-id=\"searchBox\"]'));\ncollector.add(new search_collector__WEBPACK_IMPORTED_MODULE_0__.FiredSearchCollector((writer, type, context) => {\n  firedSearchCallback(searchPhrase => {\n    const query = new search_collector__WEBPACK_IMPORTED_MODULE_0__.Query();\n    query.setSearch(searchPhrase);\n    writer.write({\n      \"type\": type,\n      \"keywords\": searchPhrase,\n      \"query\": query.toString()\n    });\n  });\n}));\ncollector.start();\n\n//# sourceURL=webpack://flooper/./src/ts/index.ts?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   post: () => (/* binding */ post)\n/* harmony export */ });\n/* harmony import */ var search_collector__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! search-collector */ \"./node_modules/search-collector/index.js\");\n/* harmony import */ var _UbiWriter__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./UbiWriter */ \"./src/ts/UbiWriter.ts\");\n/* harmony import */ var _UbiLogger__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./UbiLogger */ \"./src/ts/UbiLogger.ts\");\nvar _document$querySelect, _document$querySelect2;\n//##########################\n//TODO: place holder for demo, most of what is below is old code \n//##########################\n\n// to link search collector in to an old demo\n// from the demo at https://github.com/searchhub/search-collector/tree/master/demo and https://www.searchhub.io/search-collector/demo/ for collector implementation details\n\n\n\nfunction post(msg) {\n  return (0,_UbiLogger__WEBPACK_IMPORTED_MODULE_2__[\"default\"])(msg);\n}\nconst lastPathSegmentRegex = /\\/(?:.(?!\\/))+$/g;\nfunction redirect(path) {\n  document.location.href = window.location.href.replace(lastPathSegmentRegex, \"\") + path;\n}\nfunction resetEvents() {\n  localStorage.setItem(\"____localstorageWriter\", \"[]\");\n  localStorage.setItem(\"search-collector-trail\", \"{}\");\n  sessionStorage.setItem(\"search-collector-trail\", \"{}\");\n  document.cookie = \"SearchCollectorSession=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;\";\n  let e = document.querySelector(\"#events\");\n  if (e != null) e.innerHTML = \"\";else console.log(\"#events control is null\");\n}\n\n/**\r\n * Clear Events\r\n */\n(_document$querySelect = document.querySelector(\"#clearEvents\")) === null || _document$querySelect === void 0 || _document$querySelect.addEventListener(\"click\", () => {\n  resetEvents();\n  document.location.reload();\n});\nconst sessionResolver = () => (0,search_collector__WEBPACK_IMPORTED_MODULE_0__.cookieSessionResolver)();\nconst queryResolver = () => {\n  const params = new URLSearchParams(window.location.search);\n  const query = new search_collector__WEBPACK_IMPORTED_MODULE_0__.Query();\n  query.setSearch(params.get(\"query\"));\n  return query;\n};\nconst firedSearchCallback = callback => {\n  const searchBox = document.querySelector('[data-track-id=\"searchBox\"]');\n  const searchButton = document.querySelector('[data-track-id=\"searchButton\"]');\n\n  /*\r\n  searchBox?.addEventListener(\"keypress\", (event) => {\r\n  \tif (event.key === \"Enter\" && searchBox.value && event.repeat === false) {\r\n  \t\tcallback(searchBox.value);\r\n  \t}\r\n  });\r\n  \n  searchButton?.addEventListener(\"click\", (event) => {\r\n  \tif (searchBox.value)\r\n  \t\tcallback(searchBox.value);\r\n  });\r\n  */\n};\n\n//##################################################################\n//on document load, hook things up here\ndocument.addEventListener('DOMContentLoaded', function () {\n\n  //alert('LOADED');\n});\n//##################################################################\n\nconst debug = true;\nconst trail = new search_collector__WEBPACK_IMPORTED_MODULE_0__.Trail(queryResolver, sessionResolver);\nconst context = new search_collector__WEBPACK_IMPORTED_MODULE_0__.Context(window, document);\n\n/**/\nconst writer = new _UbiWriter__WEBPACK_IMPORTED_MODULE_1__.UbiWriter('http://127.0.0.1:9200', 'bad_log_shouldnt_exist', queryResolver, sessionResolver, debug);\nconst collector = new search_collector__WEBPACK_IMPORTED_MODULE_0__.CollectorModule({\n  writer,\n  context\n});\ncollector.addLogTransport(new search_collector__WEBPACK_IMPORTED_MODULE_0__.ConsoleTransport());\n//xx ListenerType.Sentinel ?\ncollector.add(\n//TODO: fake product selection\nnew search_collector__WEBPACK_IMPORTED_MODULE_0__.ProductClickCollector('[data-track-id=\"timeButton\"]', {\n  idResolver: element => '42',\n  //element.getAttribute('data-product-id'),\n  positionResolver: element => (0,search_collector__WEBPACK_IMPORTED_MODULE_0__.positionResolver)('[data-track-id=\"timeButton\"]', element),\n  priceResolver: element => 42,\n  // extractPrice(element.querySelector('[data-track-id=\"priceContainer\"]')?.textContent),\n  metadataResolver: element => void 42,\n  // metadata can be anything\n  trail\n}));\n(_document$querySelect2 = document.querySelector('[data-track-id=\"searchButton\"]')) === null || _document$querySelect2 === void 0 || _document$querySelect2.addEventListener(\"click\", event => {\n  //writer.write(JSON.stringify(\"I am here xx3\"))\n  //writer.write(location)\n  redirect('/events.html?onclick');\n});\ncollector.add(new search_collector__WEBPACK_IMPORTED_MODULE_0__.InstantSearchQueryCollector('[data-track-id=\"searchBox\"]'));\ncollector.add(new search_collector__WEBPACK_IMPORTED_MODULE_0__.FiredSearchCollector((writer, type, context) => {\n  firedSearchCallback(searchPhrase => {\n    const query = new search_collector__WEBPACK_IMPORTED_MODULE_0__.Query();\n    query.setSearch(searchPhrase);\n    writer.write({\n      \"type\": type,\n      \"keywords\": searchPhrase,\n      \"query\": query.toString()\n    });\n  });\n}));\ncollector.start();\n\n//# sourceURL=webpack://flooper/./src/ts/index.ts?");
 
 /***/ }),
 
@@ -1065,7 +1065,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /************************************************************************/
 /******/ 	// The module cache
 /******/ 	var __webpack_module_cache__ = {};
-/******/ 	
+/******/
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
 /******/ 		// Check if module is in cache
@@ -1079,14 +1079,14 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /******/ 			// no module.loaded needed
 /******/ 			exports: {}
 /******/ 		};
-/******/ 	
+/******/
 /******/ 		// Execute the module function
 /******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
-/******/ 	
+/******/
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-/******/ 	
+/******/
 /************************************************************************/
 /******/ 	/* webpack/runtime/define property getters */
 /******/ 	(() => {
@@ -1099,12 +1099,12 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /******/ 			}
 /******/ 		};
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	(() => {
 /******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/make namespace object */
 /******/ 	(() => {
 /******/ 		// define __esModule on exports
@@ -1115,14 +1115,14 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /******/ 			Object.defineProperty(exports, '__esModule', { value: true });
 /******/ 		};
 /******/ 	})();
-/******/ 	
+/******/
 /************************************************************************/
-/******/ 	
+/******/
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module can't be inlined because the eval devtool is used.
 /******/ 	var __webpack_exports__ = __webpack_require__("./src/ts/index.ts");
 /******/ 	flooper = __webpack_exports__;
-/******/ 	
+/******/
 /******/ })()
 ;

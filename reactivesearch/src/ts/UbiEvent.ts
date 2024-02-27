@@ -36,11 +36,12 @@ export class UbiEvent {
 	 */
 	public readonly action_name:string;
 	public readonly user_id:string;
-	public readonly page_id:string;
 	public query_id:string;
 	public session_id:string;
+	public page_id:string= window.location.pathname
 	public message_type:string='INFO';
 	public message:string;
+	public timestamp:number=Date.now();
 	public event_attributes:UbiEventAttributes = new UbiEventAttributes();
 
 	constructor(action_name:string, user_id:string, query_id:string, message:string=null) {

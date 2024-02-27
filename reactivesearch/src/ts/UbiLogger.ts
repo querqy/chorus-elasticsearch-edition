@@ -1,10 +1,10 @@
 import axios, {AxiosRequestConfig, AxiosProxyConfig, AxiosInstance} from "axios";
-import OS from '@opensearch-project/opensearch'
+import {Client} from '@opensearch-project/opensearch'
 import { UbiEvent } from "./UbiEvent";
 
 /**
  * Methods and client to talk directly with OpenSearch for logging
- * 
+ *
  */
 
 
@@ -20,15 +20,19 @@ export class UbiLogger {
     private readonly log_name:string;
 	private readonly rest_client:AxiosInstance; //client for direct http work
 	private readonly rest_config:AxiosRequestConfig;
-    private readonly os_client:OS.Client;       //client for OpenSearch general interactions
+    private readonly os_client:Client;       //client for OpenSearch general interactions
 
     constructor(baseUrl:string, log_name:string) {
 
-        
+
         //TODO: param checking
         this.baseUrl = baseUrl;
         this.url = baseUrl + UbiLogger.API;
         this.log_name = log_name;
+
+        //TODO: uncomment to work through webpack fallback errors
+        // this.os_client = new Client({node:baseUrl});
+
 
         //TODO: add authentication
         this.rest_config = {
@@ -58,7 +62,7 @@ export class UbiLogger {
             headers: { 'Content-type': 'application/json' },
             withCredentials:true
         });
-		
+
     }
 
     //TODO: ubi headers/cookies
@@ -77,12 +81,12 @@ export class UbiLogger {
                 e.message_type = message_type;
             }
         }
-        
+
         return this._post(e.toJson());
     }
 
     async log(level, message:string, data=null){
-        var json = (data == null) ? 
+        var json = (data == null) ?
             JSON.stringify({'level':level, 'text': message}) :
             JSON.stringify({'level':level, 'text': message, 'data':data});
         return this._post(json);
@@ -100,7 +104,7 @@ export class UbiLogger {
 
     /**
      * Delete the index.  Allow clients to do this?
-     * @returns 
+     * @returns
      */
     async delete() {
         try {
@@ -177,7 +181,7 @@ export default function post(msg) {
         rq.open("POST", "http://127.0.0.1:9200/_plugins/search_relevance/os_logger");
 
         /**
-        * changing from form-urlencoded to json, will trigger an 
+        * changing from form-urlencoded to json, will trigger an
         * addtional CORS HTTP query of "OPTIONS"
         * before actually POSTing, which *could* throw errors before the POST
         * could even be triggered
@@ -194,5 +198,3 @@ export default function post(msg) {
         }
 
 }
-
-
