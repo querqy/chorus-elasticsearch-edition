@@ -9,10 +9,18 @@ import {
   ResultList,
 } from "@appbaseio/reactivesearch";
 
-const log_store_events = '.ubl_log_events';
+const event_server =  ((sessionStorage.hasOwnProperty('event_server')) ?
+          sessionStorage.getItem('event_server')  
+          : "http://localhost:9200");
+
+const log_store_events =  ((sessionStorage.hasOwnProperty('log_store')) ?
+          '.' + sessionStorage.getItem('log_store') + '_events'
+          : '.' + 'ubi_log' + '_events');
 
 
 class LogTable extends Component {
+	rows=5;
+
 	constructor(){
 	  super();
 	}
@@ -36,8 +44,8 @@ class LogTable extends Component {
 	return (
 	  //TODO: move url and other configs to proerties file
 	  <ReactiveBase
-		url="http://localhost:9200"
-		app={log_store_events }
+		url={event_server}
+		app={ log_store_events }
 		credentials="elastic:ElasticRocks"
 		enableAppbase={false}
 		headers={{   
@@ -67,13 +75,28 @@ class LogTable extends Component {
             componentId="logresults"
             dataField={"action_name"}
             title="Log Events"
+            size={this.rows}
+            pagination={true}
 			showEndPage={true}
 			showResultStats={true}
 			infiniteScroll={true}
 			//TODO: once timestamp is in the schema
-				//sortBy
-				//sortOptions { sortyBy, dataField, label}
-            size={6}
+			//sortBy='desc'
+			sortOptions={[ {
+				sortBy:'desc', 
+				dataField:'timestamp', 
+				label:'time desc'
+			}, {
+				sortBy:'desc', 
+				dataField:'action_name', 
+				label:'action desc'
+			},{
+				sortBy:'asc', 
+				dataField:'timestamp', 
+				label:'action asc'
+			},
+
+			]}
             showSearch={false}
 			onChangeonData={  
 				function(data) {
@@ -89,7 +112,6 @@ class LogTable extends Component {
               }
             }
             style={{ "paddingBottom": "10px", "paddingTop": "10px", "height":"50px" }}
-            pagination={true}
             react={{
               or: ["market-place", "searchbox", "brandfilter", "typefilter"]
             }}
@@ -142,7 +164,9 @@ class LogTable extends Component {
 											margin: "5px",
 											marginTop: "2px"
 										}}
-										>&nbsp;<em>timestamp</em>{item.timestamp}</div>
+										>&nbsp;{
+											(item.timestamp != null ) ? new Date(item.timestamp).toLocaleString() : '<em>null</em>'
+										}</div>
 										<div style={{
 											display: "table-cell",
 											flexDirection: "column",
@@ -160,8 +184,11 @@ class LogTable extends Component {
 											margin: "3px",
 											marginTop: "2px"
 										  }}
-										>&nbsp;{item.action_name}</div>
-					
+										>&nbsp;{
+											//(item.action_name != null )? item.action_name : '<em>null</em>'
+											"aosdfjasp"
+										
+										}</div>
 										<div style={{
 											display: "table-cell",
 											flexDirection: "column",
@@ -198,6 +225,12 @@ class LogTable extends Component {
 					Something went wrong loading the logs!<br/>Error details<br/>{error}
 				</div>
 			)}
+			onError={  
+				function(error) {
+                console.warn('Log table error. The log prolly needs to be initialized ' + JSON.stringify(error));
+				return 'pap';
+              }
+			}
             onNoResults={
               function(results) {
                 console.warn('no log results');
@@ -209,7 +242,6 @@ class LogTable extends Component {
               }
             }
           />
-      
 	     </div>
     </ReactiveBase>
   );
