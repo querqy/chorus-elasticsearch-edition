@@ -1,13 +1,5 @@
 import React, {Component} from "react";
-import {
-  ReactiveBase,
-  DataSearch,
-  MultiList,
-  ReactiveList,
-  ResultCard,
-  StateProvider,
-  ResultList,
-} from "@appbaseio/reactivesearch";
+import { ReactiveBase, ReactiveList, StateProvider, ResultList, } from "@appbaseio/reactivesearch";
 
 const event_server =  ((sessionStorage.hasOwnProperty('event_server')) ?
           sessionStorage.getItem('event_server')  
@@ -69,7 +61,7 @@ class LogTable extends Component {
 			}}
 			
 		/>
-		<div style={{ height: "250px", width: "100%"}}>
+		<div style={{ height: "275px", width: "100%"}}>
 			<h3>Event Log</h3>
 			<ReactiveList
             componentId="logresults"
@@ -82,17 +74,27 @@ class LogTable extends Component {
 			infiniteScroll={true}
 			//TODO: once timestamp is in the schema
 			//sortBy='desc'
-			sortOptions={[ {
+			sortOptions={[ 
+				
+			{
+				sortBy:'desc', 
+				dataField:'_id', 
+				label:'ID'
+			},{
 				sortBy:'desc', 
 				dataField:'timestamp', 
 				label:'time desc'
+			},{
+				sortBy:'desc', 
+				dataField:'message_type', 
+				label:'message type'
 			}, {
 				sortBy:'desc', 
 				dataField:'action_name', 
 				label:'action desc'
 			},{
 				sortBy:'asc', 
-				dataField:'timestamp', 
+				dataField:'action_name', 
 				label:'action asc'
 			},
 
@@ -117,10 +119,6 @@ class LogTable extends Component {
             }}
             render={({ data }) => (
             <ReactiveList.ResultListWrapper >
-				{/*
-				<div style={{  display: "table", textAlign: "left", }}>
-					<div style={{display: "table-row-group", textAlign: 'left'}}>
-			*/}
 						<div style={{display: "table-row", height: "15px", textAlign:'center', margin:'5px', fontWeight: '800'}}>
 							<div style={{ display: "table-cell", width: "270px", }}>
 								&nbsp;user_id
@@ -142,69 +140,48 @@ class LogTable extends Component {
 							</div>
 						</div>
                 {data.map((item) => (
-
                     <ResultList key={item._id}>
                         <ResultList.Content >
 						<div style={{  display: "table", textAlign: "left", }}>
 									<div style={{display: "table-row", height: "15px", width:'1500px'}}>
 										<div 
 										  style={{
-											display: "table-cell",
-											flexDirection: "column",
-											width: "275px",
-											margin: "5px",
-											marginTop: "2px"
+											display: "table-cell", flexDirection: "column",
+											width: "275px", margin: "5px", marginTop: "2px"
 										  }}
 										>&nbsp;{item.user_id}</div>
 										<div style={{
-											display: "table-cell",
-											flexDirection: "column",
-											width: "100px",
+											display: "table-cell", flexDirection: "column",
 											textAlign: "left",
-											margin: "5px",
-											marginTop: "2px"
+											width: "100px", margin: "5px", marginTop: "2px"
 										}}
 										>&nbsp;{
-											(item.timestamp != null ) ? new Date(item.timestamp).toLocaleString() : '<em>null</em>'
+											(item.timestamp != null ) ? new Date(item.timestamp).toLocaleString() : 'null'
 										}</div>
 										<div style={{
-											display: "table-cell",
-											flexDirection: "column",
-											width: "60px",
+											display: "table-cell", flexDirection: "column",
 											textAlign: "left",
-											margin: "5px",
-											marginTop: "2px"
+											width: "60px", margin: "5px", marginTop: "2px"
 										  }}
 										>&nbsp;{item.message_type}</div>
 										<div style={{
-											display: "table-cell",
-											flexDirection: "column",
-											width: "110px",
+											display: "table-cell", flexDirection: "column",
 											textAlign: "left",
-											margin: "3px",
-											marginTop: "2px"
+											width: "110px", margin: "3px", marginTop: "2px"
 										  }}
 										>&nbsp;{
-											//(item.action_name != null )? item.action_name : '<em>null</em>'
-											"aosdfjasp"
-										
+											(item.action_name != null )? item.action_name : 'null'
 										}</div>
 										<div style={{
-											display: "table-cell",
-											flexDirection: "column",
-											width: "250px",
+											display: "table-cell", flexDirection: "column",
 											textAlign: "left",
-											margin: "3px",
-											marginTop: "2px",
+											width: "250px", margin: "3px", marginTop: "2px",
 										  }}
 										>&nbsp;{item.message}</div>
 										<div style={{
-											display: "table-cell",
-											flexDirection: "column",
-											width: "210px",
+											display: "table-cell", flexDirection: "column",
 											textAlign: "left",
-											margin: "3px",
-											marginTop: "2px"
+											width: "210px", margin: "3px", marginTop: "2px"
 										  }}
 										>&nbsp;{
 											(item.data != null ) ? 'has related object' : 'no object'
@@ -216,8 +193,6 @@ class LogTable extends Component {
                         </ResultList.Content>
                     </ResultList>
                 ))}
-				{//</div>
-						}
               </ReactiveList.ResultListWrapper>
             )}
 			renderError={(error) => (
