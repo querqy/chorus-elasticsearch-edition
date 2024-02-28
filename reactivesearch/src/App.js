@@ -9,12 +9,12 @@ import {
   ResultList,
 } from "@appbaseio/reactivesearch";
 import AlgoPicker from './custom/AlgoPicker';
-import fetchIntercept from 'fetch-intercept';
 
 
 //######################################
 // global variables
 let has_results = false;//debug
+//const test = `lorem <b onmouseover="alert('mouseover');">ipsum</b>`;
 
 const event_server = "http://127.0.0.1:9200";
 
@@ -71,6 +71,10 @@ function getGenerateQueryId(){
 
 function genDataId(){
   return 'dev-OBJECTID-'+guiid();
+}
+
+function genTransactionId(){
+  return 'dev-TRANSACT-'+guiid();
 }
 
 
@@ -152,6 +156,7 @@ const context = new Context(window, document);
 
 // TODO: move parameters to properties file
 const writer = new UbiWriter(event_server, log_store, queryResolver, sessionResolver,  debug);
+
 
 
 //##################################################################
@@ -379,9 +384,6 @@ class App extends Component {
             // The update is accepted by default
             //if (value) {
                 // To reject the update, throw an error
-           
-                //alert(this.state)
-
           //    console.log("beforeValueChanged current value: ", value)
             
         }}
@@ -413,16 +415,78 @@ class App extends Component {
             react={{
               and: ["searchbox", "brandfilter", "typefilter"]
             }}
+            onClick={
+            function(results) {
+              //page scrolling
+              console.warn('on click');
+            }
+          }
+            onPageClick={
+              function(results) {
+                //page scrolling
+                //console.warn('click');
+              }
+            }
             style={{ textAlign: "center" }}
             render={({ data }) => (
               <ReactiveList.ResultCardsWrapper>
                 {data.map((item) => (
-                  <ResultCard key={item._id}>
+                  <div id='product_item' 
+                  onMouseOver={
+                    function(_event) {
+                        console.log('mouse over ' + item.title);
+                        let e = new UbiEvent('product_hover', user_id, query_id);
+                        e.message = item.title + ' (' + item.id + ')'
+                        e.session_id = session_id
+                        e.page_id = window.location.pathname;
+      
+                        e.event_attributes.data = new UbiData('product', genDataId(), item.title, item);
+                        e.event_attributes.data.data_id = item.id;
+                        e.event_attributes.data.data_type = item.name;
+                        writer.write_event(e);
+                    }
+                  }
+                  onDoubleClick={    
+                    function(_event) {
+                      
+                      if (window.confirm('Do you want to buy' + item.title)) {
+                        console.log('User just bought ' + item.title);
+
+                        let e = new UbiEvent('product_purchase', user_id, query_id);
+                        e.message_type = 'PURCHASE'
+                        e.message = item.title + ' (' + item.id + ')'
+                        e.session_id = session_id
+                        e.page_id = window.location.pathname;
+      
+                        e.event_attributes.data = new UbiData('product', genDataId(), item.title, item);
+                        e.event_attributes.data.data_id = item.id;
+                        e.event_attributes.data.transaction_id = genTransactionId()
+                        e.event_attributes.data.data_type = item.name;
+                        writer.write_event(e);                       
+                      } else {
+                        console.log('User declined to buy ' + item.title);
+
+                        let e = new UbiEvent('declined_product', user_id, query_id);
+                        e.message_type = 'REJECT'
+                        e.message = item.title + ' (' + item.id + ')'
+                        e.session_id = session_id
+                        e.page_id = window.location.pathname;
+      
+                        e.event_attributes.data = new UbiData('product', genDataId(), item.title, item);
+                        e.event_attributes.data.data_id = item.id;
+                        e.event_attributes.data.data_type = item.name;
+                        writer.write_event(e);
+                      }
+                    }
+                  }
+                  >
+                  <ResultCard key={item._id} >
                     <ResultCard.Image
                       style={{
                         backgroundSize: "cover",
                         backgroundImage: `url(${item.img_500x500})`
                       }}
+
                     />
                     <ResultCard.Title
                       dangerouslySetInnerHTML={{
@@ -434,7 +498,9 @@ class App extends Component {
                         " $ | " +
                         item.supplier}
                     </ResultCard.Description>
+                    
                   </ResultCard>
+                  </div>
                 ))}
               </ReactiveList.ResultCardsWrapper>
             )}
