@@ -177,7 +177,9 @@ class LogTable extends Component {
 											textAlign: "left",
 											width: "250px", margin: "3px", marginTop: "2px",
 										  }}
-										>&nbsp;{item.message}</div>
+										>&nbsp;{
+											(item.message != null )? item.message.substring(0, 25) + '...': 'null'
+										}</div>
 										<div style={{
 											display: "table-cell", flexDirection: "column",
 											textAlign: "left",

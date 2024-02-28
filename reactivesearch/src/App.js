@@ -467,6 +467,7 @@ class App extends Component {
                         console.log('User declined to buy ' + item.title);
 
                         let e = new UbiEvent('declined_product', user_id, query_id);
+                        e.message_type = 'REJECT'
                         e.message = item.title + ' (' + item.id + ')'
                         e.session_id = session_id
                         e.page_id = window.location.pathname;
