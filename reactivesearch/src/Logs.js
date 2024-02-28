@@ -115,7 +115,7 @@ class LogTable extends Component {
             }
             style={{ "paddingBottom": "10px", "paddingTop": "10px", "height":"50px" }}
             react={{
-              or: ["market-place", "searchbox", "brandfilter", "typefilter"]
+              or: ["market-place", "logs", "searchbox", "brandfilter", "typefilter"]
             }}
             render={({ data }) => (
             <ReactiveList.ResultListWrapper >
@@ -184,7 +184,9 @@ class LogTable extends Component {
 											width: "210px", margin: "3px", marginTop: "2px"
 										  }}
 										>&nbsp;{
-											(item.data != null ) ? 'has related object' : 'no object'
+											(item.event_attributes != null && item.event_attributes.data != null ) 
+												? item.event_attributes.data.data_type + ': ' +  item.event_attributes.data.data_id
+												: 'no object'
 										}</div>
 									</div>
 							</div>
