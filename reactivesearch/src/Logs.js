@@ -183,7 +183,7 @@ class LogTable extends Component {
 										<div style={{
 											display: "table-cell", flexDirection: "column",
 											textAlign: "left",
-											width: "210px", margin: "3px", marginTop: "2px"
+											width: "310px", margin: "3px", marginTop: "2px"
 										  }}
 										>&nbsp;{
 											(item.event_attributes != null && item.event_attributes.data != null ) 
