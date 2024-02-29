@@ -56,12 +56,11 @@ services:
 
   chorus-ui:
     container_name: chorus_ui
-    build: ./reactivesearch/.
+    build: ./chorus_ui/.
     depends_on:
       - opensearch
-      - mysql
     volumes:
-      - './reactivesearch:/usr/src/app'
+      - './chorus_ui:/usr/src/app'
       - '/usr/src/app/node_modules'
     ports:
       - 4000:3000
