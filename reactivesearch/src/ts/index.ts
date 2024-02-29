@@ -47,11 +47,11 @@ const queryResolver = () => {
 	return query;
 }
 
+	/*
 const firedSearchCallback = callback => {
 	const searchBox = document.querySelector('[data-track-id="searchBox"]');
 	const searchButton = document.querySelector('[data-track-id="searchButton"]');
 
-	/*
 	searchBox?.addEventListener("keypress", (event) => {
 		if (event.key === "Enter" && searchBox.value && event.repeat === false) {
 			callback(searchBox.value);
@@ -62,19 +62,10 @@ const firedSearchCallback = callback => {
 		if (searchBox.value)
 			callback(searchBox.value);
 	});
-*/
 }
+*/
 
-//##################################################################
-//on document load, hook things up here
-document.addEventListener('DOMContentLoaded', function () {
-
-	//alert('LOADED');
-
-});
-//##################################################################
-
-
+/**
 const debug = true;
 const trail = new Trail(queryResolver, sessionResolver);
 const context = new Context(window, document);
@@ -82,13 +73,14 @@ const context = new Context(window, document);
 
 
 
-/**/
 const writer = new UbiWriter('http://127.0.0.1:9200', 'bad_log_shouldnt_exist', queryResolver, sessionResolver,  debug);
 
 const collector = new CollectorModule({
 	writer,
 	context
 });
+
+
 
 collector.addLogTransport(new ConsoleTransport())
 //xx ListenerType.Sentinel ?
@@ -123,3 +115,4 @@ collector.add(new FiredSearchCollector((writer, type, context) => {
 	});
 }));
 collector.start();
+*/

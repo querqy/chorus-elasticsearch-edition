@@ -17,22 +17,26 @@ export class UbiLogger {
 
     private readonly baseUrl:string;
     private readonly url:string;
-    private readonly log_name:string;
+    private readonly ubi_store:string;
 	private readonly rest_client:AxiosInstance; //client for direct http work
 	private readonly rest_config:AxiosRequestConfig;
-    private readonly os_client:Client;       //client for OpenSearch general interactions
+    private readonly os_client:Client;       //client for OpenSearch easier, general interactions
+    private user_id:string;
+    private session_id:string;
 
-    constructor(baseUrl:string, log_name:string) {
+    constructor(baseUrl:string, ubi_store:string, user_id:string=null, session_id:string=null) {
 
 
         //TODO: param checking
         this.baseUrl = baseUrl;
         this.url = baseUrl + UbiLogger.API;
-        this.log_name = log_name;
+        this.ubi_store = ubi_store;
+
+        this.user_id = (user_id != null) ? user_id : sessionStorage.getItem('user_id');
+        this.session_id = (session_id != null) ? session_id : sessionStorage.getItem('session_id');
 
         //TODO: uncomment to work through webpack fallback errors
         // this.os_client = new Client({node:baseUrl});
-
 
         //TODO: add authentication
         this.rest_config = {
@@ -42,13 +46,17 @@ export class UbiLogger {
 			headers :{
 				//'Content-Type':'application/x-www-form-urlencoded',
 				'Content-type': 'application/json',
-                //'Cookie': 'X-ubi-store:' + this.log_name
+                //'Cookie': 'X-ubi-store:' + this.ubi_store
+                'X-ubi-store': ubi_store,
+                //'X-ubi-query-id': query_id,
+                'X-ubi-user-id': user_id,
+                'X-ubi-session-id':session_id,
 			},
 			//httpAgent
 			//httpsAgent
 			//proxy :proxy
 			//data
-            //data: {'X-ubi-store': this.log_name}
+            //data: {'X-ubi-store': this.ubi_store}
 			//timeout
 			//withCredentials
 			//responseType
@@ -63,6 +71,23 @@ export class UbiLogger {
             withCredentials:true
         });
 
+        this.init();
+    }
+
+    init(){
+        try{
+            const response = this.rest_client.put(this.url + this.ubi_store , null, this.rest_config).then(
+                (response) => {
+                    console.log('Inititializing ' + this.ubi_store + ': ' + JSON.stringify(response));
+                  }
+            ).catch(
+                (error) => {
+                    console.error('Error initializing ' + this.ubi_store + ': ' + error);
+                  } 
+            )
+        } catch(error){
+            console.error('Error initializing ' + this.ubi_store + ': ' + error);
+        }
     }
 
     //TODO: ubi headers/cookies
@@ -108,7 +133,7 @@ export class UbiLogger {
      */
     async delete() {
         try {
-            const response = await this.rest_client.delete(this.url + this.log_name, this.rest_config )
+            const response = await this.rest_client.delete(this.url + this.ubi_store, this.rest_config )
             return response.data;
         } catch (error) {
             console.error(error);
@@ -125,8 +150,9 @@ export class UbiLogger {
 
     async _post(data) {
         try {
-            document.cookie = 'X-ubi-store:' + this.log_name
-            const response = await this.rest_client.post(this.url + this.log_name, data, this.rest_config);
+            //TODO: use cookies? headers? json?
+            //document.cookie = 'X-ubi-store:' + this.ubi_store
+            const response = await this.rest_client.post(this.url + this.ubi_store, data, this.rest_config);
             return response.data;
         } catch (error) {
             console.error(error);
@@ -135,7 +161,7 @@ export class UbiLogger {
 
     async _put(data=null) {
         try {
-            const response = await this.rest_client.put(this.url + this.log_name , data, this.rest_config);
+            const response = await this.rest_client.put(this.url + this.ubi_store , data, this.rest_config);
             return response.data;
         } catch (error) {
             console.error(error);
@@ -178,7 +204,9 @@ export default function post(msg) {
 */
 
         var j = JSON.stringify({'text': msg});
-        rq.open("POST", "http://127.0.0.1:9200/_plugins/search_relevance/os_logger");
+        //purposely breaking in case this code sneaks in somewhere
+        //but we might need it depending on how we intercept query_id or other params
+        rq.open("POST", "http://127.0.0.1:9200");
 
         /**
         * changing from form-urlencoded to json, will trigger an

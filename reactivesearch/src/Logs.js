@@ -1,11 +1,14 @@
 import React, {Component} from "react";
 import { ReactiveBase, ReactiveList, StateProvider, ResultList, } from "@appbaseio/reactivesearch";
 
+
+const logging_credentials="elastic:ElasticRocks"
 const event_server =  ((sessionStorage.hasOwnProperty('event_server')) ?
           sessionStorage.getItem('event_server')  
           : "http://localhost:9200");
 
 const log_store_events =  ((sessionStorage.hasOwnProperty('log_store')) ?
+			//convert the log_store into just the event log store
           '.' + sessionStorage.getItem('log_store') + '_events'
           : '.' + 'ubi_log' + '_events');
 
@@ -18,33 +21,40 @@ class LogTable extends Component {
 	}
 	state = {
 	};
+	
   
+	/*
 	handleSearch = value => {
 	  this.setState({
 		value
 	  });
 	};
-  
+  	*/
 	componentDidMount(){
 	  console.log('logs mounted ' + this);
   
 	}
-  
-	
-  
+
+	refresh(){
+		console.log('refreshing logs');
+	}
+ 
+	 
 	render(){
 	return (
 	  //TODO: move url and other configs to proerties file
 	  <ReactiveBase
+        componentId="eventlogs"
 		url={event_server}
 		app={ log_store_events }
-		credentials="elastic:ElasticRocks"
+		credentials={logging_credentials}
 		enableAppbase={false}
+		initialQueriesSyncTime={100}
+
 		headers={{   
 		 
 		}}
 		transformResponse={async (response, componentId) => {
-
 		  
 		  return response;
 		}}
@@ -58,32 +68,31 @@ class LogTable extends Component {
 		<StateProvider
 			onChange={(prevState, nextState) => {
 			  let queryString = nextState;
+			  console.log('logs onChange()')
 			}}
 			
 		/>
 		<div style={{ height: "275px", width: "100%"}}>
-			<h3>Event Log</h3>
-			<ReactiveList
+		  <h3>Event Log</h3>
+		  <ReactiveList
             componentId="logresults"
-            dataField={"action_name"}
+            dataField={"timestamp"}
             title="Log Events"
             size={this.rows}
             pagination={true}
 			showEndPage={true}
 			showResultStats={true}
 			infiniteScroll={true}
-			//TODO: once timestamp is in the schema
-			//sortBy='desc'
 			sortOptions={[ 
-				
+			{
+				sortBy:'desc', 
+				dataField:'timestamp', 
+				label:'time desc'
+			},
 			{
 				sortBy:'desc', 
 				dataField:'_id', 
 				label:'ID'
-			},{
-				sortBy:'desc', 
-				dataField:'timestamp', 
-				label:'time desc'
 			},{
 				sortBy:'desc', 
 				dataField:'message_type', 
@@ -99,7 +108,7 @@ class LogTable extends Component {
 			},
 
 			]}
-            showSearch={false}
+            showSearch={true}
 			onChangeonData={  
 				function(data) {
 					console.warn('on log change');
@@ -115,7 +124,7 @@ class LogTable extends Component {
             }
             style={{ "paddingBottom": "10px", "paddingTop": "10px", "height":"50px" }}
             react={{
-              or: ["market-place", "logs", "searchbox", "brandfilter", "typefilter"]
+              or: ["market-place", "logs", "logresults", "searchbox", "brandfilter", "typefilter"]
             }}
             render={({ data }) => (
             <ReactiveList.ResultListWrapper >
@@ -136,12 +145,12 @@ class LogTable extends Component {
 								&nbsp;log message
 							</div>
 							<div style={{ display: "table-cell", width: "210px", }}>
-								&nbsp;object type
+								&nbsp;object id
 							</div>
 						</div>
                 {data.map((item) => (
                     <ResultList key={item._id}>
-                        <ResultList.Content >
+                        <ResultList.Content>
 						<div style={{  display: "table", textAlign: "left", }}>
 									<div style={{display: "table-row", height: "15px", width:'1500px'}}>
 										<div 
@@ -192,8 +201,6 @@ class LogTable extends Component {
 										}</div>
 									</div>
 							</div>
-
-									          
                         </ResultList.Content>
                     </ResultList>
                 ))}
