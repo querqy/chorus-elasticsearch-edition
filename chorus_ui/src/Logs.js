@@ -1,8 +1,9 @@
-import React, {Component} from "react";
-import { ReactiveBase, ReactiveList, StateProvider, ResultList, } from "@appbaseio/reactivesearch";
+import React, {Component, useEffect, useState} from "react";
+import { render } from 'react-dom';
+import { ReactiveBase, ReactiveList, StateProvider, ResultList, ReactiveComponent} from "@appbaseio/reactivesearch";
 
 
-const logging_credentials="elastic:ElasticRocks"
+const logging_credentials="*:*"
 const event_server =  ((sessionStorage.hasOwnProperty('event_server')) ?
           sessionStorage.getItem('event_server')  
           : "http://localhost:9200");
@@ -13,36 +14,45 @@ const log_store_events =  ((sessionStorage.hasOwnProperty('log_store')) ?
           : '.' + 'ubi_log' + '_events');
 
 
+//TODO: auto refresh.
+//the following will refresh the entire page
+//xx <meta http-equiv="refresh" content="30" />
+//<meta httpEquiv="refresh" content="30" />
+setInterval(function(){
+	
+	//TODO: sort custom query by changing timestamp
+	window.logs.timestamp = Date.now();
+	console.log('intervale');
+  }, 30000);
+
+
+//https://github.com/appbaseio/reactivesearch/discussions/2025
+
+
 class LogTable extends Component {
 	rows=5;
-
+	
 	constructor(){
 	  super();
 	}
 	state = {
 	};
+
 	
-  
-	/*
-	handleSearch = value => {
-	  this.setState({
-		value
-	  });
-	};
-  	*/
 	componentDidMount(){
 	  console.log('logs mounted ' + this);
-  
 	}
 
-	refresh(){
-		console.log('refreshing logs');
+	forceUpdate(){
+		console.log('force update');
 	}
- 
+
+	componentDidUpdate(){
+		console.log('logs update');
+	}
 	 
 	render(){
 	return (
-	  //TODO: move url and other configs to proerties file
 	  <ReactiveBase
         componentId="eventlogs"
 		url={event_server}
@@ -50,7 +60,7 @@ class LogTable extends Component {
 		credentials={logging_credentials}
 		enableAppbase={false}
 		initialQueriesSyncTime={100}
-
+		
 		headers={{   
 		 
 		}}

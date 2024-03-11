@@ -1,7 +1,6 @@
 import {Writer} from "search-collector";
 //import {} from '../search_collector.window.bundle'
 import {UbiLogger} from "./UbiLogger";
-import { default as olPost } from "./UbiLogger";
 import { UbiEvent } from "./UbiEvent";
 
 /*
@@ -82,7 +81,5 @@ export class UbiWriter implements Writer {
 		//console.log('about to log');
 		this.logger.log_event(e);
 		console.log('Just logged: ' + e.toJson());
-
-		//TODO: xx this.write(e);  ?
 	}
 }

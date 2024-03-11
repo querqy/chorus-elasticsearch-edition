@@ -10,30 +10,35 @@ import {
 } from "@appbaseio/reactivesearch";
 import AlgoPicker from './custom/AlgoPicker';
 
+import {CollectorModule, Context, InstantSearchQueryCollector, Trail, Query, cookieSessionResolver, ConsoleTransport} from "search-collector";
+
+var UbiWriter = require('./ts/UbiWriter.ts').UbiWriter;
+var UbiEvent = require('./ts/UbiEvent.ts').UbiEvent;
+var UbiAttributes = require('./ts/UbiEvent.ts').UbiEventAttributes;
+var UbiData = require('./ts/UbiEvent.ts').UbiEventData;
+
 
 //######################################
 // global variables
-let has_results = false;//debug
+//let has_results = false;//debug
 //const test = `lorem <b onmouseover="alert('mouseover');">ipsum</b>`;
 
 const event_server = "http://127.0.0.1:9200";
-const search_credentials = "elastic:ElasticRocks";
+const search_credentials = "*:*";
 const search_store = 'ecommerce'
+const search_field = 'name'
 const ubi_store = 'ubi_log'
 
-const user_id = 'DEMO-eeed-43de-959d-90e6040e84f9'; // demo user id
+const user_id = 'USER-eeed-43de-959d-90e6040e84f9'; // demo user id
 const session_id = ((sessionStorage.hasOwnProperty('session_id')) ?
           sessionStorage.getItem('session_id') 
-          : 'dev-SESSIONID-' + guiid()); //<- new fake session, otherwise it should reuse the sessionStorage version
-let query_id = ((sessionStorage.hasOwnProperty('query_id')) ?
-          sessionStorage.getItem('query_id') 
-          : 'need a query id');
-
+          : 'SESSION-' + guiid()); //<- new fake session, otherwise it should reuse the sessionStorage version
 sessionStorage.setItem('ubi_store', ubi_store);
 sessionStorage.setItem('event_server', event_server);
 sessionStorage.setItem('user_id', user_id);
 sessionStorage.setItem('session_id', session_id);
-sessionStorage.setItem('query_id', query_id);
+sessionStorage.setItem('search_store', search_store);
+sessionStorage.setItem('search_field', search_field);
 
 
 //######################################
@@ -60,43 +65,76 @@ String.prototype.f = function () {
   });
 };
 
-function getGenerateQueryId(){
-  let id = sessionStorage.getItem('query_id');
-  if(id == null){
-    id = 'dev-QUERYID-'+ guiid();
-    sessionStorage.setItem('query_id', id);
-  }
-  query_id = id;
-  return id;
+function genQueryId(){
+  return 'QUERY-' + guiid();
 }
 
-function genDataId(){
-  return 'dev-OBJECTID-'+guiid();
+function QueryId(){
+  return sessionStorage.getItem('query_id');
+}
+
+function CurrentHeaders(){
+  let query_id = sessionStorage.getItem('query_id');
+  if(query_id == null || query_id == 'null' || query_id==''){
+    console.log('query_id is currently null')
+    return {   
+      'X-ubi-store': ubi_store,
+    // enable if the client were to maintain query_id's:
+    //'X-ubi-query-id': genQueryId(),
+      'X-ubi-user-id': user_id,
+      'X-ubi-session-id':session_id,
+    };
+  }
+
+  return {   
+    'X-ubi-store': ubi_store,
+    'X-ubi-query-id': query_id,
+    'X-ubi-user-id': user_id,
+    'X-ubi-session-id':session_id,
+  };
+}
+
+function genObjectId(){
+  return 'OBJECT-'+guiid();
 }
 
 function genTransactionId(){
-  return 'dev-TRANSACT-'+guiid();
+  return 'TRANSACT-'+guiid();
 }
 
 
-
+/**
+ * overriding send so that we can intercept the query id response
+ * from any post
+ */
 (function(send) { 
   XMLHttpRequest.prototype.send = function(data) { 
       this.addEventListener('readystatechange', function() { 
         if (this.readyState == 4 ){//} && this.status == 200) {
-          let headers = this.getAllResponseHeaders();
-          console.log('response headers => ' + headers);
-          try{
-            query_id = this.getResponseHeader('query_id');
-            sessionStorage.setItem('query_id', query_id);
-          }
-          catch(error){
-            console.log(error);
-            console.warn('query_id not exposed in the response');
+          /**
+           * only pull query_id out for searches on the main store
+           * otherwise, this also runs for ubi client calls
+           */
+            if(this.responseURL.includes(search_store)){
+              let headers = this.getAllResponseHeaders();
+              if(headers.includes('query_id:')) {
+              try{
+                let query_id = this.getResponseHeader('query_id');
+                if(query_id == null || query_id == 'null' || query_id==''){
 
+                  query_id = genQueryId()
+                  console.warn('Received null query id.  Generated - ' + query_id);
+                }
+                sessionStorage.setItem('query_id', query_id);
+            }
+            catch(error){
+              console.log(error);
+            }
+          }else {
+            console.warn('No query id in the search response headers => ' + headers);
           }
-        
-        }
+        } 
+      }
 
       }, false); 
       try{
@@ -106,42 +144,14 @@ function genTransactionId(){
         console.warm('POST error: ' + error);
         console.log(data);
       }
-      //if(has_results){
-      //  console.log('posted');
-     // }
   }; 
 })(XMLHttpRequest.prototype.send);
 
 
-/*
-XMLHttpRequest.setDisableHeaderCheck = function(data) { 
-  return false;
-}; 
-(function(setDisableHeaderCheck) { 
-  XMLHttpRequest.prototype.setDisableHeaderCheck = function(data) { 
-      return true;
-  }; 
-})(XMLHttpRequest.prototype.setDisableHeaderCheck);
-*/
-/*
-(function(getAllResponseHeaders) { 
-  XMLHttpRequest.prototype.getAllResponseHeaders = function() { 
 
-    console.log('getting headers');
-    return getAllResponseHeaders.call(this);
-  }; 
-})(XMLHttpRequest.prototype.getAllResponseHeaders);
-*/
-import {CollectorModule, Context, InstantSearchQueryCollector, Trail, Query, cookieSessionResolver, ConsoleTransport} from "search-collector";
-
-var UbiWriter = require('./ts/UbiWriter.ts').UbiWriter;
-var UbiEvent = require('./ts/UbiEvent.ts').UbiEvent;
-var UbiAttributes = require('./ts/UbiEvent.ts').UbiEventAttributes;
-var UbiData = require('./ts/UbiEvent.ts').UbiEventData;
 
 
 const sessionResolver = () => cookieSessionResolver();
-
 const queryResolver = () => {
 	const params = new URLSearchParams(window.location.search);
 
@@ -166,56 +176,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 });
-/*
-TODO: finish refresh
 
-various attempts at calling a react component
-
-window.findReactComponent = function(el) {
-  for (const key in el) {
-    if (key.startsWith('__reactInternalInstance$')) {
-      const fiberNode = el[key];
-
-      return fiberNode && fiberNode.return && fiberNode.return.stateNode;
-    }
-  }
-  return null;
-};
-
-var ReactDOM = require('react-dom');
-(function () {
-    var _render = ReactDOM.render;
-    ReactDOM.render = function () {
-        return arguments[1].react = _render.apply(this, arguments);
-    };
-})();
-
-document.addEventListener('click', function(event) {
-  const el = event.target;
-  for (const key in el) {
-    if (key.startsWith('__reactInternalInstance$')) {
-      const fiberNode = el[key];
-      const component = fiberNode && fiberNode._debugOwner;
-      if (component) {
-        console.log(component.type.displayName || component.type.name);
-        window.$r = component.stateNode;
-      }
-      return;
-    }
-  }
-});
-*/
-/*
-
-function refreshLogs() {
-  var elem = document.getElementById('logs');
-  console.warn('refreshLogs ' + elem);
-  if(elem != null){
-    console.warn(window.logs._internalRoot.current);
-    // window.logs.render();
-  }
-}
-*/
 //##################################################################
 
 
@@ -237,7 +198,6 @@ class App extends Component {
     super();
   }
 
-  search_text=''
   state = {
     customQuery: queries['default']('')
   };
@@ -268,16 +228,13 @@ class App extends Component {
       //enableAppbase={false} <- orig
       
       //**************************************************************
-      //TODO: add headers back once fully integrated with ubl->ubi name changes
-      // else products won't show
-      headers={{   
-        'X-ubi-store': ubi_store,
-        'X-ubi-query-id': '**fake query_id**',
-        'X-ubi-user-id': user_id,
-        'X-ubi-session-id':session_id,
-        'Access-Control-Expose-Headers':'query_id'
-      }}
+
+      
+      headers={CurrentHeaders()}
       //**************************************************************
+      
+
+      
 
       recordAnalytics={true}
       searchStateHeader={true}
@@ -289,7 +246,7 @@ class App extends Component {
           //console.log('** Brand change =>' + response);
         } else if(componentId == 'results'){
           console.log('** Search results =>' + response);
-          has_results = true;
+          //has_results = true;
         }else if(componentId == 'logresults'){
           //event log update
           console.warn('log update');
@@ -301,9 +258,7 @@ class App extends Component {
         return response;
       }}
       transformRequest={async (request) => {
-        request.headers['test'] = 'xyz';
-        //request.headers['Access-Control-Expose-Headers'] = 'query_id';
-       //console.log(request);
+        //intercept request headers here
         
         return request;
       }}
@@ -314,7 +269,6 @@ class App extends Component {
           onChange={(prevState, nextState) => {
             let queryString = nextState;
             console.log('Page.onChange - ' + queryString.searchbox.value);
-            //this.search_text = queryString.searchbox.value;
             
           }}
           
@@ -337,7 +291,7 @@ class App extends Component {
             componentId="algopicker" 
             writer={writer}
             user_id={user_id}
-            query_id={query_id}
+            query_id={QueryId()}
             session_id={session_id}
             />
           <MultiList
@@ -350,12 +304,12 @@ class App extends Component {
               function(prevQuery, nextQuery) {
                 if(nextQuery != prevQuery){
                   console.log('filtering on brands');
-                  let e = new UbiEvent('brand_filter', user_id, query_id);
-                  e.message = 'filtering on brands'
-                  e.session_id = session_id
+                  let e = new UbiEvent('brand_filter', user_id, QueryId());
+                  e.message = 'filtering on brands';
+                  e.session_id = session_id;
                   e.page_id = window.location.pathname;
 
-                  e.event_attributes.data = new UbiData('filter_data', genDataId(), nextQuery);
+                  e.event_attributes.data = new UbiData('filter_data', genObjectId(), nextQuery);
                   writer.write_event(e);
                 }
               }
@@ -375,12 +329,12 @@ class App extends Component {
               function(prevQuery, nextQuery) {
                 if(nextQuery != prevQuery){
                   console.log('filtering on product types');
-                  let e = new UbiEvent('type_filter', user_id, query_id);
-                  e.message = 'filtering on product types'
-                  e.session_id = session_id
+                  let e = new UbiEvent('type_filter', user_id, QueryId());
+                  e.message = 'filtering on product types';
+                  e.session_id = session_id;
                   e.page_id = window.location.pathname;
 
-                  e.event_attributes.data = new UbiData('filter_data', genDataId(), nextQuery);
+                  e.event_attributes.data = new UbiData('filter_data', genObjectId(), nextQuery);
                   writer.write_event(e);
                 }
               }
@@ -393,13 +347,11 @@ class App extends Component {
         </div>
         <div style={{ display: "flex", flexDirection: "column", width: "75%" }}>
           <DataSearch 
-          
           onValueChange={
             function(value) {
               console.log("onValueChanged search value: ", value)
 
-              //TODO: pull in user id, query id, page id, etc.
-              let e = new UbiEvent('on_search', user_id, query_id, value);
+              let e = new UbiEvent('on_search', user_id, QueryId(), value);
               e.message_type = 'QUERY'
               e.session_id = session_id
               e.page_id = window.location.pathname;
@@ -408,7 +360,7 @@ class App extends Component {
           }
           onChange={
             function(value, cause, source) {
-            //  console.log("onChange current value: ", value)
+              console.log("onChange current value: ", value)
             }
           } 
           onValueSelected={
@@ -471,12 +423,12 @@ class App extends Component {
                   onMouseOver={
                     function(_event) {
                         console.log('mouse over ' + item.title);
-                        let e = new UbiEvent('product_hover', user_id, query_id);
-                        e.message = item.title + ' (' + item.id + ')'
-                        e.session_id = session_id
+                        let e = new UbiEvent('product_hover', user_id, QueryId());
+                        e.message = item.title + ' (' + item.id + ')';
+                        e.session_id = session_id;
                         e.page_id = window.location.pathname;
       
-                        e.event_attributes.data = new UbiData('product', genDataId(), item.title, item);
+                        e.event_attributes.data = new UbiData('product', genObjectId(), item.title, item);
                         e.event_attributes.data.data_id = item.id;
                         e.event_attributes.data.data_type = item.name;
                         writer.write_event(e);
@@ -486,26 +438,26 @@ class App extends Component {
                     function(_event) {
                       
                       if (window.confirm('Do you want to buy ' + item.title)) {
-                        let e = new UbiEvent('product_purchase', user_id, query_id);
-                        e.message_type = 'PURCHASE'
-                        e.message = item.title + ' (' + item.id + ')'
-                        e.session_id = session_id
+                        let e = new UbiEvent('product_purchase', user_id, QueryId());
+                        e.message_type = 'PURCHASE';
+                        e.message = item.title + ' (' + item.id + ')';
+                        e.session_id = session_id;
                         e.page_id = window.location.pathname;
       
-                        e.event_attributes.data = new UbiData('product', genDataId(), item.title, item);
+                        e.event_attributes.data = new UbiData('product', genObjectId(), item.title, item);
                         e.event_attributes.data.data_id = item.id;
                         e.event_attributes.data.transaction_id = genTransactionId()
                         e.event_attributes.data.data_type = item.name;
                         writer.write_event(e);                       
                         console.log('User just bought ' + item.title);
                       } else {
-                        let e = new UbiEvent('declined_product', user_id, query_id);
+                        let e = new UbiEvent('declined_product', user_id, QueryId());
                         e.message_type = 'REJECT'
                         e.message = item.title + ' (' + item.id + ')'
                         e.session_id = session_id
                         e.page_id = window.location.pathname;
       
-                        e.event_attributes.data = new UbiData('product', genDataId(), item.title, item);
+                        e.event_attributes.data = new UbiData('product', genObjectId(), item.title, item);
                         e.event_attributes.data.data_id = item.id;
                         e.event_attributes.data.data_type = item.name;
                         writer.write_event(e);

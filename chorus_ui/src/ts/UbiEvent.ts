@@ -17,8 +17,8 @@ export class UbiEventData {
 export class UbiEventAttributes {
 	/**
 	 * Attributes should be in the form of
-	 * this['item1'] = 1
-	 * this['item2'] = '2'
+	 * attributes['item1'] = 1
+	 * attributes['item2'] = '2'
 	 * 
 	 * The data member is reserved for further, relevant data payloads or classes
 	 */

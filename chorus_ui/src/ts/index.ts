@@ -4,15 +4,12 @@
 
 // to link search collector in to an old demo
 // from the demo at https://github.com/searchhub/search-collector/tree/master/demo and https://www.searchhub.io/search-collector/demo/ for collector implementation details
-import {CollectorModule, Context, DefaultWriter, FiredSearchCollector, InstantSearchQueryCollector, Trail, Query, cookieSessionResolver, ConsoleTransport, positionResolver, ListenerType, ProductClickCollector} from "search-collector";
+//import {CollectorModule, Context, DefaultWriter, FiredSearchCollector, InstantSearchQueryCollector, Trail, Query, cookieSessionResolver, ConsoleTransport, positionResolver, ListenerType, ProductClickCollector} from "search-collector";
 import { UbiWriter } from "./UbiWriter";
-import { default as olPost } from "./UbiLogger";
 
-export function post(msg){
-	return olPost(msg);
-} 
-
-
+/**
+ * 
+ * Search collector wiring
 const lastPathSegmentRegex = /\/(?:.(?!\/))+$/g;
 
 function redirect(path) {
@@ -29,11 +26,7 @@ function resetEvents(){
 		e.innerHTML = "";
 	else
 		console.log("#events control is null");
-}
 
-	/**
-	 * Clear Events
-	 */
 	document.querySelector("#clearEvents")?.addEventListener("click", () => {
 		resetEvents();
 		document.location.reload();
@@ -47,7 +40,7 @@ const queryResolver = () => {
 	return query;
 }
 
-	/*
+	
 const firedSearchCallback = callback => {
 	const searchBox = document.querySelector('[data-track-id="searchBox"]');
 	const searchButton = document.querySelector('[data-track-id="searchButton"]');
