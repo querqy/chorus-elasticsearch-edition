@@ -46,7 +46,6 @@ export class UbiLogger {
 			headers :{
 				//'Content-Type':'application/x-www-form-urlencoded',
 				'Content-type': 'application/json',
-                //'Cookie': 'X-ubi-store:' + this.ubi_store
                 'X-ubi-store': ubi_store,
                 //'X-ubi-query-id': query_id,
                 'X-ubi-user-id': user_id,
@@ -151,8 +150,6 @@ export class UbiLogger {
 
     async _post(data) {
         try {
-            //TODO: use cookies? headers? json?
-            //document.cookie = 'X-ubi-store:' + this.ubi_store
             const response = await this.rest_client.post(this.url + this.ubi_store, data, this.rest_config);
             return response.data;
         } catch (error) {
@@ -169,61 +166,5 @@ export class UbiLogger {
         }
     }
 
-
-}
-
-
-
-/**
- * Barebones OpenSearch post method
- */
-export default function post(msg) {
-    //alert('About to post');
-    try{
-        var rq = new XMLHttpRequest;
-
-        rq.onreadystatechange = function() {
-            if (this.readyState == 4 ){//} && this.status == 200) {
-                if(this.responseText != null && this.responseText != ''){
-                    console.log(this.responseText);
-                    //alert('Response -> ' + this.responseText)
-                }
-                else
-                    console.log('Possible CORS violation')
-            }
-        };
-
-        /*
-        rq.onerror = function(){
-            if(this.error != null && this.error != ''){
-                console.log(this.error);
-                alert('ERROR: ' + this.error);
-            }
-            else
-                alert('unspecified error');
-        }
-*/
-
-        var j = JSON.stringify({'text': msg});
-        //purposely breaking in case this code sneaks in somewhere
-        //but we might need it depending on how we intercept query_id or other params
-        rq.open("POST", "http://127.0.0.1:9200");
-
-        /**
-        * changing from form-urlencoded to json, will trigger an
-        * addtional CORS HTTP query of "OPTIONS"
-        * before actually POSTing, which *could* throw errors before the POST
-        * could even be triggered
-        * BUT OpenSearch doesn't allow form-urlencoded posts out of the box
-        */
-            rq.setRequestHeader("Content-type", "application/json");
-            //rq.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-
-            rq.send(j);
-            //alert('No errors thrown. Check log for: ' + j);
-        } catch(error){
-            console.log(error)
-            //alert("Ahh sorry. That didn't work! " + error);
-        }
 
 }

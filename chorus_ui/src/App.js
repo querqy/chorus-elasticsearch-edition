@@ -26,6 +26,7 @@ var UbiData = require('./ts/UbiEvent.ts').UbiEventData;
 const event_server = "http://127.0.0.1:9200";
 const search_credentials = "*:*";
 const search_store = 'ecommerce'
+const search_field = 'name'
 const ubi_store = 'ubi_log'
 
 const user_id = 'USER-eeed-43de-959d-90e6040e84f9'; // demo user id
@@ -36,6 +37,8 @@ sessionStorage.setItem('ubi_store', ubi_store);
 sessionStorage.setItem('event_server', event_server);
 sessionStorage.setItem('user_id', user_id);
 sessionStorage.setItem('session_id', session_id);
+sessionStorage.setItem('search_store', search_store);
+sessionStorage.setItem('search_field', search_field);
 
 
 //######################################
@@ -76,7 +79,7 @@ function CurrentHeaders(){
     console.log('query_id is currently null')
     return {   
       'X-ubi-store': ubi_store,
-    // if the client were to maintain query_id's:
+    // enable if the client were to maintain query_id's:
     //'X-ubi-query-id': genQueryId(),
       'X-ubi-user-id': user_id,
       'X-ubi-session-id':session_id,
@@ -91,7 +94,7 @@ function CurrentHeaders(){
   };
 }
 
-function genDataId(){
+function genObjectId(){
   return 'OBJECT-'+guiid();
 }
 
@@ -101,7 +104,7 @@ function genTransactionId(){
 
 
 /**
- * overriding send so that we can get the query id response
+ * overriding send so that we can intercept the query id response
  * from any post
  */
 (function(send) { 
@@ -255,8 +258,7 @@ class App extends Component {
         return response;
       }}
       transformRequest={async (request) => {
-        //request.headers['test'] = 'xyz';
-       //console.log(request);
+        //intercept request headers here
         
         return request;
       }}
@@ -267,7 +269,6 @@ class App extends Component {
           onChange={(prevState, nextState) => {
             let queryString = nextState;
             console.log('Page.onChange - ' + queryString.searchbox.value);
-            //this.search_text = queryString.searchbox.value;
             
           }}
           
@@ -308,7 +309,7 @@ class App extends Component {
                   e.session_id = session_id;
                   e.page_id = window.location.pathname;
 
-                  e.event_attributes.data = new UbiData('filter_data', genDataId(), nextQuery);
+                  e.event_attributes.data = new UbiData('filter_data', genObjectId(), nextQuery);
                   writer.write_event(e);
                 }
               }
@@ -333,7 +334,7 @@ class App extends Component {
                   e.session_id = session_id;
                   e.page_id = window.location.pathname;
 
-                  e.event_attributes.data = new UbiData('filter_data', genDataId(), nextQuery);
+                  e.event_attributes.data = new UbiData('filter_data', genObjectId(), nextQuery);
                   writer.write_event(e);
                 }
               }
@@ -350,7 +351,6 @@ class App extends Component {
             function(value) {
               console.log("onValueChanged search value: ", value)
 
-              //TODO: pull in user id, query id, page id, etc.
               let e = new UbiEvent('on_search', user_id, QueryId(), value);
               e.message_type = 'QUERY'
               e.session_id = session_id
@@ -360,7 +360,7 @@ class App extends Component {
           }
           onChange={
             function(value, cause, source) {
-            //  console.log("onChange current value: ", value)
+              console.log("onChange current value: ", value)
             }
           } 
           onValueSelected={
@@ -428,7 +428,7 @@ class App extends Component {
                         e.session_id = session_id;
                         e.page_id = window.location.pathname;
       
-                        e.event_attributes.data = new UbiData('product', genDataId(), item.title, item);
+                        e.event_attributes.data = new UbiData('product', genObjectId(), item.title, item);
                         e.event_attributes.data.data_id = item.id;
                         e.event_attributes.data.data_type = item.name;
                         writer.write_event(e);
@@ -438,13 +438,13 @@ class App extends Component {
                     function(_event) {
                       
                       if (window.confirm('Do you want to buy ' + item.title)) {
-                        let e = new ubievent('product_purchase', user_id, QueryId());
+                        let e = new UbiEvent('product_purchase', user_id, QueryId());
                         e.message_type = 'PURCHASE';
                         e.message = item.title + ' (' + item.id + ')';
                         e.session_id = session_id;
                         e.page_id = window.location.pathname;
       
-                        e.event_attributes.data = new UbiData('product', genDataId(), item.title, item);
+                        e.event_attributes.data = new UbiData('product', genObjectId(), item.title, item);
                         e.event_attributes.data.data_id = item.id;
                         e.event_attributes.data.transaction_id = genTransactionId()
                         e.event_attributes.data.data_type = item.name;
@@ -457,7 +457,7 @@ class App extends Component {
                         e.session_id = session_id
                         e.page_id = window.location.pathname;
       
-                        e.event_attributes.data = new UbiData('product', genDataId(), item.title, item);
+                        e.event_attributes.data = new UbiData('product', genObjectId(), item.title, item);
                         e.event_attributes.data.data_id = item.id;
                         e.event_attributes.data.data_type = item.name;
                         writer.write_event(e);
