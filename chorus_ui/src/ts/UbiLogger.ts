@@ -71,7 +71,8 @@ export class UbiLogger {
             withCredentials:true
         });
 
-        this.init();
+        //TODO: init if it doesn't exist
+        //this.init();
     }
 
     init(){
