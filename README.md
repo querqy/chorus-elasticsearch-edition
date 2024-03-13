@@ -29,10 +29,10 @@ Want to stay up-to-date with the community? Visit https://querqy.org/ to learn m
 * The UI (Reactivesearch) runs at http://localhost:4000 
 * OpenSearch runs at http://localhost:9200
 * OpenSearch Dashboards runs at http://localhost:5601/app/home
-* Quepid runs at http://localhost:3000  |  http://chorus-es-edition.dev.o19s.com:3000
+* Quepid runs at http://localhost:3000  |  http://chorus-opensearch-edition.dev.o19s.com:3000
 
 Working with macOS? Pop open all the tuning related web pages with one terminal command:
-> open http://localhost:4000 http://localhost:9200 http://localhost:5601 http://localhost:9000 http://localhost:3000
+> open http://localhost:4000 http://localhost:9200 http://localhost:5601/app/home http://localhost:3000
 
 # 5 Minutes to Run Chorus!
 
