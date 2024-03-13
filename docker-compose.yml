@@ -2,12 +2,11 @@ version: '3.7'
 services:
   mysql:
     container_name: mysql
-    image: amd64/mysql:5.7.42
+    image: amd64/mysql:8
     ports:
       - 3306:3306
     environment:
       - MYSQL_ROOT_PASSWORD=password
-      - MYSQL_DATABASE=smui
     volumes:
       - ./mysql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
       - mysql_data:/var/lib/mysql
@@ -68,7 +67,7 @@ services:
 
   quepid:
     container_name: quepid
-    image: o19s/quepid:6.14.0
+    image: o19s/quepid:7.15.1
     ports:
       - 3000:3000
     environment:
@@ -102,4 +101,3 @@ services:
 
 volumes:
   mysql_data: {}
-  es_data: {}

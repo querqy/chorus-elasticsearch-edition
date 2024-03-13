@@ -26,13 +26,13 @@ Want to stay up-to-date with the community? Visit https://querqy.org/ to learn m
 
 # What Runs Where
 
-* The UI (Reactivesearch) runs at http://localhost:4000 
-* OpenSearch runs at http://localhost:9200
-* OpenSearch Dashboards runs at http://localhost:5601/app/home
-* Quepid runs at http://localhost:3000  |  http://chorus-es-edition.dev.o19s.com:3000
+* The UI (Reactivesearch) runs at http://localhost:4000 |  http://chorus-opensearch-edition.dev.o19s.com:4000
+* OpenSearch runs at http://localhost:9200 |  http://chorus-opensearch-edition.dev.o19s.com:9200
+* OpenSearch Dashboards runs at http://localhost:5601/app/home |  http://chorus-opensearch-edition.dev.o19s.com:5601/app/home
+* Quepid runs at http://localhost:3000  |  http://chorus-opensearch-edition.dev.o19s.com:3000
 
 Working with macOS? Pop open all the tuning related web pages with one terminal command:
-> open http://localhost:4000 http://localhost:9200 http://localhost:5601 http://localhost:9000 http://localhost:3000
+> open http://localhost:4000 http://localhost:9200 http://localhost:5601/app/home http://localhost:3000
 
 # 5 Minutes to Run Chorus!
 
@@ -40,7 +40,7 @@ We are trying to strike a balance between making the setup process as easy and f
 
 If you are impatient, we provide a quick start script, `./quickstart.sh` that sets Chorus up for you. However, I recommend you go through [Kata 0: Setting up Chorus](katas/000_setting_up_chorus.md), to get a picture of what's running in the stack.
 
-After setting up Chorus you can check out [Kata 1: Lets Optimize a Query](katas/001_optimize_a_query.md) for an introduction to the world of active search management.
+After setting up Chorus you can check out [Kata 1: Lets Simulate Some Traffic](katas/001_lets_simulate_some_traffic.md) to learn about getting some insight into your user's behavior!
 
 [More Katas can be found in the Solr version of Chorus](https://github.com/querqy/chorus#structured-learning-using-chorus) and many can be transferred to this OpenSearch based stack. Some are also covered in a video series called [Meet Pete](https://opensourceconnections.com/blog/2020/07/07/meet-pete-the-e-commerce-search-product-manager/). Feel free to open PRs to add Katas you find useful or open issues if you want to see specific Katas included. Every contribution is welcome! 
 

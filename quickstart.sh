@@ -119,8 +119,8 @@ curl -X PUT "localhost:9200/_plugins/ubi/log"
 if $offline_lab; then
 
   echo -e "${MAJOR}Setting up Quepid${RESET}"
-  docker compose run --rm quepid bin/rake db:setup
-  docker compose run quepid thor user:create -a admin@choruselectronics.com "Chorus Admin" password
+  docker compose run --rm quepid bundle exec bin/rake db:setup
+  docker compose run quepid bundle exec thor user:create -a admin@choruselectronics.com "Chorus Admin" password
 
 fi
 
