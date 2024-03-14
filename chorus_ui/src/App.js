@@ -9,10 +9,8 @@ import {
   ResultList,
 } from "@appbaseio/reactivesearch";
 import AlgoPicker from './custom/AlgoPicker';
+import { UbiClient } from "./ts/UbiClient.ts";
 
-import {CollectorModule, Context, InstantSearchQueryCollector, Trail, Query, cookieSessionResolver, ConsoleTransport} from "search-collector";
-
-var UbiWriter = require('./ts/UbiWriter.ts').UbiWriter;
 var UbiEvent = require('./ts/UbiEvent.ts').UbiEvent;
 var UbiAttributes = require('./ts/UbiEvent.ts').UbiEventAttributes;
 var UbiData = require('./ts/UbiEvent.ts').UbiEventData;
@@ -20,29 +18,34 @@ var UbiData = require('./ts/UbiEvent.ts').UbiEventData;
 
 //######################################
 // global variables
-//let has_results = false;//debug
-//const test = `lorem <b onmouseover="alert('mouseover');">ipsum</b>`;
-
 const event_server = "http://127.0.0.1:9200";
 const search_credentials = "*:*";
-const search_store = 'ecommerce'
-const search_field = 'name'
+const search_index = 'ecommerce'
+const index_field = 'name'
 const ubi_store = 'ubi_log'
 
 const user_id = 'USER-eeed-43de-959d-90e6040e84f9'; // demo user id
 const session_id = ((sessionStorage.hasOwnProperty('session_id')) ?
           sessionStorage.getItem('session_id') 
           : 'SESSION-' + guiid()); //<- new fake session, otherwise it should reuse the sessionStorage version
+
+const ubi_client = new  UbiClient(event_server, ubi_store, user_id, session_id);
+
+//write each event to the console
+ubi_client.verbose = 1;
+
 sessionStorage.setItem('ubi_store', ubi_store);
 sessionStorage.setItem('event_server', event_server);
 sessionStorage.setItem('user_id', user_id);
 sessionStorage.setItem('session_id', session_id);
-sessionStorage.setItem('search_store', search_store);
-sessionStorage.setItem('search_field', search_field);
+sessionStorage.setItem('search_index', search_index);
+
+// only needed to initialize the store.  if it's already initialized, this is not needed
+sessionStorage.setItem('index_field', index_field);
 
 
 //######################################
-// util functions, TODO: reorganize
+// util functions, TODO: reorganize files
 function guiid() {
   let id = '';
   try{
@@ -115,7 +118,7 @@ function genTransactionId(){
            * only pull query_id out for searches on the main store
            * otherwise, this also runs for ubi client calls
            */
-            if(this.responseURL.includes(search_store)){
+            if(this.responseURL.includes(search_index)){
               let headers = this.getAllResponseHeaders();
               if(headers.includes('query_id:')) {
               try{
@@ -149,24 +152,6 @@ function genTransactionId(){
 
 
 
-
-
-const sessionResolver = () => cookieSessionResolver();
-const queryResolver = () => {
-	const params = new URLSearchParams(window.location.search);
-
-	const query = new Query();
-	query.setSearch(params.get("query"));
-
-	return query;
-}
-const debug = true;
-const trail = new Trail(queryResolver, sessionResolver);
-const context = new Context(window, document);
-
-
-// TODO: move parameters to properties file
-const writer = new UbiWriter(event_server, ubi_store, queryResolver, sessionResolver,  debug);
 
 
 
@@ -222,7 +207,7 @@ class App extends Component {
     <ReactiveBase
       componentId="market-place"
       url={event_server}
-      app={search_store}
+      app={search_index}
       credentials={search_credentials}
       //enableAppbase={true}  <- TODO: to allow auto analytics
       //enableAppbase={false} <- orig
@@ -289,7 +274,7 @@ class App extends Component {
           <AlgoPicker
             title="Product Sort"
             componentId="algopicker" 
-            writer={writer}
+            ubi_client={ubi_client}
             user_id={user_id}
             query_id={QueryId()}
             session_id={session_id}
@@ -310,7 +295,7 @@ class App extends Component {
                   e.page_id = window.location.pathname;
 
                   e.event_attributes.data = new UbiData('filter_data', genObjectId(), nextQuery);
-                  writer.write_event(e);
+                  ubi_client.log_event(e);
                 }
               }
             }
@@ -335,7 +320,7 @@ class App extends Component {
                   e.page_id = window.location.pathname;
 
                   e.event_attributes.data = new UbiData('filter_data', genObjectId(), nextQuery);
-                  writer.write_event(e);
+                  ubi_client.log_event(e);
                 }
               }
             }
@@ -355,7 +340,7 @@ class App extends Component {
               e.message_type = 'QUERY'
               e.session_id = session_id
               e.page_id = window.location.pathname;
-              writer.write_event(e);
+              ubi_client.log_event(e);
             }
           }
           onChange={
@@ -431,7 +416,7 @@ class App extends Component {
                         e.event_attributes.data = new UbiData('product', genObjectId(), item.title, item);
                         e.event_attributes.data.data_id = item.id;
                         e.event_attributes.data.data_type = item.name;
-                        writer.write_event(e);
+                        ubi_client.log_event(e);
                     }
                   }
                   onDoubleClick={    
@@ -448,7 +433,7 @@ class App extends Component {
                         e.event_attributes.data.data_id = item.id;
                         e.event_attributes.data.transaction_id = genTransactionId()
                         e.event_attributes.data.data_type = item.name;
-                        writer.write_event(e);                       
+                        ubi_client.log_event(e);
                         console.log('User just bought ' + item.title);
                       } else {
                         let e = new UbiEvent('declined_product', user_id, QueryId());
@@ -460,7 +445,7 @@ class App extends Component {
                         e.event_attributes.data = new UbiData('product', genObjectId(), item.title, item);
                         e.event_attributes.data.data_id = item.id;
                         e.event_attributes.data.data_type = item.name;
-                        writer.write_event(e);
+                        ubi_client.log_event(e);
                         console.log('User declined to buy ' + item.title);
                       }
                     }
