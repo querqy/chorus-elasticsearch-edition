@@ -153,16 +153,31 @@ function genTransactionId(){
 
 
 
-
-
-//##################################################################
-//on document load, hook things up here
+//js EVENTS #############################################################
+//on document load, hook things up here that require a fully loaded page
 document.addEventListener('DOMContentLoaded', function () {
 
 
 });
+//###############
 
-//##################################################################
+function logClickPosition(event) {
+  let e = new UbiEvent('click', user_id, QueryId());
+  e.message = `(${event.offsetX}, ${event.offsetY})`
+  e.session_id = session_id;
+  e.page_id = window.location.pathname;
+
+  e.event_attributes.data = new UbiData('location', genObjectId(), e.message, event);
+  e.event_attributes.data.data_type = 'click_event';
+  e.event_attributes['offsetX'] = event.offsetX;
+  e.event_attributes['offsetY'] = event.offsetY;
+  e.event_attributes['clientX'] = event.clientX;
+  e.event_attributes['clientY'] = event.clientY;
+  ubi_client.log_event(e);
+   
+  }
+  document.addEventListener("click", logClickPosition);
+//EVENTS ###############################################################
 
 
 

@@ -1,1 +1,1 @@
-import { UbiWriter } from "./UbiWriter";
+import { UbiClient } from "./UbiClient";
