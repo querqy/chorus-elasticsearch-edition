@@ -1,7 +1,7 @@
 /**
  * Work in progress!
  * 
- * This file iullustrates how one might use the UbiClient to integrate with 
+ * This file illustrates how one might use the UbiClient to integrate with 
  * Search-collector: https://github.com/searchhub/search-collector
  */
 
