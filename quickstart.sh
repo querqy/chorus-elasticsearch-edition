@@ -40,12 +40,13 @@ do
       echo -e "Use the option --with-offline-lab | -lab to include Quepid and RRE services in Chorus."
       echo -e "Use the option --shutdown | -s to shutdown and remove the Docker containers and data."
       echo -e "Use the option --stop to stop the Docker containers."
+      echo -e "Use the option --online-deployment | -online to update configuration to run on chorus.dev.o19s.com environment."
 			exit
 			;;
     --with-offline-lab | -lab)
 			offline_lab=true
       echo -e "${MAJOR}Running Chorus with offline lab environment enabled\n${RESET}"
-			;;
+			;;		
     --shutdown | -s)
 			shutdown=true
       echo -e "${MAJOR}Shutting down Chorus\n${RESET}"
@@ -54,6 +55,10 @@ do
     	stop=true
       echo -e "${MAJOR}Stopping Chorus\n${RESET}"
     	;;
+    --online-deployment | -online)
+      local_deploy=false
+      log_major "Configuring Chorus for chorus-opensearch-edition.dev.o19s.com environment"
+      ;;	     
 	esac
 	shift
 done
@@ -62,6 +67,13 @@ services="opensearch opensearch-dashboards chorus-ui"
 
 if $offline_lab; then
   services="${services} quepid"
+fi
+
+if ! $local_deploy; then
+  echo -e "${MAJOR}Updating configuration files for online deploy${RESET}"
+  sed -i.bu 's/localhost:9200/chorus-opensearch-edition.dev.o19s.com:9200/g'  ./chorus_ui/src/Logs.js
+  sed -i.bu 's/localhost:9200/chorus-opensearch-edition.dev.o19s.com:9200/g'  ./opensearch/wait-for-os.sh
+  #sed -i.bu 's/localhost:9200/chorus-opensearch-edition.dev.o19s.com/g'  ./docker-compose.yml
 fi
 
 if $stop; then
