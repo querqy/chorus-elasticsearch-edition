@@ -72,6 +72,7 @@ fi
 if ! $local_deploy; then
   echo -e "${MAJOR}Updating configuration files for online deploy${RESET}"
   sed -i.bu 's/localhost:9200/chorus-opensearch-edition.dev.o19s.com:9200/g'  ./chorus_ui/src/Logs.js
+  sed -i.bu 's/127.0.0.1:9200/chorus-opensearch-edition.dev.o19s.com:9200/g'  ./chorus_ui/src/App.js
   sed -i.bu 's/localhost:9200/chorus-opensearch-edition.dev.o19s.com:9200/g'  ./opensearch/wait-for-os.sh
 fi
 
