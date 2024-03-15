@@ -162,13 +162,13 @@ document.addEventListener('DOMContentLoaded', function () {
 //###############
 
 function logClickPosition(event) {
-  let e = new UbiEvent('click', user_id, QueryId());
+  let e = new UbiEvent('global_click', user_id, QueryId());
   e.message = `(${event.offsetX}, ${event.offsetY})`
   e.session_id = session_id;
   e.page_id = window.location.pathname;
 
   e.event_attributes.data = new UbiData('location', genObjectId(), e.message, event);
-  e.event_attributes.data.data_type = 'click_event';
+  e.event_attributes.data.data_type = 'click_location';
   e.event_attributes['offsetX'] = event.offsetX;
   e.event_attributes['offsetY'] = event.offsetY;
   e.event_attributes['clientX'] = event.clientX;
