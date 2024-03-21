@@ -95,11 +95,12 @@ echo -e "${MAJOR}Waiting for OpenSearch to start up and be online.${RESET}"
 
 echo -e "${MAJOR}Creating ecommerce index, defining its mapping & settings\n${RESET}"
 curl -s -X PUT "localhost:9200/ecommerce/" -H 'Content-Type: application/json' --data-binary @./opensearch/schema.json
+echo -e "\n"
 
 # Initialize the UBI store for the ecommerce setup
 echo -e "${MAJOR}Creating UBI settings, defining its mapping & settings\n${RESET}"
 curl -X PUT "localhost:9200/_plugins/ubi/log?index=ecommerce"
-
+echo -e "\n"
 
 # Populating product data for non-vector search
 if [ ! -f ./icecat-products-w_price-19k-20201127.tar.gz ]; then
