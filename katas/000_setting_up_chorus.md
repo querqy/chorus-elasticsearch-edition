@@ -1,5 +1,8 @@
 # Kata 000: Setting up Chorus
 
+> [!NOTE]  
+> The steps here are wrapped up in the `quickstart.sh` but are hear to help you learn how the parts fit together.
+
 We use a Docker Compose based environment to manage and firing up all the components of the Chorus stack. Then you will have to load the data and configure the components.
 
 Open up a terminal window and run:
@@ -8,6 +11,14 @@ Open up a terminal window and run:
 It will take a while to download the data and build all the Docker images!  You may think it's frozen at various points, but be patient - it'll be up and running eventually.
 
 Now we need to load our sample product data into Chorus.  Open a second terminal window, so you can see how the various system respond, as you work with Chorus.
+
+Let's first set up our ecommerce index in OpenSearch with some predefined settings and basic mappings:
+
+> curl -s -X PUT "localhost:9200/ecommerce/" -H 'Content-Type: application/json' --data-binary @./opensearch/schema.json
+
+We also have integrated into the the ability to track what users are doing, which we call _User Behavior Insights (UBI)_.   Let's set that up:
+
+> curl -X PUT "localhost:9200/_plugins/ubi/log?index=ecommerce"
 
 Grab the sample dataset of ~19k products by running this command from the root directory of the Chorus checkout:
 
@@ -19,13 +30,10 @@ First, we have to uncompress the data:
 
 Next, we need to format the data before we can index it into Elasticsearch. For that run the script `transform_data.sh`:
 
-> ./transform_data.sh > transformed_data.json
+> ./opensearch/transform_data.sh > transformed_data.json
 
 This can take a while. The script takes the freshly extracted JSON data and transforms it in a way, so it can be used by the [OpenSearch's Bulk API](https://opensearch.org/docs/latest/api-reference/document-apis/bulk/).
 
-Before we can index the data, we have to create an index with some predefined settings and a basic mapping:
-
-> curl -s -X PUT "localhost:9200/ecommerce/" -H 'Content-Type: application/json' --data-binary @./opensearch/schema.json
 
 With the index created and the data in a suitable format, we can go ahead and index the data into OpenSearch:
 
@@ -41,11 +49,11 @@ Now we want to pivot to setting up our Offline Testing Environment. Today we hav
 
 First we need to create the database for Quepid:
 
-> docker-compose run --rm quepid bin/rake db:setup
+> docker compose run --rm quepid bundle exec bin/rake db:setup
 
 We also need to create an account with Administrator permissions:
 
-> docker-compose run quepid thor user:create -a admin@choruselectronics.com "Chorus Admin" password
+> docker compose run quepid bundle exec thor user:create -a admin@choruselectronics.com "Chorus Admin" password
 
 Visit Quepid at http://localhost:3000 and log in with the email and password you just set up.
 

@@ -102,31 +102,20 @@ echo -e "${MAJOR}Creating UBI settings, defining its mapping & settings\n${RESET
 curl -X PUT "localhost:9200/_plugins/ubi/log?index=ecommerce"
 echo -e "\n"
 
-# Populating product data for non-vector search
+echo -e "${MAJOR}Prepping Data for Ingestion\n${RESET}"
 if [ ! -f ./icecat-products-w_price-19k-20201127.tar.gz ]; then
-  echo -e "${MAJOR}Downloading the sample product data\n${RESET}"
+  echo -e "${MINOR}Downloading the sample product data\n${RESET}"
   wget https://querqy.org/datasets/icecat/icecat-products-w_price-19k-20201127.tar.gz
 fi
 
 if [ ! -f ./icecat-products-w_price-19k-20201127.json ]; then
-  echo -e "${MAJOR}Unpacking the sample product data, please give it a few minutes!\n${RESET}"
+  echo -e "${MINOR}Unpacking the sample product data, please give it a few minutes!\n${RESET}"
   tar xzf icecat-products-w_price-19k-20201127.tar.gz
 fi
 
 if [ ! -f ./transformed_data.json ]; then
-  output=transformed_data.json
-
-  for row in $(cat icecat-products-w_price-19k-20201127.json | jq -r '.[] | @base64'); do
-      my_line=$(echo ${row} | base64 --decode)
-      _id() {
-       echo ${my_line} | jq -r .id
-      }
-      _jq() {
-       echo ${my_line} | jq -r ${1}
-      }
-     echo { \"index\" : {\"_id\" : \"$(_id)\"}} >> ${output}
-     echo $(_jq '.') >> ${output}
-  done
+  echo -e "${MINOR}Transforming the sample product data into JSON format, please give it a few minutes!\n${RESET}"
+  ./opensearch/transform_data.sh > transformed_data.json
 fi
 echo -e "${MAJOR}Indexing the sample product data, please wait...\n${RESET}"
 curl -s -X PUT "localhost:9200/ecommerce/_settings"  -H 'Content-Type: application/json' -d '{"index.mapping.total_fields.limit": 20000}'
