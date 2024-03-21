@@ -11,7 +11,7 @@ const event_server =  ((sessionStorage.hasOwnProperty('event_server')) ?
 const log_store_events =  ((sessionStorage.hasOwnProperty('log_store')) ?
 			//convert the log_store into just the event log store
           '.' + sessionStorage.getItem('log_store') + '_events'
-          : '.' + 'ubi_log' + '_events');
+          : '.' + 'log' + '_events');
 
 
 //TODO: auto refresh.
