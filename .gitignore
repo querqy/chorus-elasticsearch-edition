@@ -2,6 +2,7 @@
 transformed_data.json
 icecat-products-w_price-19k-20201127.tar.gz
 icecat-products-w_price-19k-20201127.json
+elasticsearch/data
 *.bu
 *.DS_Store
 .*.json

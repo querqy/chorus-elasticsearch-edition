@@ -19,7 +19,7 @@ services:
       node.name: opensearch
       plugins.security.disabled: "true"
 #      See https://forum.opensearch.org/t/how-to-enable-cors-cross-origin-resource-sharing/426/3 for more
-      http.cors.enabled: true 
+      http.cors.enabled: true
 #      Warning: this is opening it up to all cross domains
 #      http.cors.allow-origin: "http://localhost"...
       http.cors.allow-origin: "*"

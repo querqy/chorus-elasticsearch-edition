@@ -37,6 +37,7 @@ while [ ! $# -eq 0 ]
 do
 	case "$1" in
 		--help | -h)
+		  echo -e "Use the option --with-vector-search | -vector to include Vector services in Chorus."
       echo -e "Use the option --with-offline-lab | -lab to include Quepid and RRE services in Chorus."
       echo -e "Use the option --shutdown | -s to shutdown and remove the Docker containers and data."
       echo -e "Use the option --stop to stop the Docker containers."
@@ -46,7 +47,7 @@ do
     --with-offline-lab | -lab)
 			offline_lab=true
       echo -e "${MAJOR}Running Chorus with offline lab environment enabled\n${RESET}"
-			;;		
+			;;
     --shutdown | -s)
 			shutdown=true
       echo -e "${MAJOR}Shutting down Chorus\n${RESET}"
@@ -58,7 +59,7 @@ do
     --online-deployment | -online)
       local_deploy=false
       echo -e "${MAJOR}Configuring Chorus for chorus-opensearch-edition.dev.o19s.com environment\n${RESET}"
-      ;;	     
+      ;;
 	esac
 	shift
 done
