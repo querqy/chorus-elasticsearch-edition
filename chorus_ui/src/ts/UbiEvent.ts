@@ -1,5 +1,9 @@
 import { integer } from "@opensearch-project/opensearch/api/types";
 
+/**
+ * Ubi Event data structures
+ */
+
 
 export class UbiEventData {
 	public readonly data_type:string;

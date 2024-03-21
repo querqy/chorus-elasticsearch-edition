@@ -1,6 +1,14 @@
+/**
+ * Work in progress!
+ * 
+ * This file illustrates how one might use the UbiClient to integrate with 
+ * Search-collector: https://github.com/searchhub/search-collector
+ */
+
+
 import {Writer} from "search-collector";
 //import {} from '../search_collector.window.bundle'
-import {UbiLogger} from "./UbiLogger";
+import {UbiClient} from "./UbiClient";
 import { UbiEvent } from "./UbiEvent";
 
 /*
@@ -36,15 +44,15 @@ const {
 */
 
 /**
- * This connects the UbiLogger to the search-collector's DemoWriter code
+ * This connects the UbiClient to the search-collector's DemoWriter code
  */
 export class UbiWriter implements Writer {
-	private readonly logger:UbiLogger;
+	private readonly ubi_client:UbiClient;
 
 	constructor(olUrl, channel, queryResolver, sessionResolver, debug) {
 
 
-		this.logger = new UbiLogger(olUrl, channel);
+		this.ubi_client = new UbiClient(olUrl, channel);
 
 		const localstorageWriter = {
 			write: (data) => {
@@ -72,14 +80,14 @@ export class UbiWriter implements Writer {
 	write(data) {
 		//TODO: chicken/egg?
 
-		//this.logger.info(data);
+		//this.ubi_client.info(data);
 		//this.writer.write(data);
 		console.warn('EVENT WRITE => ' + JSON.stringify(data));
 	}
 
 	write_event(e:UbiEvent){
 		//console.log('about to log');
-		this.logger.log_event(e);
+		this.ubi_client.log_event(e);
 		console.log('Just logged: ' + e.toJson());
 	}
 }

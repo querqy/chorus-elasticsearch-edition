@@ -1,10 +1,9 @@
 import axios, {AxiosRequestConfig, AxiosProxyConfig, AxiosInstance} from "axios";
-import {Client} from '@opensearch-project/opensearch'
 import { UbiEvent } from "./UbiEvent";
 
 /**
- * Methods and client to talk directly with OpenSearch for logging
- *
+ * Methods and client to talk directly with the OpenSearch Ubi plugin
+ * for logging events
  */
 
 
@@ -12,7 +11,7 @@ import { UbiEvent } from "./UbiEvent";
 /**
  * Class to handle OpenSearch authentication (eventually) log connectivity
  */
-export class UbiLogger {
+export class UbiClient {
     static readonly API = '/_plugins/ubi/';
 
     private readonly baseUrl:string;
@@ -20,23 +19,31 @@ export class UbiLogger {
     private readonly ubi_store:string;
 	private readonly rest_client:AxiosInstance; //client for direct http work
 	private readonly rest_config:AxiosRequestConfig;
-    private readonly os_client:Client;       //client for OpenSearch easier, general interactions
     private user_id:string;
     private session_id:string;
+    private search_index:string;
+    private index_field:string;
+    private verbose:number=0;
+
+
+    //TODO: ubi headers/cookies
+    //TODO: capture response and request headers
 
     constructor(baseUrl:string, ubi_store:string, user_id:string=null, session_id:string=null) {
 
 
         //TODO: param checking
         this.baseUrl = baseUrl;
-        this.url = baseUrl + UbiLogger.API;
+        this.url = baseUrl + UbiClient.API;
         this.ubi_store = ubi_store;
 
         this.user_id = (user_id != null) ? user_id : sessionStorage.getItem('user_id');
         this.session_id = (session_id != null) ? session_id : sessionStorage.getItem('session_id');
 
-        //TODO: uncomment to work through webpack fallback errors
-        // this.os_client = new Client({node:baseUrl});
+        //TODO: make these parameters when the interface is more finalized
+        this.search_index = sessionStorage.getItem('search_index');
+        this.index_field = sessionStorage.getItem('index_field');
+
 
         //TODO: add authentication
         this.rest_config = {
@@ -70,29 +77,61 @@ export class UbiLogger {
             withCredentials:true
         });
 
-        //TODO: init if it doesn't exist
-        //this.init();
-    }
 
-    init(){
-        try{
-            const response = this.rest_client.put(this.url + this.ubi_store , null, this.rest_config).then(
-                (response) => {
-                    console.log('Inititializing ' + this.ubi_store + ': ' + JSON.stringify(response));
-                  }
-            ).catch(
-                (error) => {
-                    console.error('Error initializing ' + this.ubi_store + ': ' + error);
-                  } 
-            )
-        } catch(error){
-            console.error('Error initializing ' + this.ubi_store + ': ' + error);
+        //if the ubi store doesn't exist, create it
+        if(this.get_stores().indexOf(this.ubi_store) != -1){
+            this.init();
         }
+
     }
 
-    //TODO: ubi headers/cookies
-    //TODO: init event stores
-    //TODO: capture response and request headers
+    /**
+     * 
+     * @returns All available Ubi stores
+     */
+    get_stores(){
+        const response = this._get(this.url).then(
+        (response) => {
+            if(response.status == 200){
+                console.log('Listing stores: ' + JSON.stringify(response));
+                return response['data']['stores'];
+            }
+            }
+        ).catch(
+            (error) => {
+                console.warn('Error querying stores: ' + error);
+                console.warn('Ubi Store ' + this.ubi_store + ' needs to be initialized');
+                } 
+        )
+    
+        return []
+    }
+
+    /**
+     * Initialize the Ubi store
+     * @returns true, if the store is created
+     */
+    init(){
+        if( this.search_index == null || this.index_field == null){
+            try{
+                const response = this._put(this.url + this.ubi_store + '/index=' + this.search_index).then(
+                    (response) => {
+                        console.log('Inititializing ' + this.ubi_store + ': ' + JSON.stringify(response));
+                        return true;
+                    }
+                ).catch(
+                    (error) => {
+                        console.error('Error initializing ' + this.ubi_store + ': ' + error);
+                    } 
+                )
+            } catch(error){
+                console.error('Error initializing ' + this.ubi_store + ': ' + error);
+            } 
+        } else {
+            console.error('Cannot initialize Ubi store.');
+        }
+        return false;
+    }
 
     async log_event(e:UbiEvent, message:string=null, message_type:string=null){
         if(message){
@@ -106,31 +145,18 @@ export class UbiLogger {
                 e.message_type = message_type;
             }
         }
+        const json = e.toJson();
+        if(this.verbose > 0){
+            console.log('POSTing event: ' + json);
+        }
 
-        return this._post(e.toJson());
-    }
-
-    async log(level, message:string, data=null){
-        var json = (data == null) ?
-            JSON.stringify({'level':level, 'text': message}) :
-            JSON.stringify({'level':level, 'text': message, 'data':data});
         return this._post(json);
     }
 
-    async debug(message:string, data=null){
-        return this.log('DEBUG', message, data)
-    }
-    async info(message:string, data=null){
-        return this.log('INFO', message, data)
-    }
-    async error(message:string, data=null){
-        return this.log('ERROR', message, data)
-    }
-
     /**
-     * Delete the index.  Allow clients to do this?
+     * Delete the ubi store.  Allow clients to do this?
      * @returns
-     */
+     *
     async delete() {
         try {
             const response = await this.rest_client.delete(this.url + this.ubi_store, this.rest_config )
@@ -139,9 +165,10 @@ export class UbiLogger {
             console.error(error);
         }
     }
+    */
     async _get(url) {
         try {
-            const response = await this.rest_client.get(url);
+            const response = await this.rest_client.get(url, this.rest_config);
             return response.data;
         } catch (error) {
             console.error(error);

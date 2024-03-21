@@ -133,7 +133,6 @@ curl -s -X PUT "localhost:9200/ecommerce/_settings"  -H 'Content-Type: applicati
 curl -s -X POST "localhost:9200/ecommerce/_bulk?pretty" -H 'Content-Type: application/json' --data-binary @transformed_data.json
 
 
-
 if $offline_lab; then
   echo -e "${MAJOR}Setting up Quepid${RESET}"
   docker compose run --rm quepid bundle exec bin/rake db:setup
