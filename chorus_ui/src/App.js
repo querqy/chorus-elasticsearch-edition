@@ -27,7 +27,7 @@ const event_server = "http://127.0.0.1:9200";
 const search_credentials = "*:*";
 const search_store = 'ecommerce'
 const search_field = 'name'
-const ubi_store = 'ubi_log'
+const ubi_store = 'log'
 
 const user_id = 'USER-eeed-43de-959d-90e6040e84f9'; // demo user id
 const session_id = ((sessionStorage.hasOwnProperty('session_id')) ?
