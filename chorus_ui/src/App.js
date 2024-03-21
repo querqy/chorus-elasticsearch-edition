@@ -20,7 +20,7 @@ var UbiData = require('./ts/UbiEvent.ts').UbiEventData;
 // global variables
 const event_server = "http://127.0.0.1:9200";
 const search_credentials = "*:*";
-const search_store = 'ecommerce'
+const search_index = 'ecommerce'
 const index_field = 'name'
 const ubi_store = 'log'
 
