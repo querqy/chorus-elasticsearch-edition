@@ -37,9 +37,10 @@ while [ ! $# -eq 0 ]
 do
 	case "$1" in
 		--help | -h)
-      echo -e "Use the option --with-offline-lab | -lab to include Quepid and RRE services in Chorus."
-      echo -e "Use the option --shutdown | -s to shutdown and remove the Docker containers and data."
-      echo -e "Use the option --stop to stop the Docker containers."
+	    echo -e "Use the option --with-offline-lab | -lab to include Quepid and RRE services in Chorus."
+	    echo -e "Use the option --shutdown | -s to shutdown and remove the Docker containers and data."
+	    echo -e "Use the option --stop to stop the Docker containers."
+	    echo -e "Use the option --online-deployment | -online to update configuration to run on chorus.dev.o19s.com environment."
 			exit
 			;;
     --with-offline-lab | -lab)
@@ -54,6 +55,10 @@ do
     	stop=true
       echo -e "${MAJOR}Stopping Chorus\n${RESET}"
     	;;
+    --online-deployment | -online)
+      local_deploy=false
+      echo -e "${MAJOR}Configuring Chorus for chorus-opensearch-edition.dev.o19s.com environment\n${RESET}"
+      ;;
 	esac
 	shift
 done
@@ -62,6 +67,13 @@ services="opensearch opensearch-dashboards chorus-ui"
 
 if $offline_lab; then
   services="${services} quepid"
+fi
+
+if ! $local_deploy; then
+  echo -e "${MAJOR}Updating configuration files for online deploy${RESET}"
+  sed -i.bu 's/localhost:9200/chorus-opensearch-edition.dev.o19s.com:9200/g'  ./chorus_ui/src/Logs.js
+  sed -i.bu 's/127.0.0.1:9200/chorus-opensearch-edition.dev.o19s.com:9200/g'  ./chorus_ui/src/App.js
+  sed -i.bu 's/localhost:9200/chorus-opensearch-edition.dev.o19s.com:9200/g'  ./opensearch/wait-for-os.sh
 fi
 
 if $stop; then
@@ -80,8 +92,15 @@ docker compose up -d --build ${services}
 echo -e "${MAJOR}Waiting for OpenSearch to start up and be online.${RESET}"
 ./opensearch/wait-for-os.sh # Wait for OpenSearch to be online
 
+
 echo -e "${MAJOR}Creating ecommerce index, defining its mapping & settings\n${RESET}"
 curl -s -X PUT "localhost:9200/ecommerce/" -H 'Content-Type: application/json' --data-binary @./opensearch/schema.json
+echo -e "\n"
+
+# Initialize the UBI store for the ecommerce setup
+echo -e "${MAJOR}Creating UBI settings, defining its mapping & settings\n${RESET}"
+curl -X PUT "localhost:9200/_plugins/ubi/log?index=ecommerce"
+echo -e "\n"
 
 # Populating product data for non-vector search
 if [ ! -f ./icecat-products-w_price-19k-20201127.tar.gz ]; then
@@ -113,15 +132,11 @@ echo -e "${MAJOR}Indexing the sample product data, please wait...\n${RESET}"
 curl -s -X PUT "localhost:9200/ecommerce/_settings"  -H 'Content-Type: application/json' -d '{"index.mapping.total_fields.limit": 20000}'
 curl -s -X POST "localhost:9200/ecommerce/_bulk?pretty" -H 'Content-Type: application/json' --data-binary @transformed_data.json
 
-# Initialize the UBI store called "ubi_log" and listen for queries on the "ecommerce" index
-curl -X PUT "localhost:9200/_plugins/ubi/ubi_log?index=ecommerce&id_field=name"
 
 if $offline_lab; then
-
   echo -e "${MAJOR}Setting up Quepid${RESET}"
   docker compose run --rm quepid bundle exec bin/rake db:setup
   docker compose run quepid bundle exec thor user:create -a admin@choruselectronics.com "Chorus Admin" password
-
 fi
 
 echo -e "${MAJOR}Welcome to Chorus OpenSearch Edition!${RESET}"
