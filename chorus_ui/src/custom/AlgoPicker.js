@@ -3,7 +3,7 @@ import Title from '../styles/Title';
 import Container from '../styles/Container';
 import {getClassName} from '@appbaseio/reactivecore/lib/utils/helper';
 
-var UbiWriter = require('.././ts/UbiWriter.ts').UbiWriter;
+var UbiClient = require('.././ts/UbiClient.ts').UbiClient;
 var Ubi = require('.././ts/UbiEvent.ts');
 
 //TODO: change name to something like ChoicePicker
@@ -26,8 +26,8 @@ class AlgoPicker extends Component {
 
     console.log('SortPicker.onChange ' + selection);
 
-    if('writer' in this.props){
-      const writer = this.props['writer']
+    if('ubi_client' in this.props){
+      const ubi_client = this.props['ubi_client']
       const user_id = this.props['user_id'];
       const query_id = this.props['query_id'];
       const session_id = this.props['session_id'];
@@ -36,7 +36,7 @@ class AlgoPicker extends Component {
       e.message_type = 'SORT'
       e.event_attributes['session_id'] = session_id;
       e.event_attributes.data = new Ubi.UbiEventData('sort_event', 'fake object id', ''. event);
-      writer.write_event(e);
+      ubi_client.log_event(e);
     }
     else
       console.log('null writer');
