@@ -37,8 +37,7 @@ while [ ! $# -eq 0 ]
 do
 	case "$1" in
 		--help | -h)
-		  echo -e "Use the option --with-vector-search | -vector to include Vector services in Chorus."
-      echo -e "Use the option --with-offline-lab | -lab to include Quepid and RRE services in Chorus."
+		  echo -e "Use the option --with-offline-lab | -lab to include Quepid and RRE services in Chorus."
       echo -e "Use the option --shutdown | -s to shutdown and remove the Docker containers and data."
       echo -e "Use the option --stop to stop the Docker containers."
       echo -e "Use the option --online-deployment | -online to update configuration to run on chorus.dev.o19s.com environment."
@@ -93,6 +92,10 @@ docker compose up -d --build ${services}
 echo -e "${MAJOR}Waiting for OpenSearch to start up and be online.${RESET}"
 ./opensearch/wait-for-os.sh # Wait for OpenSearch to be online
 
+# Initialize the UBI store called "log"
+echo -e "${MAJOR}Creating UBI settings, defining its mapping & settings\n${RESET}"
+curl -X PUT "localhost:9200/_plugins/ubi/log?index=ecommerce"
+
 echo -e "${MAJOR}Creating ecommerce index, defining its mapping & settings\n${RESET}"
 curl -s -X PUT "localhost:9200/ecommerce/" -H 'Content-Type: application/json' --data-binary @./opensearch/schema.json
 
@@ -126,15 +129,12 @@ echo -e "${MAJOR}Indexing the sample product data, please wait...\n${RESET}"
 curl -s -X PUT "localhost:9200/ecommerce/_settings"  -H 'Content-Type: application/json' -d '{"index.mapping.total_fields.limit": 20000}'
 curl -s -X POST "localhost:9200/ecommerce/_bulk?pretty" -H 'Content-Type: application/json' --data-binary @transformed_data.json
 
-# Initialize the UBI store called "log"
-curl -X PUT "localhost:9200/_plugins/ubi/log"
+
 
 if $offline_lab; then
-
   echo -e "${MAJOR}Setting up Quepid${RESET}"
   docker compose run --rm quepid bundle exec bin/rake db:setup
   docker compose run quepid bundle exec thor user:create -a admin@choruselectronics.com "Chorus Admin" password
-
 fi
 
 echo -e "${MAJOR}Welcome to Chorus OpenSearch Edition!${RESET}"
