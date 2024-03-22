@@ -10,6 +10,7 @@ import {
 } from "@appbaseio/reactivesearch";
 import AlgoPicker from './custom/AlgoPicker';
 import { UbiClient } from "./ts/UbiClient.ts";
+import chorusLogo from './assets/chorus-logo.png';
 
 var UbiEvent = require('./ts/UbiEvent.ts').UbiEvent;
 var UbiAttributes = require('./ts/UbiEvent.ts').UbiEventAttributes;
@@ -28,6 +29,8 @@ const user_id = 'USER-eeed-43de-959d-90e6040e84f9'; // demo user id
 const session_id = ((sessionStorage.hasOwnProperty('session_id')) ?
           sessionStorage.getItem('session_id') 
           : 'SESSION-' + guiid()); //<- new fake session, otherwise it should reuse the sessionStorage version
+
+
 
 const ubi_client = new  UbiClient(event_server, ubi_store, user_id, session_id);
 
@@ -218,7 +221,7 @@ class App extends Component {
 
   render(){
   return (
-    //TODO: move url and other configs to proerties file
+    //TODO: move url and other configs to properties file
     <ReactiveBase
       componentId="market-place"
       url={event_server}
@@ -274,8 +277,11 @@ class App extends Component {
           
       />
       <div style={{ height: "200px", width: "100%"}}>
-        <img style={{ height: "100%", class: "center"  }} src={require('./assets/chorus-logo.png').default} />
+        <img style={{ height: "100%", class: "center"  }} src={chorusLogo} />
       </div>
+      
+      Your User ID: {user_id} | Your Session ID: {session_id}
+      
       <div style={{ display: "flex", flexDirection: "row" }}>
         <div
           style={{
