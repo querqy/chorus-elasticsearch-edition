@@ -32,6 +32,8 @@ Want to stay up-to-date with the community? Visit https://querqy.org/ to learn m
 
 # What Runs Where
 
+**We haven't been using the online demo much so to save costs it has been turned off.  If you would like a demo send me an email at epugh@opensourceconnections.com and I'll be happy to turn it on!**
+
 * The UI (Reactivesearch) runs at http://localhost:4000  |  http://chorus-es-edition.dev.o19s.com:4000
 * Elasticsearch runs at http://localhost:9200  |  http://chorus-es-edition.dev.o19s.com:9200
 * Kibana runs at http://localhost:5601  |  http://chorus-es-edition.dev.o19s.com:5601
