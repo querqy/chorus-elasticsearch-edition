@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useStore } from "../store/useStore";
 import logo from "../assets/chorus-logo.png";
 import Sidebar from "../components/layout/Sidebar";
@@ -10,21 +10,18 @@ export default function Home() {
   const setSearchQuery = useStore((state) => state.setSearchQuery);
   const executeSearch = useStore((state) => state.executeSearch);
   const totalResults = useStore((state) => state.totalResults);
-
   const loadInitialData = useStore((state) => state.loadInitialData);
   const loading = useStore((state) => state.isLoading || state.loading);
 
-  // Initial load
   useEffect(() => {
     if (loadInitialData) loadInitialData();
     else executeSearch();
-  }, []);
+  }, [loadInitialData, executeSearch]);
 
-  // Search-as-you-type (Debounced)
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       executeSearch();
-    }, 300); // 300ms delay to prevent spamming backend
+    }, 300);
 
     return () => clearTimeout(delayDebounceFn);
   }, [searchQuery, executeSearch]);
@@ -90,14 +87,11 @@ export default function Home() {
           <Sidebar />
         </aside>
 
-        {/* 1. Changed p-4 to pt-4 px-4 pb-2 to reduce bottom padding */}
         <main className="flex-1 flex flex-col h-full overflow-hidden border border-gray-200 rounded-lg pt-4 px-4 pb-2 shadow-sm bg-gray-50">
-          {/* 2. Changed pb-4 to pb-2 */}
           <div className="flex-grow overflow-y-auto pr-2 pb-2">
             <ProductGrid />
           </div>
 
-          {/* 3. Changed mt-8 to mt-2, and pt-6 to pt-3 */}
           <div className="mt-2 flex justify-center border-t border-gray-200 pt-3">
             <Pagination />
           </div>

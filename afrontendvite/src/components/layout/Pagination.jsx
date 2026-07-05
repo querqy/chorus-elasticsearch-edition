@@ -1,5 +1,4 @@
-import React from 'react';
-import { useStore } from '../../store/useStore';
+import { useStore } from "../../store/useStore";
 
 export default function Pagination() {
   const currentPage = useStore((state) => state.currentPage) || 1;
@@ -12,11 +11,11 @@ export default function Pagination() {
   const getVisiblePages = () => {
     let start = Math.max(1, currentPage - 2);
     let end = Math.min(totalPages, start + 4);
-    
+
     if (end - start < 4) {
       start = Math.max(1, end - 4);
     }
-    
+
     return Array.from({ length: end - start + 1 }, (_, i) => start + i);
   };
 
@@ -26,29 +25,29 @@ export default function Pagination() {
 
   return (
     <div className="flex items-center justify-center gap-1 my-2">
-      <button 
+      <button
         onClick={() => setPage(currentPage - 1)}
         disabled={currentPage === 1}
         className="px-3 py-1 bg-gray-100 text-gray-400 rounded text-sm hover:bg-gray-200 disabled:opacity-50"
       >
         Prev
       </button>
-      
+
       {pages.map((page) => (
         <button
           key={page}
           onClick={() => setPage(page)}
           className={`px-3 py-1 rounded text-sm border ${
-            currentPage === page 
-              ? 'bg-blue-600 text-white border-blue-600' 
-              : 'bg-gray-100 text-gray-700 border-transparent hover:bg-gray-200 hover:border-gray-300'
+            currentPage === page
+              ? "bg-blue-600 text-white border-blue-600"
+              : "bg-gray-100 text-gray-700 border-transparent hover:bg-gray-200 hover:border-gray-300"
           }`}
         >
           {page}
         </button>
       ))}
 
-      <button 
+      <button
         onClick={() => setPage(currentPage + 1)}
         disabled={currentPage >= totalPages}
         className="px-3 py-1 bg-gray-100 text-gray-700 rounded text-sm hover:bg-gray-200 disabled:opacity-50"
