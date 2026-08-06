@@ -46,8 +46,8 @@ services:
     depends_on:
       opensearch:
         condition: service_healthy
-      opensearch-mcp-server-py:
-        condition: service_healthy
+      #opensearch-mcp-server-py:
+        #condition: service_healthy
   
   opensearch-mcp-server-py:
     container_name: opensearch-mcp-server-py
@@ -77,9 +77,14 @@ services:
 
   opensearch:
     container_name: opensearch
-    image: opensearchstaging/opensearch:3.7.0
-    #build: ./opensearch/.
-    
+    # Must NOT be tagged opensearchstaging/opensearch:3.7.0 (the base image the
+    # Dockerfile's FROM line pulls from) — reusing that tag makes our own build
+    # output shadow the upstream base image locally, so the next build's FROM
+    # resolves to our already-patched image instead of the pristine upstream one,
+    # and the plugin install step fails with "plugin directory already exists".
+    image: chorus/opensearch-with-ubi-plugin:3.7.0
+    build: ./opensearch/.
+
     environment:
       discovery.type: single-node
       node.name: opensearch

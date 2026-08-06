@@ -4,7 +4,9 @@ opensearch-mcp-server-py/opensearch-mcp-server-py/
 opensearch-dashboards/OpenSearch-Dashboards/
 .env
 build/
+.gradle/
 .idea/
+opensearch/ubi-hits-search-pipeline.zip
 .vscode/
 *.bu
 *.DS_Store

@@ -52,6 +52,10 @@ if ! [ -x "$(command -v wget)" ]; then
   echo "${ERROR}Error: wget is not installed.${RESET}" >&2
   exit 1
 fi
+if ! [ -x "$(command -v java)" ]; then
+  echo "${ERROR}Error: java is not installed (needed to build the ubi-hits-search-pipeline-plugin).${RESET}" >&2
+  exit 1
+fi
 
 while [ ! $# -eq 0 ]
 do
@@ -170,10 +174,11 @@ docker compose down -t 30
 # Using pre-prepared sample data instead of downloading and transforming
 echo -e "${MAJOR}Using pre-prepared sample data for quicker startup\n${RESET}"
 
+echo -e "${MAJOR}Compiling the ubi-hits-search-pipeline OpenSearch plugin...${RESET}"
+(cd ubi-hits-search-pipeline-plugin && ./gradlew build --console=plain)
+cp ubi-hits-search-pipeline-plugin/build/distributions/ubi-hits-search-pipeline-*.zip ./opensearch/ubi-hits-search-pipeline.zip
 
-
-
-docker compose up -d --build ${services} 
+docker compose up -d --build ${services}
 
 echo -e "${MAJOR}Waiting for OpenSearch to start up and be online.${RESET}"
 ./opensearch/wait-for-os.sh # Wait for OpenSearch to be online
@@ -310,6 +315,17 @@ os_curl -s -X PUT "$OS_URL/_ingest/pipeline/embeddings-pipeline" \
 
 echo -e "${MAJOR}Setting up User Behavior Insights indexes...\n${RESET}"
 os_curl -s -X POST "$OS_URL/_plugins/ubi/initialize"
+
+echo -e "${MAJOR}Creating capture-replay-index search pipeline...\n${RESET}"
+os_curl -s -X PUT "$OS_URL/_search/pipeline/capture-replay-index" \
+  -H 'Content-Type: application/json' \
+  --data-binary '{
+    "description": "Expands ubi_queries query_response_hit_ids into individual search hits",
+    "response_processors": [
+      { "ubi_hits_to_docs": {} }
+    ]
+  }'
+echo -e "\n"
 
 echo -e "${MAJOR}Creating ecommerce index, defining its mapping & settings\n${RESET}"
 os_curl -s -X PUT "$OS_URL/ecommerce" -H 'Content-Type: application/json' --data-binary @./opensearch/schema.json

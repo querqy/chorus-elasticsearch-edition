@@ -1,0 +1,60 @@
+plugins {
+    id 'java'
+}
+
+group = 'org.opensearch.search.pipeline.ubi'
+version = '1.0.0'
+
+// Must match the OpenSearch version running in this repo's docker-compose.yml
+// (opensearchstaging/opensearch:3.7.0). A plugin built against any other
+// version will be rejected at node startup with a version mismatch error.
+ext.opensearchVersion = '3.7.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Deliberately only depend on the core server jar (never search-pipeline-common
+    // or any other module/plugin artifact) — OpenSearch gives each plugin its own
+    // isolated classloader, so classes from other modules are NOT visible at
+    // runtime even if they're bundled in the same distribution. Building against
+    // only `server` guarantees everything we reference is on every plugin's classpath.
+    compileOnly "org.opensearch:opensearch:${opensearchVersion}"
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+def pluginName = 'ubi-hits-search-pipeline'
+
+jar {
+    archiveBaseName.set(pluginName)
+}
+
+processResources {
+    expand(
+        'name': pluginName,
+        'description': 'Expands ubi_queries query_response_hit_ids into individual search hits',
+        'version': version,
+        'opensearchVersion': opensearchVersion,
+        'className': 'org.opensearch.search.pipeline.ubi.UbiHitsPlugin'
+    )
+}
+
+// Bundles the jar + plugin-descriptor.properties into the zip layout
+// `bin/opensearch-plugin install` expects.
+tasks.register('bundlePlugin', Zip) {
+    dependsOn jar
+    archiveFileName.set("${pluginName}-${version}.zip")
+    destinationDirectory.set(file("${buildDir}/distributions"))
+    from(jar.archiveFile) { into('') }
+    from(processResources) {
+        include 'plugin-descriptor.properties'
+        into('')
+    }
+}
+
+build.dependsOn bundlePlugin
