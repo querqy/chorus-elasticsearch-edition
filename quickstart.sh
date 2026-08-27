@@ -35,6 +35,8 @@ offline_lab=false
 local_deploy=true
 vector_search=false
 stop=false
+default_es_proxy="http://localhost:9200"
+es_proxy="${default_es_proxy}"
 
 while [ ! $# -eq 0 ]
 do
@@ -46,6 +48,7 @@ do
       echo -e "Use the option --shutdown | -s to shutdown and remove the Docker containers and data."
       echo -e "Use the option --stop to stop the Docker containers."
       echo -e "Use the option --online-deployment | -online to update configuration to run on chorus-es-edition.dev.o19s.com environment."
+      echo -e "Use the option --es-proxy <url> to point the frontend at an Elasticsearch URL other than ${default_es_proxy}."
 			exit
 			;;
 		--with-observability | -obs)
@@ -63,6 +66,11 @@ do
     --with-vector-search | -vector)
         vector_search=true
         echo -e "${MAJOR}Configuring Chorus with vector search services enabled${RESET}"
+        ;;
+    --es-proxy)
+        es_proxy="$2"
+        echo -e "${MAJOR}Configuring frontend to use Elasticsearch proxy at ${es_proxy}${RESET}"
+        shift
         ;;
     --shutdown | -s)
 			shutdown=true
@@ -91,6 +99,10 @@ if ! $local_deploy; then
   sed -i.bu 's/keycloak:9080/chorus-es-edition.dev.o19s.com:9080/g'  ./keycloak/wait-for-keycloak.sh
   sed -i.bu 's/keycloak:9080/chorus-es-edition.dev.o19s.com:9080/g'  ./docker-compose.yml
   sed -i.bu 's/localhost:9200/chorus-es-edition.dev.o19s.com:9200/g'  ./reactivesearch/src/App.js
+fi
+
+if [ "${es_proxy}" != "${default_es_proxy}" ]; then
+  sed -i.bu -E "s#url=\"[^\"]*\"#url=\"${es_proxy}\"#" ./reactivesearch/src/App.js
 fi
 
 if $vector_search; then
