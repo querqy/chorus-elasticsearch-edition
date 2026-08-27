@@ -1,0 +1,38 @@
+{
+  "mappings": {
+    "properties": {
+      "product_vector": {
+        "type": "dense_vector",
+        "dims": 384,
+        "index": true,
+        "similarity": "cosine"
+      },
+      "product_image_vector": {
+        "type": "dense_vector",
+        "dims": 768,
+        "index": true,
+        "similarity": "cosine"
+      }
+    },
+    "dynamic_templates": [
+      {
+        "vector_attributes_768": {
+          "match": "*_768",
+          "mapping": {
+            "type": "dense_vector",
+            "dims": 768
+          }
+        }
+      },
+      {
+        "vector_attributes_384": {
+          "match": "*_384",
+          "mapping": {
+            "type": "dense_vector",
+            "dims": 384
+          }
+        }
+      }
+    ]
+  }
+}

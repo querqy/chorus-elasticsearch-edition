@@ -142,7 +142,16 @@ curl -u 'elastic:ElasticRocks' -X POST "localhost:9200/_security/role/anonymous_
 '
 
 echo -e "${MAJOR}Creating ecommerce index, defining its mapping & settings\n${RESET}"
-curl -u 'elastic:ElasticRocks' -s -X PUT "localhost:9200/ecommerce/" -H 'Content-Type: application/json' --data-binary @./elasticsearch/schema.json
+schema_file=./elasticsearch/schema.json
+if $vector_search; then
+  schema_file=$(mktemp)
+  jq -s '.[0] as $base | .[1] as $vec |
+    $base
+    | .mappings.properties += $vec.mappings.properties
+    | .mappings.dynamic_templates = ($vec.mappings.dynamic_templates + .mappings.dynamic_templates)' \
+    ./elasticsearch/schema.json ./elasticsearch/schema-vector-additions.json > "${schema_file}"
+fi
+curl -u 'elastic:ElasticRocks' -s -X PUT "localhost:9200/ecommerce/" -H 'Content-Type: application/json' --data-binary @"${schema_file}"
 
 if $vector_search; then
   # Populating product data for vector search
