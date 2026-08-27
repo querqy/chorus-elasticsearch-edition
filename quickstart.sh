@@ -35,6 +35,8 @@ offline_lab=false
 local_deploy=true
 vector_search=false
 stop=false
+default_es_proxy="http://localhost:9200"
+es_proxy="${default_es_proxy}"
 
 while [ ! $# -eq 0 ]
 do
@@ -46,6 +48,7 @@ do
       echo -e "Use the option --shutdown | -s to shutdown and remove the Docker containers and data."
       echo -e "Use the option --stop to stop the Docker containers."
       echo -e "Use the option --online-deployment | -online to update configuration to run on chorus-es-edition.dev.o19s.com environment."
+      echo -e "Use the option --es-proxy <url> to point the frontend at an Elasticsearch URL other than ${default_es_proxy}."
 			exit
 			;;
 		--with-observability | -obs)
@@ -63,6 +66,11 @@ do
     --with-vector-search | -vector)
         vector_search=true
         echo -e "${MAJOR}Configuring Chorus with vector search services enabled${RESET}"
+        ;;
+    --es-proxy)
+        es_proxy="$2"
+        echo -e "${MAJOR}Configuring frontend to use Elasticsearch proxy at ${es_proxy}${RESET}"
+        shift
         ;;
     --shutdown | -s)
 			shutdown=true
@@ -91,6 +99,10 @@ if ! $local_deploy; then
   sed -i.bu 's/keycloak:9080/chorus-es-edition.dev.o19s.com:9080/g'  ./keycloak/wait-for-keycloak.sh
   sed -i.bu 's/keycloak:9080/chorus-es-edition.dev.o19s.com:9080/g'  ./docker-compose.yml
   sed -i.bu 's/localhost:9200/chorus-es-edition.dev.o19s.com:9200/g'  ./reactivesearch/src/App.js
+fi
+
+if [ "${es_proxy}" != "${default_es_proxy}" ]; then
+  sed -i.bu -E "s#url=\"[^\"]*\"#url=\"${es_proxy}\"#" ./reactivesearch/src/App.js
 fi
 
 if $vector_search; then
@@ -142,7 +154,16 @@ curl -u 'elastic:ElasticRocks' -X POST "localhost:9200/_security/role/anonymous_
 '
 
 echo -e "${MAJOR}Creating ecommerce index, defining its mapping & settings\n${RESET}"
-curl -u 'elastic:ElasticRocks' -s -X PUT "localhost:9200/ecommerce/" -H 'Content-Type: application/json' --data-binary @./elasticsearch/schema.json
+schema_file=./elasticsearch/schema.json
+if $vector_search; then
+  schema_file=$(mktemp)
+  jq -s '.[0] as $base | .[1] as $vec |
+    $base
+    | .mappings.properties += $vec.mappings.properties
+    | .mappings.dynamic_templates = ($vec.mappings.dynamic_templates + .mappings.dynamic_templates)' \
+    ./elasticsearch/schema.json ./elasticsearch/schema-vector-additions.json > "${schema_file}"
+fi
+curl -u 'elastic:ElasticRocks' -s -X PUT "localhost:9200/ecommerce/" -H 'Content-Type: application/json' --data-binary @"${schema_file}"
 
 if $vector_search; then
   # Populating product data for vector search

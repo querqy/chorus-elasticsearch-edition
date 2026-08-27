@@ -53,7 +53,7 @@ services:
     ports:
       - "9200:9200"
     healthcheck:
-      test: [ "CMD", "wget", "http://localhost:9200" ]
+      test: [ "CMD-SHELL", "curl -s -o /dev/null -w '%{http_code}' -u elastic:$$ELASTIC_PASSWORD http://localhost:9200 | grep -q 200" ]
       interval: 30s
       timeout: 10s
       retries: 50
