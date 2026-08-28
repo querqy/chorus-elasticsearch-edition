@@ -208,6 +208,19 @@ class App extends Component {
             react={{
               and: ["searchbox", "brandfilter", "typefilter"]
             }}
+            defaultQuery={
+              function() {
+                var input = document.querySelector('input[placeholder="Search for products, brands or EAN"]');
+                var hasQuery = input && input.value && input.value.trim() !== "";
+                if (hasQuery) {
+                  return { sort: [] }
+                }
+                return {
+                  query: { match_all: {} },
+                  sort: [{ id: "asc" }]
+                }
+              }
+            }
             style={{ textAlign: "center" }}
             render={({ data }) => (
               <ReactiveList.ResultCardsWrapper>
